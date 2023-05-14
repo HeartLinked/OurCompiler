@@ -67,21 +67,22 @@
 
 
 /* First part of user prologue.  */
-#line 6 "src/sysy.y"
+#line 7 "src/sysy.y"
 
 
 #include <iostream>
 #include <memory>
 #include <string>
+#include "AST.h"
 
 // 声明 lexer 函数和错误处理函数
 int yylex();
-void yyerror(std::unique_ptr<std::string> &ast, const char *s);
+void yyerror(std::unique_ptr<BaseAST> &ast, const char *s);
 
 using namespace std;
 
 
-#line 85 "build/sysy.tab.c"
+#line 86 "build/sysy.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -514,7 +515,7 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    52,    52,    68,    78,    84,    91,    98
+       0,    46,    46,    55,    66,    74,    82,    90
 };
 #endif
 
@@ -687,7 +688,7 @@ do {                                                                      \
 
 static void
 yy_symbol_value_print (FILE *yyo,
-                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, std::unique_ptr<std::string> &ast)
+                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, std::unique_ptr<BaseAST> &ast)
 {
   FILE *yyoutput = yyo;
   YY_USE (yyoutput);
@@ -706,7 +707,7 @@ yy_symbol_value_print (FILE *yyo,
 
 static void
 yy_symbol_print (FILE *yyo,
-                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, std::unique_ptr<std::string> &ast)
+                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, std::unique_ptr<BaseAST> &ast)
 {
   YYFPRINTF (yyo, "%s %s (",
              yykind < YYNTOKENS ? "token" : "nterm", yysymbol_name (yykind));
@@ -745,7 +746,7 @@ do {                                                            \
 
 static void
 yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
-                 int yyrule, std::unique_ptr<std::string> &ast)
+                 int yyrule, std::unique_ptr<BaseAST> &ast)
 {
   int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -807,7 +808,7 @@ int yydebug;
 
 static void
 yydestruct (const char *yymsg,
-            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, std::unique_ptr<std::string> &ast)
+            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, std::unique_ptr<BaseAST> &ast)
 {
   YY_USE (yyvaluep);
   YY_USE (ast);
@@ -837,7 +838,7 @@ int yynerrs;
 `----------*/
 
 int
-yyparse (std::unique_ptr<std::string> &ast)
+yyparse (std::unique_ptr<BaseAST> &ast)
 {
     yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
@@ -1079,60 +1080,67 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* CompUnit: FuncDef  */
-#line 52 "src/sysy.y"
+#line 46 "src/sysy.y"
             {
-    ast = unique_ptr<string>((yyvsp[0].str_val));
+    auto comp_unit = make_unique<CompUnitAST>();
+    comp_unit->func_def = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    ast = move(comp_unit);
   }
-#line 1087 "build/sysy.tab.c"
+#line 1090 "build/sysy.tab.c"
     break;
 
   case 3: /* FuncDef: FuncType IDENT '(' ')' Block  */
-#line 68 "src/sysy.y"
+#line 55 "src/sysy.y"
                                  {
-    auto type = unique_ptr<string>((yyvsp[-4].str_val));
-    auto ident = unique_ptr<string>((yyvsp[-3].str_val));
-    auto block = unique_ptr<string>((yyvsp[0].str_val));
-    (yyval.str_val) = new string(*type + " " + *ident + "() " + *block);
+    auto func_def = new FuncDefAST();
+    func_def->func_type = unique_ptr<BaseAST>((yyvsp[-4].ast_val));
+    func_def->func_name = *unique_ptr<string>((yyvsp[-3].str_val));
+    func_def->func_block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = func_def;
   }
-#line 1098 "build/sysy.tab.c"
+#line 1102 "build/sysy.tab.c"
     break;
 
   case 4: /* FuncType: INT  */
-#line 78 "src/sysy.y"
+#line 66 "src/sysy.y"
         {
-    (yyval.str_val) = new string("int");
+    auto func_type = new FuncTypeAST();
+    func_type -> type = "int";
+    (yyval.ast_val) = func_type;
   }
-#line 1106 "build/sysy.tab.c"
+#line 1112 "build/sysy.tab.c"
     break;
 
   case 5: /* Block: '{' Stmt '}'  */
-#line 84 "src/sysy.y"
+#line 74 "src/sysy.y"
                  {
-    auto stmt = unique_ptr<string>((yyvsp[-1].str_val));
-    (yyval.str_val) = new string("{ " + *stmt + " }");
+    auto block = new BlockAST();
+    block -> stmts = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
+    (yyval.ast_val) = block;
   }
-#line 1115 "build/sysy.tab.c"
+#line 1122 "build/sysy.tab.c"
     break;
 
   case 6: /* Stmt: RETURN Number ';'  */
-#line 91 "src/sysy.y"
+#line 82 "src/sysy.y"
                       {
-    auto number = unique_ptr<string>((yyvsp[-1].str_val));
-    (yyval.str_val) = new string("return " + *number + ";");
-  }
-#line 1124 "build/sysy.tab.c"
-    break;
-
-  case 7: /* Number: INT_CONST  */
-#line 98 "src/sysy.y"
-              {
-    (yyval.str_val) = new string(to_string((yyvsp[0].int_val)));
+    auto stmt = new StmtAST();
+    stmt->stmt_ret = (yyvsp[-1].int_val);
+    (yyval.ast_val) = stmt;
   }
 #line 1132 "build/sysy.tab.c"
     break;
 
+  case 7: /* Number: INT_CONST  */
+#line 90 "src/sysy.y"
+              {
+    
+  }
+#line 1140 "build/sysy.tab.c"
+    break;
 
-#line 1136 "build/sysy.tab.c"
+
+#line 1144 "build/sysy.tab.c"
 
       default: break;
     }
@@ -1325,11 +1333,10 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 103 "src/sysy.y"
+#line 95 "src/sysy.y"
 
 
-// 定义错误处理函数, 其中第二个参数是错误信息
-// parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数
-void yyerror(unique_ptr<string> &ast, const char *s) {
+// 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数
+void yyerror(unique_ptr<BaseAST> &ast, const char *s) {
   cerr << "error: " << s << endl;
 }

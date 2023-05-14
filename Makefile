@@ -8,7 +8,7 @@ TARGET      := $(TARGETDIR)/compiler
 SRCEXT      := cpp
 
 # Flags, Libraries and Includes
-CFLAGS      := -g -Wall -O3 -I$(BUILDDIR)
+CFLAGS      := -g -Wall -O3 -I$(BUILDDIR) -Isrc
 LIB         := 
 INC         := -I$(SRCDIR)
 

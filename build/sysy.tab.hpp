@@ -49,8 +49,9 @@ extern int yydebug;
 
   #include <memory>
   #include <string>
+  #include "AST.h"
 
-#line 54 "build/sysy.tab.hpp"
+#line 55 "build/sysy.tab.hpp"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -73,12 +74,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 30 "src/sysy.y"
+#line 26 "src/sysy.y"
 
   std::string *str_val;
   int int_val;
+  BaseAST *ast_val;   // AST
 
-#line 82 "build/sysy.tab.hpp"
+#line 84 "build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -90,7 +92,7 @@ typedef union YYSTYPE YYSTYPE;
 extern YYSTYPE yylval;
 
 
-int yyparse (std::unique_ptr<std::string> &ast);
+int yyparse (std::unique_ptr<BaseAST> &ast);
 
 
 #endif /* !YY_YY_BUILD_SYSY_TAB_HPP_INCLUDED  */
