@@ -1,2 +1,4 @@
-funcdef
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { StmtAST { 0 } } } }
+PARSEAST
+fun @main(): i32 {
+   ret 0
+}

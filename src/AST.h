@@ -9,18 +9,25 @@ class BaseAST {
     virtual ~BaseAST() = default;
 
     virtual void Dump() const = 0;
+
+    virtual void Traverse() const = 0;
 };
 
 // CompUnit := FuncDef
 class CompUnitAST : public BaseAST {
   public:
-    // 用智能指针管理对象
+    // 程序目前只由一个函数组成
     std::unique_ptr<BaseAST> func_def;
 
     void Dump() const override {
         std::cout << "CompUnitAST { ";
         func_def->Dump();
         std::cout << " }";
+    }
+
+    void Traverse() const override {
+        // Dump();  这里疑似暂时不用输出
+        func_def->Traverse();
     }
 };
 
@@ -32,10 +39,7 @@ class FuncDefAST : public BaseAST {
     std::unique_ptr<BaseAST> func_type;
     // 函数名
     std::string func_name;
-    // 函数参数列表
-    // std::vector<std::pair<std::string, std::string>> arglist;
-    // 函数体
-    // std::unique_ptr<BaseAST> funcbody;
+    // 函数内目前只有一个入口基本块
     std::unique_ptr<BaseAST> func_block;
 
     void Dump() const override {
@@ -46,6 +50,19 @@ class FuncDefAST : public BaseAST {
         func_block->Dump();
         std::cout << " }";
     }
+
+    void Traverse() const override {
+        cout << "fun @" << func_name << "(): ";
+        func_type->Traverse();
+        cout << "{" << endl;
+        func_block->Traverse();
+        cout << "}" << endl;
+    }
+
+    // 函数参数列表
+    // std::vector<std::pair<std::string, std::string>> arglist;
+    // 函数体
+    // std::unique_ptr<BaseAST> funcbody;
 };
 
 class FuncTypeAST : public BaseAST {
@@ -57,6 +74,54 @@ class FuncTypeAST : public BaseAST {
         std::cout << "FuncTypeAST { ";
         std::cout << type;
         std::cout << " }";
+    }
+
+    void Traverse() const override {
+        if(type == "int") {
+            cout << "i32 ";
+        }
+        else {
+            // TODO
+        }
+    }
+};
+
+// Block := '{' Stmt* '}'
+// Block := '{' Stmt '}'
+class BlockAST : public BaseAST {
+  public:
+    // 块内的语句，目前只有一条返回指令
+    std::unique_ptr<BaseAST> stmts;
+
+    void Dump() const override {
+        std::cout << "BlockAST { ";
+        stmts->Dump();
+        std::cout << " }";
+    }
+
+    void Traverse() const override {
+        stmts->Traverse();
+    }
+
+    // std::vector<std::unique_ptr<BaseAST>> stmts;
+};
+
+// Stmt := "return" Number ";"
+class StmtAST : public BaseAST {
+  public:
+    // 返回值, 目前只有 int 类型
+    int stmt_ret;
+
+    void Dump() const override {
+        std::cout << "StmtAST { ";
+        std::cout << stmt_ret;
+        std::cout << " }";
+    }
+
+    void Traverse() const override {
+        cout << "   ret ";
+        cout << stmt_ret;
+        cout << endl;
     }
 };
 
@@ -86,31 +151,3 @@ class ArgAST : public BaseAST {
     std::string ident;
 };
 */
-
-// Block := '{' Stmt* '}'
-// Block := '{' Stmt '}'
-class BlockAST : public BaseAST {
-  public:
-    // 块内的语句
-    // std::vector<std::unique_ptr<BaseAST>> stmts;
-    std::unique_ptr<BaseAST> stmts;
-
-    void Dump() const override {
-        std::cout << "BlockAST { ";
-        stmts->Dump();
-        std::cout << " }";
-    }
-};
-
-// Stmt := "return" Number ";"
-class StmtAST : public BaseAST {
-  public:
-    // 返回值
-    int stmt_ret;
-
-    void Dump() const override {
-        std::cout << "StmtAST { ";
-        std::cout << stmt_ret;
-        std::cout << " }";
-    }
-};
