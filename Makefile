@@ -8,7 +8,7 @@ TARGET      := $(TARGETDIR)/compiler
 SRCEXT      := cpp
 
 # Flags, Libraries and Includes
-CFLAGS      := -g -Wall -O3 -I$(BUILDDIR) -Isrc
+CFLAGS      := -g -Wall -O3 -I$(BUILDDIR) -Isrc -MMD -MP
 LIB         := 
 INC         := -I$(SRCDIR)
 
@@ -18,6 +18,7 @@ INC         := -I$(SRCDIR)
 
 SOURCES     := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+DEPS        := $(OBJECTS:.o=.d)
 
 # Defining a rule for flex and bison
 LEX         := flex
@@ -56,6 +57,9 @@ directories:
 clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
+
+# Include dependencies
+-include $(DEPS)
 
 # Non-File Targets
 .PHONY: all remake clean

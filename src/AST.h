@@ -9,9 +9,6 @@ class BaseAST {
     virtual ~BaseAST() = default;
 
     virtual void Dump() const = 0;
-    // void Dump() {
-    //     cout << "DUMP" << endl;
-    // }
 };
 
 // CompUnit := FuncDef
@@ -21,15 +18,10 @@ class CompUnitAST : public BaseAST {
     std::unique_ptr<BaseAST> func_def;
 
     void Dump() const override {
-        std::cout << "CompUnitAST {";
-        //  func_def->Dump();
-        std::cout << "}";
-    } 
-    // void Dump() {
-    //     std::cout << "CompUnitAST {";
-    //     //  func_def->Dump();
-    //     std::cout << "}";
-    // } 
+        std::cout << "CompUnitAST { ";
+        func_def->Dump();
+        std::cout << " }";
+    }
 };
 
 // FuncDef := FuncType IDENT '(' ')' Block
@@ -46,14 +38,14 @@ class FuncDefAST : public BaseAST {
     // std::unique_ptr<BaseAST> funcbody;
     std::unique_ptr<BaseAST> func_block;
 
-  /*  void Dump() const override {
-        std::cout << "FuncDefAST {";
+    void Dump() const override {
+        std::cout << "FuncDefAST { ";
         func_type->Dump();
-        std::cout << ", " << func_name;
+        std::cout << ", " << func_name << ", ";
         // std::cout << "arglist: " << arglist << std::endl;
         func_block->Dump();
-        std::cout << "}";
-    }  */
+        std::cout << " }";
+    }
 };
 
 class FuncTypeAST : public BaseAST {
@@ -61,11 +53,11 @@ class FuncTypeAST : public BaseAST {
     // 函数返回值类型
     std::string type;
 
-   /* void Dump() const override {
-        std::cout << "FuncTypeAST {";
+    void Dump() const override {
+        std::cout << "FuncTypeAST { ";
         std::cout << type;
-        std::cout << "}";
-    } */
+        std::cout << " }";
+    }
 };
 
 /*
@@ -103,11 +95,11 @@ class BlockAST : public BaseAST {
     // std::vector<std::unique_ptr<BaseAST>> stmts;
     std::unique_ptr<BaseAST> stmts;
 
-  /*  void Dump() const override {
-        std::cout << "BlockAST {";
+    void Dump() const override {
+        std::cout << "BlockAST { ";
         stmts->Dump();
-        std::cout << "}";
-    }  */
+        std::cout << " }";
+    }
 };
 
 // Stmt := "return" Number ";"
@@ -116,9 +108,9 @@ class StmtAST : public BaseAST {
     // 返回值
     int stmt_ret;
 
-    /* void Dump() const override {
-        std::cout << "StmtAST {";
+    void Dump() const override {
+        std::cout << "StmtAST { ";
         std::cout << stmt_ret;
-        std::cout << "}";
-    }  */
+        std::cout << " }";
+    }
 };

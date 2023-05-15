@@ -515,7 +515,7 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    46,    46,    55,    66,    74,    82,    90
+       0,    46,    46,    55,    67,    76,    84,    92
 };
 #endif
 
@@ -1092,55 +1092,57 @@ yyreduce:
   case 3: /* FuncDef: FuncType IDENT '(' ')' Block  */
 #line 55 "src/sysy.y"
                                  {
+    cout << "funcdef" << endl;
     auto func_def = new FuncDefAST();
     func_def->func_type = unique_ptr<BaseAST>((yyvsp[-4].ast_val));
     func_def->func_name = *unique_ptr<string>((yyvsp[-3].str_val));
     func_def->func_block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = func_def;
   }
-#line 1102 "build/sysy.tab.c"
+#line 1103 "build/sysy.tab.c"
     break;
 
   case 4: /* FuncType: INT  */
-#line 66 "src/sysy.y"
+#line 67 "src/sysy.y"
         {
+    // cout << "INT" << endl;
     auto func_type = new FuncTypeAST();
     func_type -> type = "int";
     (yyval.ast_val) = func_type;
   }
-#line 1112 "build/sysy.tab.c"
+#line 1114 "build/sysy.tab.c"
     break;
 
   case 5: /* Block: '{' Stmt '}'  */
-#line 74 "src/sysy.y"
+#line 76 "src/sysy.y"
                  {
     auto block = new BlockAST();
     block -> stmts = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     (yyval.ast_val) = block;
   }
-#line 1122 "build/sysy.tab.c"
+#line 1124 "build/sysy.tab.c"
     break;
 
   case 6: /* Stmt: RETURN Number ';'  */
-#line 82 "src/sysy.y"
+#line 84 "src/sysy.y"
                       {
     auto stmt = new StmtAST();
     stmt->stmt_ret = (yyvsp[-1].int_val);
     (yyval.ast_val) = stmt;
   }
-#line 1132 "build/sysy.tab.c"
+#line 1134 "build/sysy.tab.c"
     break;
 
   case 7: /* Number: INT_CONST  */
-#line 90 "src/sysy.y"
+#line 92 "src/sysy.y"
               {
     
   }
-#line 1140 "build/sysy.tab.c"
+#line 1142 "build/sysy.tab.c"
     break;
 
 
-#line 1144 "build/sysy.tab.c"
+#line 1146 "build/sysy.tab.c"
 
       default: break;
     }
@@ -1333,7 +1335,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 95 "src/sysy.y"
+#line 97 "src/sysy.y"
 
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数

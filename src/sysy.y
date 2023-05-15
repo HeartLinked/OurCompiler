@@ -53,6 +53,7 @@ CompUnit
 // FuncDef := FuncType IDENT '(' ')' Block
 FuncDef
   : FuncType IDENT '(' ')' Block {
+    cout << "funcdef" << endl;
     auto func_def = new FuncDefAST();
     func_def->func_type = unique_ptr<BaseAST>($1);
     func_def->func_name = *unique_ptr<string>($2);
@@ -64,6 +65,7 @@ FuncDef
 
 FuncType
   : INT {
+    // cout << "INT" << endl;
     auto func_type = new FuncTypeAST();
     func_type -> type = "int";
     $$ = func_type;

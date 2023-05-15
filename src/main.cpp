@@ -27,17 +27,15 @@ int main(int argc, const char *argv[]) {
   yyin = fopen(input, "r");
   assert(yyin); */
   freopen("test.out", "w", stdout);
-  cout << "QAQ1" << endl;
   yyin = fopen("hello.c", "r");
-  cout << "QAQ2" << endl;
   // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
   unique_ptr<BaseAST> ast;
-  cout << "QAQ3" << endl;
+
   auto ret = yyparse(ast);
-  cout << "QAQ4" << endl;
+  // cout << "QAQ1" << endl;
   
   assert(!ret);
-  cout << "QAQ7" << endl;
+  // cout << "QAQ4" << endl;
 
   // dump AST
   ast->Dump();
