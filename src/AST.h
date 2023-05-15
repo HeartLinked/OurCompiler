@@ -107,14 +107,22 @@ class BlockAST : public BaseAST {
 };
 
 // Stmt := "return" Number ";"
+// Stmt := "return" Exp ";"
 class StmtAST : public BaseAST {
   public:
     // 返回值, 目前只有 int 类型
     int stmt_ret;
 
+    std::unique_ptr<BaseAST> exp;
+
     void Dump() const override {
         std::cout << "StmtAST { ";
-        std::cout << stmt_ret;
+        if(exp != nullptr) {
+            exp->Dump();
+        }
+        else {
+            std::cout << " " << stmt_ret << " ";
+        }
         std::cout << " }";
     }
 
@@ -124,6 +132,75 @@ class StmtAST : public BaseAST {
         cout << endl;
     }
 };
+
+// Exp := UnaryExp
+class ExpAST : public BaseAST {
+  public:
+    // 目前只支持一元表达式
+    std::unique_ptr<BaseAST> unary_exp;
+
+    void Dump() const override {
+        std::cout << "Exp { ";
+        unary_exp->Dump();
+        std::cout << " }";
+    }
+
+    void Traverse() const override {
+        unary_exp->Traverse();
+    }
+};
+
+// PrimaryExp := '(' Exp ')'
+// PrimaryExp := Number
+class PrimaryExpAST : public BaseAST {
+  public:
+    
+    std::unique_ptr<BaseAST> exp;
+
+    int number;
+
+    void Dump() const override {
+        std::cout << "PrimaryExp { ";
+        if(exp != nullptr) {
+            exp->Dump();
+        }
+        else {
+            std::cout << " " << number << " ";
+        }
+        std::cout << " }";
+    }
+
+    void Traverse() const override {
+        // cout << prim;
+    }
+};
+
+class UnaryExpAST : public BaseAST {
+  public:
+    // 目前只支持一元表达式
+    std::unique_ptr<BaseAST> primary_exp;
+
+    std::string unary_op;
+
+    std::unique_ptr<BaseAST> unary_exp;
+
+    void Dump() const override {
+        std::cout << "UnaryExp { ";
+        if (primary_exp != nullptr) {
+            primary_exp->Dump();
+        }
+        else {
+            std::cout << unary_op << " ";
+            unary_exp->Dump();
+        }
+        std::cout << " }";
+    }
+
+    void Traverse() const override {
+        primary_exp->Traverse();
+    }
+};
+
 
 /*
 // FuncBody := (Decl | Stmt)*

@@ -36,8 +36,10 @@ using namespace std;
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
-%type <ast_val> FuncDef FuncType Block Stmt 
+%type <ast_val> FuncDef FuncType Block Stmt PrimaryExp UnaryExp Exp
+%type <str_val> UnaryOp
 %type <int_val> Number
+
 
 %%
 
@@ -85,14 +87,62 @@ Stmt
     stmt->stmt_ret = $2;
     $$ = stmt;
   }
-  ;
-
-Number
-  : INT_CONST {
-    
+  | RETURN Exp ';' {
+    auto stmt = new StmtAST();
+    stmt->exp = unique_ptr<BaseAST>($2);
+    $$ = stmt;
   }
   ;
 
+
+Exp
+  : UnaryExp {
+    auto exp = new ExpAST();
+    exp -> unary_exp = unique_ptr<BaseAST>($1);
+    $$ = exp;
+  }
+  ;
+
+PrimaryExp
+  : '(' Exp ')' {
+    auto primary_exp = new PrimaryExpAST();
+    primary_exp -> exp = unique_ptr<BaseAST>($2);
+    $$ = primary_exp;
+  }
+  | Number {
+    auto primary_exp = new PrimaryExpAST();
+    primary_exp -> number = $1;
+    $$ = primary_exp;
+  }
+
+UnaryExp
+  : PrimaryExp {
+    auto unary_exp = new UnaryExpAST();
+    unary_exp -> primary_exp = unique_ptr<BaseAST>($1);
+    $$ = unary_exp;
+  }
+  | UnaryOp UnaryExp{
+    auto unary_exp = new UnaryExpAST();
+    unary_exp -> unary_op = *($1);
+    unary_exp -> unary_exp = unique_ptr<BaseAST>($2);
+    $$ = unary_exp;
+  }
+
+UnaryOp
+  : '+' {
+    $$ = new string("+");
+  }
+  | '-' {
+    $$ = new string("-");
+  } 
+  | '!' {
+    $$ = new string("!");
+  }
+  ;
+
+
+Number
+  : INT_CONST ;
 %%
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数

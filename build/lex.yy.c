@@ -698,7 +698,7 @@ YY_DECL
 		}
 
 	{
-#line 31 "src/sysy.l"
+#line 32 "src/sysy.l"
 
 
 #line 705 "build/lex.yy.c"
@@ -761,58 +761,58 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 33 "src/sysy.l"
+#line 34 "src/sysy.l"
 { /* 忽略, 不做任何操作 */ }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 34 "src/sysy.l"
+#line 35 "src/sysy.l"
 { /* 忽略, 不做任何操作 */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "src/sysy.l"
+#line 36 "src/sysy.l"
 { /* 忽略, 不做任何操作 */ }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 38 "src/sysy.l"
+#line 39 "src/sysy.l"
 { return INT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 39 "src/sysy.l"
+#line 40 "src/sysy.l"
 { return RETURN; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 41 "src/sysy.l"
+#line 42 "src/sysy.l"
 { yylval.str_val = new string(yytext); return IDENT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 43 "src/sysy.l"
+#line 44 "src/sysy.l"
 { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 44 "src/sysy.l"
+#line 45 "src/sysy.l"
 { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 45 "src/sysy.l"
+#line 46 "src/sysy.l"
 { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 47 "src/sysy.l"
+#line 48 "src/sysy.l"
 { return yytext[0]; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 49 "src/sysy.l"
+#line 50 "src/sysy.l"
 ECHO;
 	YY_BREAK
 #line 819 "build/lex.yy.c"
@@ -1783,6 +1783,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 49 "src/sysy.l"
+#line 50 "src/sysy.l"
 
 

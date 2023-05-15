@@ -35,8 +35,8 @@ int main(int argc, const char *argv[]) {
   auto ret = yyparse(ast);
   assert(!ret);
 
-  ParseAST(ast);
+  // ParseAST(ast);
 
-  // ast->Dump();
+  ast->Dump();
   return 0;
 }

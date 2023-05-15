@@ -1,4 +1,1 @@
-PARSEAST
-fun @main(): i32 {
-   ret 0
-}
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { StmtAST { Exp { UnaryExp { + UnaryExp { PrimaryExp { Exp { UnaryExp { - UnaryExp { - UnaryExp { ! UnaryExp { PrimaryExp {  6  } } } } } } } } } } } } } }

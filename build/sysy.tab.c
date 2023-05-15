@@ -122,13 +122,20 @@ enum yysymbol_kind_t
   YYSYMBOL_9_ = 9,                         /* '{'  */
   YYSYMBOL_10_ = 10,                       /* '}'  */
   YYSYMBOL_11_ = 11,                       /* ';'  */
-  YYSYMBOL_YYACCEPT = 12,                  /* $accept  */
-  YYSYMBOL_CompUnit = 13,                  /* CompUnit  */
-  YYSYMBOL_FuncDef = 14,                   /* FuncDef  */
-  YYSYMBOL_FuncType = 15,                  /* FuncType  */
-  YYSYMBOL_Block = 16,                     /* Block  */
-  YYSYMBOL_Stmt = 17,                      /* Stmt  */
-  YYSYMBOL_Number = 18                     /* Number  */
+  YYSYMBOL_12_ = 12,                       /* '+'  */
+  YYSYMBOL_13_ = 13,                       /* '-'  */
+  YYSYMBOL_14_ = 14,                       /* '!'  */
+  YYSYMBOL_YYACCEPT = 15,                  /* $accept  */
+  YYSYMBOL_CompUnit = 16,                  /* CompUnit  */
+  YYSYMBOL_FuncDef = 17,                   /* FuncDef  */
+  YYSYMBOL_FuncType = 18,                  /* FuncType  */
+  YYSYMBOL_Block = 19,                     /* Block  */
+  YYSYMBOL_Stmt = 20,                      /* Stmt  */
+  YYSYMBOL_Exp = 21,                       /* Exp  */
+  YYSYMBOL_PrimaryExp = 22,                /* PrimaryExp  */
+  YYSYMBOL_UnaryExp = 23,                  /* UnaryExp  */
+  YYSYMBOL_UnaryOp = 24,                   /* UnaryOp  */
+  YYSYMBOL_Number = 25                     /* Number  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -456,16 +463,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   10
+#define YYLAST   19
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  12
+#define YYNTOKENS  15
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  7
+#define YYNRULES  16
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  17
+#define YYNSTATES  30
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   261
@@ -485,8 +492,8 @@ static const yytype_int8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       7,     8,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    14,     2,     2,     2,     2,     2,     2,
+       7,     8,     2,    12,     2,    13,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,    11,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -513,9 +520,10 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    55,    66,    75,    83,    91
+       0,    48,    48,    57,    68,    77,    85,    90,    99,   107,
+     112,   119,   124,   132,   135,   138,   145
 };
 #endif
 
@@ -532,8 +540,9 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "INT", "RETURN",
-  "IDENT", "INT_CONST", "'('", "')'", "'{'", "'}'", "';'", "$accept",
-  "CompUnit", "FuncDef", "FuncType", "Block", "Stmt", "Number", YY_NULLPTR
+  "IDENT", "INT_CONST", "'('", "')'", "'{'", "'}'", "';'", "'+'", "'-'",
+  "'!'", "$accept", "CompUnit", "FuncDef", "FuncType", "Block", "Stmt",
+  "Exp", "PrimaryExp", "UnaryExp", "UnaryOp", "Number", YY_NULLPTR
 };
 
 static const char *
@@ -543,7 +552,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-7)
+#define YYPACT_NINF (-9)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -557,8 +566,9 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -7,     1,    -7,    -2,    -7,    -5,    -4,    -1,     2,
-      -7,     3,     0,    -7,    -6,    -7,    -7
+      -1,    -9,     3,    -9,     0,    -9,    -3,     1,     2,     6,
+      -9,    -6,     4,    -9,    -6,    -9,    -9,    -9,     5,    -9,
+      -9,    -6,     7,    -9,     9,    -9,    -9,    -9,    -9,    -9
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -567,19 +577,22 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     4,     0,     2,     0,     1,     0,     0,     0,     0,
-       3,     0,     0,     7,     0,     5,     6
+       3,     0,     0,    16,     0,    13,    14,    15,     0,    11,
+       8,     0,     0,     5,     0,    10,     7,    12,     6,     9
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -7,    -7,    -7,    -7,    -7,    -7,    -7
+      -9,    -9,    -9,    -9,    -9,    -9,    -2,    -9,    -8,    -9,
+       8
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,    10,    12,    14
+       0,     2,     3,     4,    10,    12,    18,    19,    20,    21,
+      25
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -587,34 +600,37 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     5,     7,     6,     8,    16,    11,     0,     9,    13,
-      15
+      13,    14,     1,     5,     7,     6,    15,    16,    17,     8,
+      11,     9,    24,    27,    23,     0,    26,    29,    28,    22
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     7,     5,     8,    11,     4,    -1,     9,     6,
-      10
+       6,     7,     3,     0,     7,     5,    12,    13,    14,     8,
+       4,     9,    14,    21,    10,    -1,    11,     8,    11,    11
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    13,    14,    15,     0,     5,     7,     8,     9,
-      16,     4,    17,     6,    18,    10,    11
+       0,     3,    16,    17,    18,     0,     5,     7,     8,     9,
+      19,     4,    20,     6,     7,    12,    13,    14,    21,    22,
+      23,    24,    25,    10,    21,    25,    11,    23,    11,     8
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    12,    13,    14,    15,    16,    17,    18
+       0,    15,    16,    17,    18,    19,    20,    20,    21,    22,
+      22,    23,    23,    24,    24,    24,    25
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     5,     1,     3,     3,     1
+       0,     2,     1,     5,     1,     3,     3,     3,     1,     3,
+       1,     1,     2,     1,     1,     1,     1
 };
 
 
@@ -1080,17 +1096,17 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* CompUnit: FuncDef  */
-#line 46 "src/sysy.y"
+#line 48 "src/sysy.y"
             {
     auto comp_unit = make_unique<CompUnitAST>();
     comp_unit->func_def = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     ast = move(comp_unit);
   }
-#line 1090 "build/sysy.tab.c"
+#line 1106 "build/sysy.tab.c"
     break;
 
   case 3: /* FuncDef: FuncType IDENT '(' ')' Block  */
-#line 55 "src/sysy.y"
+#line 57 "src/sysy.y"
                                  {
     auto func_def = new FuncDefAST();
     func_def->func_type = unique_ptr<BaseAST>((yyvsp[-4].ast_val));
@@ -1098,50 +1114,127 @@ yyreduce:
     func_def->func_block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = func_def;
   }
-#line 1102 "build/sysy.tab.c"
+#line 1118 "build/sysy.tab.c"
     break;
 
   case 4: /* FuncType: INT  */
-#line 66 "src/sysy.y"
+#line 68 "src/sysy.y"
         {
     // cout << "INT" << endl;
     auto func_type = new FuncTypeAST();
     func_type -> type = "int";
     (yyval.ast_val) = func_type;
   }
-#line 1113 "build/sysy.tab.c"
+#line 1129 "build/sysy.tab.c"
     break;
 
   case 5: /* Block: '{' Stmt '}'  */
-#line 75 "src/sysy.y"
+#line 77 "src/sysy.y"
                  {
     auto block = new BlockAST();
     block -> stmts = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     (yyval.ast_val) = block;
   }
-#line 1123 "build/sysy.tab.c"
+#line 1139 "build/sysy.tab.c"
     break;
 
   case 6: /* Stmt: RETURN Number ';'  */
-#line 83 "src/sysy.y"
+#line 85 "src/sysy.y"
                       {
     auto stmt = new StmtAST();
     stmt->stmt_ret = (yyvsp[-1].int_val);
     (yyval.ast_val) = stmt;
   }
-#line 1133 "build/sysy.tab.c"
+#line 1149 "build/sysy.tab.c"
     break;
 
-  case 7: /* Number: INT_CONST  */
-#line 91 "src/sysy.y"
-              {
-    
+  case 7: /* Stmt: RETURN Exp ';'  */
+#line 90 "src/sysy.y"
+                   {
+    auto stmt = new StmtAST();
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
+    (yyval.ast_val) = stmt;
   }
-#line 1141 "build/sysy.tab.c"
+#line 1159 "build/sysy.tab.c"
+    break;
+
+  case 8: /* Exp: UnaryExp  */
+#line 99 "src/sysy.y"
+             {
+    auto exp = new ExpAST();
+    exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = exp;
+  }
+#line 1169 "build/sysy.tab.c"
+    break;
+
+  case 9: /* PrimaryExp: '(' Exp ')'  */
+#line 107 "src/sysy.y"
+                {
+    auto primary_exp = new PrimaryExpAST();
+    primary_exp -> exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
+    (yyval.ast_val) = primary_exp;
+  }
+#line 1179 "build/sysy.tab.c"
+    break;
+
+  case 10: /* PrimaryExp: Number  */
+#line 112 "src/sysy.y"
+           {
+    auto primary_exp = new PrimaryExpAST();
+    primary_exp -> number = (yyvsp[0].int_val);
+    (yyval.ast_val) = primary_exp;
+  }
+#line 1189 "build/sysy.tab.c"
+    break;
+
+  case 11: /* UnaryExp: PrimaryExp  */
+#line 119 "src/sysy.y"
+               {
+    auto unary_exp = new UnaryExpAST();
+    unary_exp -> primary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = unary_exp;
+  }
+#line 1199 "build/sysy.tab.c"
+    break;
+
+  case 12: /* UnaryExp: UnaryOp UnaryExp  */
+#line 124 "src/sysy.y"
+                    {
+    auto unary_exp = new UnaryExpAST();
+    unary_exp -> unary_op = *((yyvsp[-1].str_val));
+    unary_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = unary_exp;
+  }
+#line 1210 "build/sysy.tab.c"
+    break;
+
+  case 13: /* UnaryOp: '+'  */
+#line 132 "src/sysy.y"
+        {
+    (yyval.str_val) = new string("+");
+  }
+#line 1218 "build/sysy.tab.c"
+    break;
+
+  case 14: /* UnaryOp: '-'  */
+#line 135 "src/sysy.y"
+        {
+    (yyval.str_val) = new string("-");
+  }
+#line 1226 "build/sysy.tab.c"
+    break;
+
+  case 15: /* UnaryOp: '!'  */
+#line 138 "src/sysy.y"
+        {
+    (yyval.str_val) = new string("!");
+  }
+#line 1234 "build/sysy.tab.c"
     break;
 
 
-#line 1145 "build/sysy.tab.c"
+#line 1238 "build/sysy.tab.c"
 
       default: break;
     }
@@ -1334,7 +1427,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 96 "src/sysy.y"
+#line 146 "src/sysy.y"
 
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数
