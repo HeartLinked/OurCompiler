@@ -1,4 +1,5 @@
 #include "AST.h"
+#include "CodeGen.h"
 #include <cassert>
 #include <cstdio>
 #include <ctime>
@@ -17,6 +18,9 @@ extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 extern void ParseAST(unique_ptr<BaseAST> &ast);
 
+SymbolTable symbolTable;
+
+
 int main(int argc, const char *argv[]) {
     // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
     // compiler 模式 输入文件 -o 输出文件
@@ -31,7 +35,6 @@ int main(int argc, const char *argv[]) {
 
     std::cout.setf(std::ios::unitbuf);
 
-
     freopen("test.out", "w", stdout);
     yyin = fopen("hello.c", "r");
     // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
@@ -44,7 +47,7 @@ int main(int argc, const char *argv[]) {
 
     cout << endl;
 
-    // ParseAST(ast);
+    ParseAST(ast);
 
     cout << endl;
 

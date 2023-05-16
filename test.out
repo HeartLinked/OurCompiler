@@ -1,3 +1,14 @@
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { x, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { y, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } } } } } } } } },  } } }
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { x, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { y, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { y } } } } } } } } } } } },  } } }
+fun @main(): i32 {
+   %0 = add 0, 1
+   %1 = add 0, 1
+   %2 = add %0, %1
+   %3 = add 0, 1
+   %4 = add 0, 1
+   %5 = add %3, %4
+ get yfrom table as symbol5
+   ret  %5
 
-当前时间：2023-05-16 18:45:20
+}
+
+当前时间：2023-05-16 20:23:17

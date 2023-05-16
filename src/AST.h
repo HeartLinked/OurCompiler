@@ -2,12 +2,47 @@
 
 #include <iostream>
 #include <memory>
+#include <unordered_map>
 #include <vector>
+
 using namespace std;
 
 extern int cnt;
 
 int gen();
+
+class SymbolTable {
+  public:
+    // 插入新符号，如果符号已经存在，返回 false，否则返回 true
+    bool insertSymbol(const std::string &name, std::string value) {
+        // 如果符号已经存在，返回 false
+        if (table.find(name) != table.end()) {
+            return false;
+        }
+        // 插入新符号
+        table[name] = value;
+        return true;
+    }
+
+    // 检查符号是否存在
+    bool exists(const std::string &name) const {
+        return table.find(name) != table.end();
+    }
+
+    // 获取符号的值，如果符号不存在，抛出异常
+    std::string getSymbol(const std::string &name) const {
+        auto iter = table.find(name);
+        if (iter == table.end()) {
+            throw std::runtime_error("Symbol not found: " + name);
+        }
+        return iter->second;
+    }
+
+  private:
+    std::unordered_map<std::string, std::string> table;
+};
+
+extern SymbolTable symbolTable;
 
 // 所有 AST 的基类
 class BaseAST {
@@ -69,12 +104,6 @@ class FuncDefAST : public BaseAST {
         cout << "}" << endl;
         return -1;
     }
-
-    // FuncDef := Type Ident '(' ArgList ')' '{' FuncBody '}'
-    // 函数参数列表
-    // std::vector<std::pair<std::string, std::string>> arglist;
-    // 函数体
-    // std::unique_ptr<BaseAST> funcbody;
 };
 
 // Decl := ConstDecl
@@ -103,7 +132,7 @@ class ConstDeclAST : public BaseAST {
     // 常量类型
     std::unique_ptr<BaseAST> b_type;
     // 常量定义
-    std::unique_ptr<vector<unique_ptr<BaseAST>> > const_defs;
+    std::unique_ptr<vector<unique_ptr<BaseAST>>> const_defs;
 
     void Dump() const override {
         cerr << "Dump ConstDecl" << endl;
@@ -118,11 +147,11 @@ class ConstDeclAST : public BaseAST {
     }
 
     int Traverse() const override {
-     /*   cerr << "Traverse ConstDecl" << endl;
-        for (auto &const_def : const_defs) {
+        cerr << "Traverse ConstDecl" << endl;
+        for (auto &const_def : *const_defs) {
             const_def->Traverse();
         }
-        return -1;*/
+        return -1;
     }
 };
 
@@ -140,13 +169,13 @@ class BTypeAST : public BaseAST {
     }
 
     int Traverse() const override {
-    /*    cerr << "Traverse BtypeAST" << endl;
-        if (btype == "int") {
-            cout << "i32 ";
-        } else {
-            // TODO
-        }
-        return -1;  */
+        /*    cerr << "Traverse BtypeAST" << endl;
+            if (btype == "int") {
+                cout << "i32 ";
+            } else {
+                // TODO
+            }
+            return -1;  */
     }
 };
 
@@ -167,11 +196,12 @@ class ConstDefAST : public BaseAST {
     }
 
     int Traverse() const override {
-     /*  cerr << "Traverse ConstDef" << endl;
-        cout << "@" << const_name << " = ";
-        const_init_val->Traverse();
-        cout << endl;
-        return -1; */
+        cerr << "Traverse ConstDef" << endl;
+        int x = const_init_val->Traverse();
+        // Insert const paramter const_name with symbol '%x'
+        symbolTable.insertSymbol(const_name, "%" + to_string(x));
+        // cout << "Insert" << const_name << " as %" << x << endl;
+        return -1;
     }
 };
 
@@ -189,13 +219,11 @@ class ConstInitValAST : public BaseAST {
     }
 
     int Traverse() const override {
-      /*  cerr << "Traverse ConstInitValAST" << endl;
-        const_exp->Traverse();
-        return -1;  */
+        cerr << "Traverse ConstInitValAST" << endl;
+        int x = const_exp->Traverse();
+        return x;
     }
 };
-
-
 
 // ------------------------------
 
@@ -223,12 +251,10 @@ class FuncTypeAST : public BaseAST {
     }
 };
 
-// Block := '{' Stmt '}'
+// Block := '{' {BlockItem} '}'
 class BlockAST : public BaseAST {
   public:
-    // 块内的语句，目前只有一条返回指令
-    // std::unique_ptr<BaseAST> block_item;
-    std::unique_ptr<vector<unique_ptr<BaseAST>> > block_items;
+    std::unique_ptr<vector<unique_ptr<BaseAST>>> block_items;
 
     void Dump() const override {
         cerr << "Dump BlockAST" << endl;
@@ -241,12 +267,12 @@ class BlockAST : public BaseAST {
     }
 
     int Traverse() const override {
-      /* cerr << "Traverse BlockAST" << endl;
-        block_item->Traverse();
-        return -1; */
+        cerr << "Traverse BlockAST" << endl;
+        for (auto &item : *block_items) {
+            item->Traverse();
+        }
+        return -1;
     }
-
-    // std::vector<std::unique_ptr<BaseAST>> stmts;
 };
 
 // BlockItem := Decl | Stmt
@@ -270,13 +296,13 @@ class BlockItemAST : public BaseAST {
     }
 
     int Traverse() const override {
-      /*  cerr << "Traverse BlockItemAST" << endl;
-        if (decl) {
+        cerr << "Traverse BlockItemAST" << endl;
+        if (mode == 1) {
             decl->Traverse();
         } else {
             stmt->Traverse();
         }
-        return -1; */
+        return -1;
     }
 };
 
@@ -336,9 +362,11 @@ class LValAST : public BaseAST {
     }
 
     int Traverse() const override {
-    /*    cerr << "Traverse Lval" << endl;
-        cout << "   %" << name;
-        return -1;   */
+        cerr << "Traverse Lval" << endl;
+        string symbol = symbolTable.getSymbol(name);
+        int x = stoi(symbol.substr(1));
+        // cout << " get " << name << "from table as symbol" << x << endl;
+        return x;
     }
 };
 
@@ -359,7 +387,7 @@ class PrimaryExpAST : public BaseAST {
         std::cout << "PrimaryExp { ";
         if (mode == 1) {
             exp->Dump();
-        } else if(mode == 3){
+        } else if (mode == 3) {
             std::cout << " " << number << " ";
         } else {
             lval->Dump();
@@ -372,12 +400,13 @@ class PrimaryExpAST : public BaseAST {
         if (mode == 1) {
             int x = exp->Traverse();
             return x;
-        } else if(mode == 3){
+        } else if (mode == 3) {
             int x = gen();
             cout << "   %" << x << " = add 0, " << number << endl;
             return x;
         } else {
-          // TODO: lval
+            int x = lval->Traverse();
+            return x;
         }
     }
 };
@@ -452,24 +481,24 @@ class MulExpAST : public BaseAST {
     }
 
     int Traverse() const override {
-         cerr << "Traverse MulExp" << endl;
-          if (mode == 1) {
-              int x = unary_exp->Traverse();
-              return x;
-          } else {
-              int x = mul_exp->Traverse(), y = -1, z = unary_exp->Traverse();
-              if (op == "*") {
-                  y = gen();
-                  cout << "   %" << y << " = mul %" << x << ", %" << z << endl;
-              } else if (op == "/") {
-                  y = gen();
-                  cout << "   %" << y << " = div %" << x << ", %" << z << endl;
-              } else if (op == "%") {
-                  y = gen();
-                  cout << "   %" << y << " = rem %" << x << ", %" << z << endl;
-              }
-              return y;
-          }
+        cerr << "Traverse MulExp" << endl;
+        if (mode == 1) {
+            int x = unary_exp->Traverse();
+            return x;
+        } else {
+            int x = mul_exp->Traverse(), y = -1, z = unary_exp->Traverse();
+            if (op == "*") {
+                y = gen();
+                cout << "   %" << y << " = mul %" << x << ", %" << z << endl;
+            } else if (op == "/") {
+                y = gen();
+                cout << "   %" << y << " = div %" << x << ", %" << z << endl;
+            } else if (op == "%") {
+                y = gen();
+                cout << "   %" << y << " = rem %" << x << ", %" << z << endl;
+            }
+            return y;
+        }
     }
 };
 
@@ -496,21 +525,21 @@ class AddExpAST : public BaseAST {
     }
 
     int Traverse() const override {
-         cerr << "Traverse AddExp" << endl;
-          if (mode == 1) {
-              int x = mul_exp->Traverse();
-              return x;
-          } else {
-              int x = add_exp->Traverse(), y = -1, z = mul_exp->Traverse();
-              if (op == "+") {
-                  y = gen();
-                  cout << "   %" << y << " = add %" << x << ", %" << z << endl;
-              } else if (op == "-") {
-                  y = gen();
-                  cout << "   %" << y << " = sub %" << x << ", %" << z << endl;
-              }
-              return y;
-          }
+        cerr << "Traverse AddExp" << endl;
+        if (mode == 1) {
+            int x = mul_exp->Traverse();
+            return x;
+        } else {
+            int x = add_exp->Traverse(), y = -1, z = mul_exp->Traverse();
+            if (op == "+") {
+                y = gen();
+                cout << "   %" << y << " = add %" << x << ", %" << z << endl;
+            } else if (op == "-") {
+                y = gen();
+                cout << "   %" << y << " = sub %" << x << ", %" << z << endl;
+            }
+            return y;
+        }
     }
 };
 
@@ -537,7 +566,7 @@ class RelExpAST : public BaseAST {
     }
 
     int Traverse() const override {
-      cerr << "Traverse RelExp" << endl;
+        cerr << "Traverse RelExp" << endl;
         if (mode == 1) {
             int x = add_exp->Traverse();
             return x;
@@ -563,136 +592,136 @@ class RelExpAST : public BaseAST {
 
 // EqExp := RelExp
 // EqExp := EqExp ('==' | '!=') RelExp
-class EqExpAST : public BaseAST{
+class EqExpAST : public BaseAST {
   public:
-      int mode; // 1为rel_exp，2为eq_exp
-      std::unique_ptr<BaseAST> rel_exp;
-      string op;
-      std::unique_ptr<BaseAST> eq_exp;
+    int mode; // 1为rel_exp，2为eq_exp
+    std::unique_ptr<BaseAST> rel_exp;
+    string op;
+    std::unique_ptr<BaseAST> eq_exp;
 
-      void Dump() const override {
-          cerr << "Dump EqExpAST" << endl;
-          std::cout << "EqExp { ";
-          if (mode == 1) {
-              rel_exp->Dump();
-          } else {
-              eq_exp->Dump();
-              cout << " " << op << " ";
-              rel_exp->Dump();
-          }
-          std::cout << " }";
-      }
+    void Dump() const override {
+        cerr << "Dump EqExpAST" << endl;
+        std::cout << "EqExp { ";
+        if (mode == 1) {
+            rel_exp->Dump();
+        } else {
+            eq_exp->Dump();
+            cout << " " << op << " ";
+            rel_exp->Dump();
+        }
+        std::cout << " }";
+    }
 
-      int Traverse() const override {
-          cerr << "Traverse EqExp" << endl;
-          if (mode == 1) {
-              int x = rel_exp->Traverse();
-              return x;
-          } else {
-              int x = eq_exp->Traverse(), y = -1, z = rel_exp->Traverse();
-              if (op == "==") {
-                  y = gen();
-                  cout << "   %" << y << " = eq %" << x << ", %" << z << endl;
-              } else if (op == "!=") {
-                  y = gen();
-                  cout << "   %" << y << " = ne %" << x << ", %" << z << endl;
-              }
-              return y;
-          }
-      }
+    int Traverse() const override {
+        cerr << "Traverse EqExp" << endl;
+        if (mode == 1) {
+            int x = rel_exp->Traverse();
+            return x;
+        } else {
+            int x = eq_exp->Traverse(), y = -1, z = rel_exp->Traverse();
+            if (op == "==") {
+                y = gen();
+                cout << "   %" << y << " = eq %" << x << ", %" << z << endl;
+            } else if (op == "!=") {
+                y = gen();
+                cout << "   %" << y << " = ne %" << x << ", %" << z << endl;
+            }
+            return y;
+        }
+    }
 };
 
 // LAndExp := EqExp
 // LAndExp := LAndExp '&&' EqExp
 class LAndExpAST : public BaseAST {
   public:
-      int mode; // 1为eq_exp，2为land_exp
-      std::unique_ptr<BaseAST> eq_exp;
-      string op;
-      std::unique_ptr<BaseAST> land_exp;
+    int mode; // 1为eq_exp，2为land_exp
+    std::unique_ptr<BaseAST> eq_exp;
+    string op;
+    std::unique_ptr<BaseAST> land_exp;
 
-      void Dump() const override {
-          cerr << "Dump LAndExpAST" << endl;
-          std::cout << "LAndExp { ";
-          if (mode == 1) {
-              eq_exp->Dump();
-          } else {
-              land_exp->Dump();
-              cout << " " << op << " ";
-              eq_exp->Dump();
-          }
-          std::cout << " }";
-      }
+    void Dump() const override {
+        cerr << "Dump LAndExpAST" << endl;
+        std::cout << "LAndExp { ";
+        if (mode == 1) {
+            eq_exp->Dump();
+        } else {
+            land_exp->Dump();
+            cout << " " << op << " ";
+            eq_exp->Dump();
+        }
+        std::cout << " }";
+    }
 
-      int Traverse() const override {
-          cerr << "Traverse LAndExp" << endl;
-          if (mode == 1) {
-              int x = eq_exp->Traverse();
-              return x;
-          } else {
-              int x = land_exp->Traverse(), y = -1, z = eq_exp->Traverse();
-              if (op == "&&") {
-                  y = gen();
-                  cout << "   %" << y << " = and %" << x << ", %" << z << endl;
-              }
-              return y;
-          }
-      }
+    int Traverse() const override {
+        cerr << "Traverse LAndExp" << endl;
+        if (mode == 1) {
+            int x = eq_exp->Traverse();
+            return x;
+        } else {
+            int x = land_exp->Traverse(), y = -1, z = eq_exp->Traverse();
+            if (op == "&&") {
+                y = gen();
+                cout << "   %" << y << " = and %" << x << ", %" << z << endl;
+            }
+            return y;
+        }
+    }
 };
 
 // LOrExp := LAndExp
 // LOrExp := LOrExp '||' LAndExp
 class LOrExpAST : public BaseAST {
-  public :
-      int mode; // 1为land_exp，2为lor_exp
-      std::unique_ptr<BaseAST> land_exp;
-      string op;
-      std::unique_ptr<BaseAST> lor_exp;
+  public:
+    int mode; // 1为land_exp，2为lor_exp
+    std::unique_ptr<BaseAST> land_exp;
+    string op;
+    std::unique_ptr<BaseAST> lor_exp;
 
-      void Dump() const override {
-          cerr << "Dump LOrExpAST" << endl;
-          std::cout << "LOrExp { ";
-          if (mode == 1) {
-              land_exp->Dump();
-          } else {
-              lor_exp->Dump();
-              cout << " " << op << " ";
-              land_exp->Dump();
-          }
-          std::cout << " }";
-      }
+    void Dump() const override {
+        cerr << "Dump LOrExpAST" << endl;
+        std::cout << "LOrExp { ";
+        if (mode == 1) {
+            land_exp->Dump();
+        } else {
+            lor_exp->Dump();
+            cout << " " << op << " ";
+            land_exp->Dump();
+        }
+        std::cout << " }";
+    }
 
-      int Traverse() const override {
-          cerr << "Traverse LOrExp" << endl;
-          if (mode == 1) {
-              int x = land_exp->Traverse();
-              return x;
-          } else {
-              int x = lor_exp->Traverse(), y = -1, z = land_exp->Traverse();
-              if (op == "||") {
-                  y = gen();
-                  cout << "   %" << y << " = or %" << x << ", %" << z << endl;
-              }
-              return y;
-          }
-      }
+    int Traverse() const override {
+        cerr << "Traverse LOrExp" << endl;
+        if (mode == 1) {
+            int x = land_exp->Traverse();
+            return x;
+        } else {
+            int x = lor_exp->Traverse(), y = -1, z = land_exp->Traverse();
+            if (op == "||") {
+                y = gen();
+                cout << "   %" << y << " = or %" << x << ", %" << z << endl;
+            }
+            return y;
+        }
+    }
 };
 
 // ConstExp := Exp
 class ConstExpAST : public BaseAST {
-  public :
-      std::unique_ptr<BaseAST> exp;
+  public:
+    std::unique_ptr<BaseAST> exp;
 
-      void Dump() const override {
-          cerr << "Dump ConstExp" << endl;
-          std::cout << "ConstExp { ";
-          exp->Dump();
-          std::cout << " }";
-      }
+    void Dump() const override {
+        cerr << "Dump ConstExp" << endl;
+        std::cout << "ConstExp { ";
+        exp->Dump();
+        std::cout << " }";
+    }
 
-      int Traverse() const override {
-        /*  cerr << "Traverse ConstExp" << endl;
-          int x = exp->Traverse();
-          return x;  */
-      }
+    int Traverse() const override {
+        cerr << "Traverse ConstExp" << endl;
+        int x = exp->Traverse();
+        return x;
+    }
 };
