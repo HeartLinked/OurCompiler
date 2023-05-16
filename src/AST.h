@@ -122,38 +122,22 @@ class BlockAST : public BaseAST {
     // std::vector<std::unique_ptr<BaseAST>> stmts;
 };
 
-// Stmt := "return" Number ";"
 // Stmt := "return" Exp ";"
 class StmtAST : public BaseAST {
   public:
-    // // 返回值, 目前只有 int
-    // // 类型，由于右侧有两种合适的匹配，设计一个mode来区分，1为number，2为exp
-    // int mode;
-    // // mode = 1时，返回值为number，stmt_ret为返回值
-    // int stmt_ret;
-    // // mode = 2时，返回值为exp，exp为返回值
+    // 返回值 exp (只有整数类型)
     std::unique_ptr<BaseAST> exp;
 
     void Dump() const override {
         cerr << "Dump StmtAST" << endl;
         std::cout << "StmtAST { ";
-        // if (mode == 1) {
-        //     std::cout << " " << stmt_ret << " ";
-        // } else {
         exp->Dump();
-        // }
         std::cout << " }";
     }
 
     int Traverse() const override {
         cerr << "Traverse StmtAST" << endl;
-
-        // if (mode == 1) {
-        //     cout << stmt_ret;
-        // } else {
         int x = exp->Traverse();
-        // }
-        // cout << stmt_ret;
         cout << "   ret  %" << x << endl;
         cout << endl;
         return -1;
@@ -284,27 +268,24 @@ class MulExpAST : public BaseAST {
     }
 
     int Traverse() const override {
-        /* cerr << "Traverse MulExp" << endl;
+         cerr << "Traverse MulExp" << endl;
           if (mode == 1) {
               int x = unary_exp->Traverse();
               return x;
           } else {
-              int x = mul_exp->Traverse(), y = -1;
+              int x = mul_exp->Traverse(), y = -1, z = unary_exp->Traverse();
               if (op == "*") {
                   y = gen();
-                  cout << "   %" << y << " = mul %" << x << ", %" << x << endl;
+                  cout << "   %" << y << " = mul %" << x << ", %" << z << endl;
               } else if (op == "/") {
                   y = gen();
-                  cout << "   %" << y << " = div %" << x << ", %" << x << endl;
+                  cout << "   %" << y << " = div %" << x << ", %" << z << endl;
               } else if (op == "%") {
                   y = gen();
-                  cout << "   %" << y << " = rem %" << x << ", %" << x << endl;
+                  cout << "   %" << y << " = rem %" << x << ", %" << z << endl;
               }
-              if (y == -1)
-                  return x;
-              else
-                  return y;
-          }*/
+              return y;
+          }
     }
 };
 
@@ -331,24 +312,21 @@ class AddExpAST : public BaseAST {
     }
 
     int Traverse() const override {
-        /* cerr << "Traverse AddExp" << endl;
+         cerr << "Traverse AddExp" << endl;
           if (mode == 1) {
               int x = mul_exp->Traverse();
               return x;
           } else {
-              int x = add_exp->Traverse(), y = -1;
+              int x = add_exp->Traverse(), y = -1, z = mul_exp->Traverse();
               if (op == "+") {
                   y = gen();
-                  cout << "   %" << y << " = add %" << x << ", %" << x << endl;
+                  cout << "   %" << y << " = add %" << x << ", %" << z << endl;
               } else if (op == "-") {
                   y = gen();
-                  cout << "   %" << y << " = sub %" << x << ", %" << x << endl;
+                  cout << "   %" << y << " = sub %" << x << ", %" << z << endl;
               }
-              if (y == -1)
-                  return x;
-              else
-                  return y;
-          }*/
+              return y;
+          }
     }
 };
 
