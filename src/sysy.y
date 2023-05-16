@@ -82,14 +82,17 @@ Block
   ;
 
 Stmt
-  : RETURN Number ';' {
-    auto stmt = new StmtAST();
-    stmt->stmt_ret = $2;
-    $$ = stmt;
-  }
-  | RETURN Exp ';' {
+  :
+  // : RETURN Number ';' {
+  //   auto stmt = new StmtAST();
+  //   stmt->stmt_ret = $2;
+  //   stmt->mode = 1;
+  //   $$ = stmt;
+  // }
+  RETURN Exp ';' {
     auto stmt = new StmtAST();
     stmt->exp = unique_ptr<BaseAST>($2);
+    // stmt->mode = 2;
     $$ = stmt;
   }
   ;
@@ -107,11 +110,13 @@ PrimaryExp
   : '(' Exp ')' {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> exp = unique_ptr<BaseAST>($2);
+    primary_exp -> mode = 1;
     $$ = primary_exp;
   }
   | Number {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> number = $1;
+    primary_exp -> mode = 2;
     $$ = primary_exp;
   }
 
@@ -119,12 +124,14 @@ UnaryExp
   : PrimaryExp {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> primary_exp = unique_ptr<BaseAST>($1);
+    unary_exp -> mode = 1;
     $$ = unary_exp;
   }
   | UnaryOp UnaryExp{
     auto unary_exp = new UnaryExpAST();
     unary_exp -> unary_op = *($1);
     unary_exp -> unary_exp = unique_ptr<BaseAST>($2);
+    unary_exp -> mode = 2;
     $$ = unary_exp;
   }
 

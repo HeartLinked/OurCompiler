@@ -8,7 +8,7 @@ TARGET      := $(TARGETDIR)/compiler
 SRCEXT      := cpp
 
 # Flags, Libraries and Includes
-CFLAGS      := -g -Wall -O3 -I$(BUILDDIR) -Isrc -MMD -MP
+CFLAGS      := -g -Wall -O3 -I$(BUILDDIR) -Isrc -MMD -MP -w
 LIB         := 
 INC         := -I$(SRCDIR)
 
@@ -48,7 +48,7 @@ $(YACCOBJ): $(YACCFILE) $(YACHEADER)
 	$(CC) $(CFLAGS) -c $(BUILDDIR)/sysy.tab.c -o $(YACCOBJ)
 
 $(YACHEADER): $(YACCFILE)
-	$(YACC) -d -o $(BUILDDIR)/sysy.tab.c --defines=$(YACHEADER) $(YACCFILE)
+	$(YACC) -d -o $(BUILDDIR)/sysy.tab.c --defines=$(YACHEADER) -v $(YACCFILE)
 
 directories: 
 	@echo " Creating directories"
