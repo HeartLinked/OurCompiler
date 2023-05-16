@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 7 "src/sysy.y"
+#line 9 "src/sysy.y"
 
 
 #include <iostream>
@@ -121,38 +121,51 @@ enum yysymbol_kind_t
   YYSYMBOL_NE = 8,                         /* NE  */
   YYSYMBOL_LE = 9,                         /* LE  */
   YYSYMBOL_GE = 10,                        /* GE  */
-  YYSYMBOL_IDENT = 11,                     /* IDENT  */
-  YYSYMBOL_INT_CONST = 12,                 /* INT_CONST  */
-  YYSYMBOL_13_ = 13,                       /* '('  */
-  YYSYMBOL_14_ = 14,                       /* ')'  */
-  YYSYMBOL_15_ = 15,                       /* '{'  */
-  YYSYMBOL_16_ = 16,                       /* '}'  */
-  YYSYMBOL_17_ = 17,                       /* ';'  */
-  YYSYMBOL_18_ = 18,                       /* '+'  */
-  YYSYMBOL_19_ = 19,                       /* '-'  */
-  YYSYMBOL_20_ = 20,                       /* '!'  */
-  YYSYMBOL_21_ = 21,                       /* '*'  */
-  YYSYMBOL_22_ = 22,                       /* '/'  */
-  YYSYMBOL_23_ = 23,                       /* '%'  */
-  YYSYMBOL_24_ = 24,                       /* '<'  */
-  YYSYMBOL_25_ = 25,                       /* '>'  */
-  YYSYMBOL_YYACCEPT = 26,                  /* $accept  */
-  YYSYMBOL_CompUnit = 27,                  /* CompUnit  */
-  YYSYMBOL_FuncDef = 28,                   /* FuncDef  */
-  YYSYMBOL_FuncType = 29,                  /* FuncType  */
-  YYSYMBOL_Block = 30,                     /* Block  */
-  YYSYMBOL_Stmt = 31,                      /* Stmt  */
-  YYSYMBOL_Exp = 32,                       /* Exp  */
-  YYSYMBOL_PrimaryExp = 33,                /* PrimaryExp  */
-  YYSYMBOL_UnaryExp = 34,                  /* UnaryExp  */
-  YYSYMBOL_UnaryOp = 35,                   /* UnaryOp  */
-  YYSYMBOL_MulExp = 36,                    /* MulExp  */
-  YYSYMBOL_AddExp = 37,                    /* AddExp  */
-  YYSYMBOL_RelExp = 38,                    /* RelExp  */
-  YYSYMBOL_EqExp = 39,                     /* EqExp  */
-  YYSYMBOL_LAndExp = 40,                   /* LAndExp  */
-  YYSYMBOL_LOrExp = 41,                    /* LOrExp  */
-  YYSYMBOL_Number = 42                     /* Number  */
+  YYSYMBOL_CONST = 11,                     /* CONST  */
+  YYSYMBOL_IDENT = 12,                     /* IDENT  */
+  YYSYMBOL_INT_CONST = 13,                 /* INT_CONST  */
+  YYSYMBOL_14_ = 14,                       /* ';'  */
+  YYSYMBOL_15_ = 15,                       /* ','  */
+  YYSYMBOL_16_ = 16,                       /* '='  */
+  YYSYMBOL_17_ = 17,                       /* '('  */
+  YYSYMBOL_18_ = 18,                       /* ')'  */
+  YYSYMBOL_19_ = 19,                       /* '{'  */
+  YYSYMBOL_20_ = 20,                       /* '}'  */
+  YYSYMBOL_21_ = 21,                       /* '+'  */
+  YYSYMBOL_22_ = 22,                       /* '-'  */
+  YYSYMBOL_23_ = 23,                       /* '!'  */
+  YYSYMBOL_24_ = 24,                       /* '*'  */
+  YYSYMBOL_25_ = 25,                       /* '/'  */
+  YYSYMBOL_26_ = 26,                       /* '%'  */
+  YYSYMBOL_27_ = 27,                       /* '<'  */
+  YYSYMBOL_28_ = 28,                       /* '>'  */
+  YYSYMBOL_YYACCEPT = 29,                  /* $accept  */
+  YYSYMBOL_CompUnit = 30,                  /* CompUnit  */
+  YYSYMBOL_Decl = 31,                      /* Decl  */
+  YYSYMBOL_ConstDecl = 32,                 /* ConstDecl  */
+  YYSYMBOL_ConstDefList = 33,              /* ConstDefList  */
+  YYSYMBOL_BType = 34,                     /* BType  */
+  YYSYMBOL_ConstDef = 35,                  /* ConstDef  */
+  YYSYMBOL_ConstInitVal = 36,              /* ConstInitVal  */
+  YYSYMBOL_FuncDef = 37,                   /* FuncDef  */
+  YYSYMBOL_FuncType = 38,                  /* FuncType  */
+  YYSYMBOL_Block = 39,                     /* Block  */
+  YYSYMBOL_BlockItemList = 40,             /* BlockItemList  */
+  YYSYMBOL_BlockItem = 41,                 /* BlockItem  */
+  YYSYMBOL_Stmt = 42,                      /* Stmt  */
+  YYSYMBOL_Exp = 43,                       /* Exp  */
+  YYSYMBOL_LVal = 44,                      /* LVal  */
+  YYSYMBOL_PrimaryExp = 45,                /* PrimaryExp  */
+  YYSYMBOL_Number = 46,                    /* Number  */
+  YYSYMBOL_UnaryExp = 47,                  /* UnaryExp  */
+  YYSYMBOL_UnaryOp = 48,                   /* UnaryOp  */
+  YYSYMBOL_MulExp = 49,                    /* MulExp  */
+  YYSYMBOL_AddExp = 50,                    /* AddExp  */
+  YYSYMBOL_RelExp = 51,                    /* RelExp  */
+  YYSYMBOL_EqExp = 52,                     /* EqExp  */
+  YYSYMBOL_LAndExp = 53,                   /* LAndExp  */
+  YYSYMBOL_LOrExp = 54,                    /* LOrExp  */
+  YYSYMBOL_ConstExp = 55                   /* ConstExp  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -480,19 +493,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   43
+#define YYLAST   54
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  26
+#define YYNTOKENS  29
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  17
+#define YYNNTS  27
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  34
+#define YYNRULES  48
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  60
+#define YYNSTATES  80
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   267
+#define YYMAXUTOK   268
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -509,16 +522,16 @@ static const yytype_int8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    20,     2,     2,     2,    23,     2,     2,
-      13,    14,    21,    18,     2,    19,     2,    22,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    17,
-      24,     2,    25,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    23,     2,     2,     2,    26,     2,     2,
+      17,    18,    24,    21,    15,    22,     2,    25,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    14,
+      27,    16,    28,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    15,     2,    16,     2,     2,     2,     2,
+       2,     2,     2,    19,     2,    20,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -532,17 +545,18 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12
+       5,     6,     7,     8,     9,    10,    11,    12,    13
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    48,    48,    57,    68,    77,    86,    95,   103,   109,
-     117,   123,   132,   135,   138,   144,   150,   158,   166,   176,
-     182,   190,   200,   206,   214,   222,   230,   240,   246,   254,
-     264,   270,   280,   286,   296
+       0,    52,    52,    60,    68,    78,    83,    95,   104,   114,
+     123,   133,   142,   150,   155,   167,   173,   183,   191,   199,
+     207,   213,   219,   228,   232,   238,   248,   251,   254,   260,
+     266,   274,   282,   293,   299,   307,   318,   324,   332,   340,
+     348,   359,   365,   373,   384,   390,   401,   407,   419
 };
 #endif
 
@@ -559,11 +573,13 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "INT", "RETURN", "AND",
-  "OR", "EQ", "NE", "LE", "GE", "IDENT", "INT_CONST", "'('", "')'", "'{'",
-  "'}'", "';'", "'+'", "'-'", "'!'", "'*'", "'/'", "'%'", "'<'", "'>'",
-  "$accept", "CompUnit", "FuncDef", "FuncType", "Block", "Stmt", "Exp",
-  "PrimaryExp", "UnaryExp", "UnaryOp", "MulExp", "AddExp", "RelExp",
-  "EqExp", "LAndExp", "LOrExp", "Number", YY_NULLPTR
+  "OR", "EQ", "NE", "LE", "GE", "CONST", "IDENT", "INT_CONST", "';'",
+  "','", "'='", "'('", "')'", "'{'", "'}'", "'+'", "'-'", "'!'", "'*'",
+  "'/'", "'%'", "'<'", "'>'", "$accept", "CompUnit", "Decl", "ConstDecl",
+  "ConstDefList", "BType", "ConstDef", "ConstInitVal", "FuncDef",
+  "FuncType", "Block", "BlockItemList", "BlockItem", "Stmt", "Exp", "LVal",
+  "PrimaryExp", "Number", "UnaryExp", "UnaryOp", "MulExp", "AddExp",
+  "RelExp", "EqExp", "LAndExp", "LOrExp", "ConstExp", YY_NULLPTR
 };
 
 static const char *
@@ -573,7 +589,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-28)
+#define YYPACT_NINF (-30)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -587,12 +603,14 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       1,   -28,    29,   -28,    19,   -28,    18,    20,    17,    31,
-     -28,   -10,    21,   -28,   -10,   -28,   -28,   -28,    22,   -28,
-     -28,   -10,    -1,   -12,    -9,    16,    28,    30,   -28,   -28,
-      24,   -28,   -28,   -10,   -10,   -10,   -10,   -10,   -10,   -10,
-     -10,   -10,   -10,   -10,   -10,   -10,   -28,   -28,   -28,   -28,
-      -1,    -1,   -12,   -12,   -12,   -12,    -9,    -9,    16,    28
+      12,   -30,    33,   -30,    22,   -30,    18,    19,    17,     5,
+     -30,    -9,    35,   -30,   -30,    20,     5,   -30,   -30,   -30,
+      -9,   -30,   -30,   -30,    25,   -30,   -30,   -30,   -30,    -9,
+       4,   -16,    -8,     3,    36,    37,   -30,    30,   -30,   -30,
+      26,   -30,   -30,    -9,    -9,    -9,    -9,    -9,    -9,    -9,
+      -9,    -9,    -9,    -9,    -9,    -9,    29,    32,    34,   -30,
+     -30,   -30,   -30,     4,     4,   -16,   -16,   -16,   -16,    -8,
+      -8,     3,    36,    -9,   -30,    30,   -30,   -30,   -30,   -30
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -600,26 +618,30 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     4,     0,     2,     0,     1,     0,     0,     0,     0,
-       3,     0,     0,    34,     0,    12,    13,    14,     0,    10,
-      15,     0,    19,    22,    27,    30,    32,     7,     9,     5,
-       0,     6,    11,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     8,    16,    17,    18,
-      20,    21,    25,    26,    23,    24,    28,    29,    31,    33
+       0,    11,     0,     2,     0,     1,     0,     0,     0,     0,
+      10,     0,     0,    15,     3,     0,    13,    16,    19,    23,
+       0,    26,    27,    28,     0,    21,    24,    22,    29,     0,
+      33,    36,    41,    44,    46,    18,     7,     0,    12,    14,
+       0,    17,    25,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     5,    20,
+      30,    31,    32,    34,    35,    39,    40,    37,    38,    42,
+      43,    45,    47,     0,     4,     0,     8,    48,     9,     6
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -28,   -28,   -28,   -28,   -28,   -28,    26,   -28,   -16,   -28,
-     -11,   -27,   -15,    -3,    -2,   -28,   -28
+     -30,   -30,   -30,   -30,   -28,   -30,   -30,   -30,   -30,   -30,
+     -30,    38,   -30,   -30,   -20,   -30,   -30,   -30,   -22,   -30,
+     -29,   -24,   -21,    -6,    -5,   -30,   -30
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,    10,    12,    18,    19,    20,    21,
-      22,    23,    24,    25,    26,    27,    28
+       0,     2,    13,    14,    57,    37,    58,    76,     3,     4,
+      10,    15,    16,    17,    24,    25,    26,    27,    28,    29,
+      30,    31,    32,    33,    34,    35,    78
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -627,50 +649,56 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      38,    39,    13,    14,     1,    32,    36,    37,    15,    16,
-      17,    52,    53,    54,    55,    40,    41,    47,    48,    49,
-      33,    34,    35,    42,    43,    50,    51,    56,    57,     5,
-       6,     7,     9,    44,     8,    11,    45,    29,    46,    31,
-      30,    58,     0,    59
+      40,    48,    49,    18,    19,    46,    47,    42,    20,    11,
+      52,    53,    21,    22,    23,     1,    12,    63,    64,    50,
+      51,    60,    61,    62,    65,    66,    67,    68,    43,    44,
+      45,    69,    70,     5,     6,     7,     9,     8,    36,    41,
+      38,    54,    56,    55,    59,    73,    74,    79,    71,    75,
+      72,     0,     0,    77,    39
 };
 
 static const yytype_int8 yycheck[] =
 {
-       9,    10,    12,    13,     3,    21,    18,    19,    18,    19,
-      20,    38,    39,    40,    41,    24,    25,    33,    34,    35,
-      21,    22,    23,     7,     8,    36,    37,    42,    43,     0,
-      11,    13,    15,     5,    14,     4,     6,    16,    14,    17,
-      14,    44,    -1,    45
+      20,     9,    10,    12,    13,    21,    22,    29,    17,     4,
+       7,     8,    21,    22,    23,     3,    11,    46,    47,    27,
+      28,    43,    44,    45,    48,    49,    50,    51,    24,    25,
+      26,    52,    53,     0,    12,    17,    19,    18,     3,    14,
+      20,     5,    12,     6,    18,    16,    14,    75,    54,    15,
+      55,    -1,    -1,    73,    16
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    27,    28,    29,     0,    11,    13,    14,    15,
-      30,     4,    31,    12,    13,    18,    19,    20,    32,    33,
-      34,    35,    36,    37,    38,    39,    40,    41,    42,    16,
-      32,    17,    34,    21,    22,    23,    18,    19,     9,    10,
-      24,    25,     7,     8,     5,     6,    14,    34,    34,    34,
-      36,    36,    37,    37,    37,    37,    38,    38,    39,    40
+       0,     3,    30,    37,    38,     0,    12,    17,    18,    19,
+      39,     4,    11,    31,    32,    40,    41,    42,    12,    13,
+      17,    21,    22,    23,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,    53,    54,     3,    34,    20,    40,
+      43,    14,    47,    24,    25,    26,    21,    22,     9,    10,
+      27,    28,     7,     8,     5,     6,    12,    33,    35,    18,
+      47,    47,    47,    49,    49,    50,    50,    50,    50,    51,
+      51,    52,    53,    16,    14,    15,    36,    43,    55,    33
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    26,    27,    28,    29,    30,    31,    32,    33,    33,
-      34,    34,    35,    35,    35,    36,    36,    36,    36,    37,
-      37,    37,    38,    38,    38,    38,    38,    39,    39,    39,
-      40,    40,    41,    41,    42
+       0,    29,    30,    31,    32,    33,    33,    34,    35,    36,
+      37,    38,    39,    40,    40,    41,    41,    42,    43,    44,
+      45,    45,    45,    46,    47,    47,    48,    48,    48,    49,
+      49,    49,    49,    50,    50,    50,    51,    51,    51,    51,
+      51,    52,    52,    52,    53,    53,    54,    54,    55
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     5,     1,     3,     3,     1,     3,     1,
-       1,     2,     1,     1,     1,     1,     3,     3,     3,     1,
-       3,     3,     1,     3,     3,     3,     3,     1,     3,     3,
-       1,     3,     1,     3,     1
+       0,     2,     1,     1,     4,     1,     3,     1,     3,     1,
+       5,     1,     3,     1,     2,     1,     1,     3,     1,     1,
+       3,     1,     1,     1,     1,     2,     1,     1,     1,     1,
+       3,     3,     3,     1,     3,     3,     1,     3,     3,     3,
+       3,     1,     3,     3,     1,     3,     1,     3,     1
 };
 
 
@@ -1136,17 +1164,92 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* CompUnit: FuncDef  */
-#line 48 "src/sysy.y"
+#line 52 "src/sysy.y"
             {
     auto comp_unit = make_unique<CompUnitAST>();
     comp_unit->func_def = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     ast = move(comp_unit);
   }
-#line 1146 "build/sysy.tab.c"
+#line 1174 "build/sysy.tab.c"
     break;
 
-  case 3: /* FuncDef: FuncType IDENT '(' ')' Block  */
-#line 57 "src/sysy.y"
+  case 3: /* Decl: ConstDecl  */
+#line 60 "src/sysy.y"
+             {
+    auto decl = new DeclAST();
+    decl->const_decl = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = decl;
+  }
+#line 1184 "build/sysy.tab.c"
+    break;
+
+  case 4: /* ConstDecl: CONST BType ConstDefList ';'  */
+#line 68 "src/sysy.y"
+                                 {
+    auto const_decl = new ConstDeclAST();
+    const_decl->b_type = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    const_decl->const_defs = unique_ptr<vector<std::unique_ptr<BaseAST>>>((yyvsp[-1].ast_list_val));
+    (yyval.ast_val) = const_decl;
+  }
+#line 1195 "build/sysy.tab.c"
+    break;
+
+  case 5: /* ConstDefList: ConstDef  */
+#line 78 "src/sysy.y"
+             {
+    auto const_def_list = new std::vector<std::unique_ptr<BaseAST>>();
+    const_def_list->push_back(move(unique_ptr<BaseAST>((yyvsp[0].ast_val))));
+    (yyval.ast_list_val) = const_def_list;
+  }
+#line 1205 "build/sysy.tab.c"
+    break;
+
+  case 6: /* ConstDefList: ConstDef ',' ConstDefList  */
+#line 83 "src/sysy.y"
+                              {
+    auto const_def_list = new std::vector<std::unique_ptr<BaseAST>>();
+    const_def_list->push_back(move(unique_ptr<BaseAST>((yyvsp[-2].ast_val))));
+    for (auto &const_def : *(yyvsp[0].ast_list_val)) {
+      const_def_list->push_back(move(const_def));
+    }
+    (yyval.ast_list_val) = const_def_list;
+  }
+#line 1218 "build/sysy.tab.c"
+    break;
+
+  case 7: /* BType: INT  */
+#line 95 "src/sysy.y"
+        {
+    auto b_type = new BTypeAST();
+    b_type->btype = "int";
+    (yyval.ast_val) = b_type;
+  }
+#line 1228 "build/sysy.tab.c"
+    break;
+
+  case 8: /* ConstDef: IDENT '=' ConstInitVal  */
+#line 104 "src/sysy.y"
+                           {
+    auto const_def = new ConstDefAST();
+    const_def->const_name = *unique_ptr<string>((yyvsp[-2].str_val));
+    const_def->const_init_val = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = const_def;
+  }
+#line 1239 "build/sysy.tab.c"
+    break;
+
+  case 9: /* ConstInitVal: ConstExp  */
+#line 114 "src/sysy.y"
+             {
+    auto const_init_val = new ConstInitValAST();
+    const_init_val->const_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = const_init_val;
+  }
+#line 1249 "build/sysy.tab.c"
+    break;
+
+  case 10: /* FuncDef: FuncType IDENT '(' ')' Block  */
+#line 123 "src/sysy.y"
                                  {
     auto func_def = new FuncDefAST();
     func_def->func_type = unique_ptr<BaseAST>((yyvsp[-4].ast_val));
@@ -1154,86 +1257,150 @@ yyreduce:
     func_def->func_block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = func_def;
   }
-#line 1158 "build/sysy.tab.c"
+#line 1261 "build/sysy.tab.c"
     break;
 
-  case 4: /* FuncType: INT  */
-#line 68 "src/sysy.y"
+  case 11: /* FuncType: INT  */
+#line 133 "src/sysy.y"
         {
-    // cout << "INT" << endl;
     auto func_type = new FuncTypeAST();
     func_type -> type = "int";
     (yyval.ast_val) = func_type;
   }
-#line 1169 "build/sysy.tab.c"
+#line 1271 "build/sysy.tab.c"
     break;
 
-  case 5: /* Block: '{' Stmt '}'  */
-#line 77 "src/sysy.y"
-                 {
+  case 12: /* Block: '{' BlockItemList '}'  */
+#line 142 "src/sysy.y"
+                          {
     auto block = new BlockAST();
-    block -> stmts = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
+    block -> block_items = unique_ptr<vector<std::unique_ptr<BaseAST>>>((yyvsp[-1].ast_list_val));
     (yyval.ast_val) = block;
   }
-#line 1179 "build/sysy.tab.c"
+#line 1281 "build/sysy.tab.c"
     break;
 
-  case 6: /* Stmt: RETURN Exp ';'  */
-#line 86 "src/sysy.y"
+  case 13: /* BlockItemList: BlockItem  */
+#line 150 "src/sysy.y"
+              {
+    auto blockitem_list = new std::vector<std::unique_ptr<BaseAST>>();
+    blockitem_list -> push_back(move(unique_ptr<BaseAST>((yyvsp[0].ast_val))));
+    (yyval.ast_list_val) = blockitem_list;
+  }
+#line 1291 "build/sysy.tab.c"
+    break;
+
+  case 14: /* BlockItemList: BlockItem BlockItemList  */
+#line 155 "src/sysy.y"
+                            {
+    auto blockitem_list = new std::vector<std::unique_ptr<BaseAST>>();
+    blockitem_list -> push_back(move(unique_ptr<BaseAST>((yyvsp[-1].ast_val))));
+    for (auto &blockitem : *(yyvsp[0].ast_list_val)) {
+      blockitem_list -> push_back(move(blockitem));
+    }
+    (yyval.ast_list_val) = blockitem_list;
+  }
+#line 1304 "build/sysy.tab.c"
+    break;
+
+  case 15: /* BlockItem: Decl  */
+#line 167 "src/sysy.y"
+         {
+    auto blockitem = new BlockItemAST();
+    blockitem -> decl = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    blockitem -> mode = 1;
+    (yyval.ast_val) = blockitem;
+  }
+#line 1315 "build/sysy.tab.c"
+    break;
+
+  case 16: /* BlockItem: Stmt  */
+#line 173 "src/sysy.y"
+         {
+    auto blockitem = new BlockItemAST();
+    blockitem -> stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    blockitem -> mode = 2;
+    (yyval.ast_val) = blockitem;
+  }
+#line 1326 "build/sysy.tab.c"
+    break;
+
+  case 17: /* Stmt: RETURN Exp ';'  */
+#line 183 "src/sysy.y"
                  {
     auto stmt = new StmtAST();
     stmt->exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
-    // stmt->mode = 2;
     (yyval.ast_val) = stmt;
   }
-#line 1190 "build/sysy.tab.c"
+#line 1336 "build/sysy.tab.c"
     break;
 
-  case 7: /* Exp: LOrExp  */
-#line 95 "src/sysy.y"
+  case 18: /* Exp: LOrExp  */
+#line 191 "src/sysy.y"
            {
     auto exp = new ExpAST();
     exp -> lor_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = exp;
   }
-#line 1200 "build/sysy.tab.c"
+#line 1346 "build/sysy.tab.c"
     break;
 
-  case 8: /* PrimaryExp: '(' Exp ')'  */
-#line 103 "src/sysy.y"
+  case 19: /* LVal: IDENT  */
+#line 199 "src/sysy.y"
+          {
+    auto lval = new LValAST();
+    lval -> name = *unique_ptr<string>((yyvsp[0].str_val));
+    (yyval.ast_val) = lval;
+  }
+#line 1356 "build/sysy.tab.c"
+    break;
+
+  case 20: /* PrimaryExp: '(' Exp ')'  */
+#line 207 "src/sysy.y"
                 {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     primary_exp -> mode = 1;
     (yyval.ast_val) = primary_exp;
   }
-#line 1211 "build/sysy.tab.c"
+#line 1367 "build/sysy.tab.c"
     break;
 
-  case 9: /* PrimaryExp: Number  */
-#line 109 "src/sysy.y"
-           {
+  case 21: /* PrimaryExp: LVal  */
+#line 213 "src/sysy.y"
+         {
     auto primary_exp = new PrimaryExpAST();
-    primary_exp -> number = (yyvsp[0].int_val);
+    primary_exp -> lval = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     primary_exp -> mode = 2;
     (yyval.ast_val) = primary_exp;
   }
-#line 1222 "build/sysy.tab.c"
+#line 1378 "build/sysy.tab.c"
     break;
 
-  case 10: /* UnaryExp: PrimaryExp  */
-#line 117 "src/sysy.y"
+  case 22: /* PrimaryExp: Number  */
+#line 219 "src/sysy.y"
+           {
+    auto primary_exp = new PrimaryExpAST();
+    primary_exp -> number = (yyvsp[0].int_val);
+    primary_exp -> mode = 3;
+    (yyval.ast_val) = primary_exp;
+  }
+#line 1389 "build/sysy.tab.c"
+    break;
+
+  case 24: /* UnaryExp: PrimaryExp  */
+#line 232 "src/sysy.y"
                {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> primary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     unary_exp -> mode = 1;
     (yyval.ast_val) = unary_exp;
   }
-#line 1233 "build/sysy.tab.c"
+#line 1400 "build/sysy.tab.c"
     break;
 
-  case 11: /* UnaryExp: UnaryOp UnaryExp  */
-#line 123 "src/sysy.y"
+  case 25: /* UnaryExp: UnaryOp UnaryExp  */
+#line 238 "src/sysy.y"
                     {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> unary_op = *((yyvsp[-1].str_val));
@@ -1241,46 +1408,46 @@ yyreduce:
     unary_exp -> mode = 2;
     (yyval.ast_val) = unary_exp;
   }
-#line 1245 "build/sysy.tab.c"
+#line 1412 "build/sysy.tab.c"
     break;
 
-  case 12: /* UnaryOp: '+'  */
-#line 132 "src/sysy.y"
+  case 26: /* UnaryOp: '+'  */
+#line 248 "src/sysy.y"
         {
     (yyval.str_val) = new string("+");
   }
-#line 1253 "build/sysy.tab.c"
+#line 1420 "build/sysy.tab.c"
     break;
 
-  case 13: /* UnaryOp: '-'  */
-#line 135 "src/sysy.y"
+  case 27: /* UnaryOp: '-'  */
+#line 251 "src/sysy.y"
         {
     (yyval.str_val) = new string("-");
   }
-#line 1261 "build/sysy.tab.c"
+#line 1428 "build/sysy.tab.c"
     break;
 
-  case 14: /* UnaryOp: '!'  */
-#line 138 "src/sysy.y"
+  case 28: /* UnaryOp: '!'  */
+#line 254 "src/sysy.y"
         {
     (yyval.str_val) = new string("!");
   }
-#line 1269 "build/sysy.tab.c"
+#line 1436 "build/sysy.tab.c"
     break;
 
-  case 15: /* MulExp: UnaryExp  */
-#line 144 "src/sysy.y"
+  case 29: /* MulExp: UnaryExp  */
+#line 260 "src/sysy.y"
              {
     auto mul_exp = new MulExpAST();
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     mul_exp -> mode = 1;
     (yyval.ast_val) = mul_exp;
   }
-#line 1280 "build/sysy.tab.c"
+#line 1447 "build/sysy.tab.c"
     break;
 
-  case 16: /* MulExp: MulExp '*' UnaryExp  */
-#line 150 "src/sysy.y"
+  case 30: /* MulExp: MulExp '*' UnaryExp  */
+#line 266 "src/sysy.y"
                         {
     auto mul_exp = new MulExpAST();
     mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1289,11 +1456,11 @@ yyreduce:
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = mul_exp;
   }
-#line 1293 "build/sysy.tab.c"
+#line 1460 "build/sysy.tab.c"
     break;
 
-  case 17: /* MulExp: MulExp '/' UnaryExp  */
-#line 158 "src/sysy.y"
+  case 31: /* MulExp: MulExp '/' UnaryExp  */
+#line 274 "src/sysy.y"
                         {
     auto mul_exp = new MulExpAST();
     mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1302,11 +1469,11 @@ yyreduce:
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = mul_exp;
   }
-#line 1306 "build/sysy.tab.c"
+#line 1473 "build/sysy.tab.c"
     break;
 
-  case 18: /* MulExp: MulExp '%' UnaryExp  */
-#line 166 "src/sysy.y"
+  case 32: /* MulExp: MulExp '%' UnaryExp  */
+#line 282 "src/sysy.y"
                         {
     auto mul_exp = new MulExpAST();
     mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1315,22 +1482,22 @@ yyreduce:
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = mul_exp;
   }
-#line 1319 "build/sysy.tab.c"
+#line 1486 "build/sysy.tab.c"
     break;
 
-  case 19: /* AddExp: MulExp  */
-#line 176 "src/sysy.y"
+  case 33: /* AddExp: MulExp  */
+#line 293 "src/sysy.y"
           {
     auto add_exp = new AddExpAST();
     add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     add_exp -> mode = 1;
     (yyval.ast_val) = add_exp;
  }
-#line 1330 "build/sysy.tab.c"
+#line 1497 "build/sysy.tab.c"
     break;
 
-  case 20: /* AddExp: AddExp '+' MulExp  */
-#line 182 "src/sysy.y"
+  case 34: /* AddExp: AddExp '+' MulExp  */
+#line 299 "src/sysy.y"
                       {
     auto add_exp = new AddExpAST();
     add_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1339,11 +1506,11 @@ yyreduce:
     add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = add_exp;
   }
-#line 1343 "build/sysy.tab.c"
+#line 1510 "build/sysy.tab.c"
     break;
 
-  case 21: /* AddExp: AddExp '-' MulExp  */
-#line 190 "src/sysy.y"
+  case 35: /* AddExp: AddExp '-' MulExp  */
+#line 307 "src/sysy.y"
                       {
     auto add_exp = new AddExpAST();
     add_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1352,22 +1519,22 @@ yyreduce:
     add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = add_exp;
   }
-#line 1356 "build/sysy.tab.c"
+#line 1523 "build/sysy.tab.c"
     break;
 
-  case 22: /* RelExp: AddExp  */
-#line 200 "src/sysy.y"
+  case 36: /* RelExp: AddExp  */
+#line 318 "src/sysy.y"
            {
     auto rel_exp = new RelExpAST();
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     rel_exp -> mode = 1;
     (yyval.ast_val) = rel_exp;
   }
-#line 1367 "build/sysy.tab.c"
+#line 1534 "build/sysy.tab.c"
     break;
 
-  case 23: /* RelExp: RelExp '<' AddExp  */
-#line 206 "src/sysy.y"
+  case 37: /* RelExp: RelExp '<' AddExp  */
+#line 324 "src/sysy.y"
                       {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1376,11 +1543,11 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1380 "build/sysy.tab.c"
+#line 1547 "build/sysy.tab.c"
     break;
 
-  case 24: /* RelExp: RelExp '>' AddExp  */
-#line 214 "src/sysy.y"
+  case 38: /* RelExp: RelExp '>' AddExp  */
+#line 332 "src/sysy.y"
                       {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1389,11 +1556,11 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1393 "build/sysy.tab.c"
+#line 1560 "build/sysy.tab.c"
     break;
 
-  case 25: /* RelExp: RelExp LE AddExp  */
-#line 222 "src/sysy.y"
+  case 39: /* RelExp: RelExp LE AddExp  */
+#line 340 "src/sysy.y"
                      {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1402,11 +1569,11 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1406 "build/sysy.tab.c"
+#line 1573 "build/sysy.tab.c"
     break;
 
-  case 26: /* RelExp: RelExp GE AddExp  */
-#line 230 "src/sysy.y"
+  case 40: /* RelExp: RelExp GE AddExp  */
+#line 348 "src/sysy.y"
                      {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1415,22 +1582,22 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1419 "build/sysy.tab.c"
+#line 1586 "build/sysy.tab.c"
     break;
 
-  case 27: /* EqExp: RelExp  */
-#line 240 "src/sysy.y"
+  case 41: /* EqExp: RelExp  */
+#line 359 "src/sysy.y"
            {
     auto eq_exp = new EqExpAST();
     eq_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     eq_exp -> mode = 1;
     (yyval.ast_val) = eq_exp;
   }
-#line 1430 "build/sysy.tab.c"
+#line 1597 "build/sysy.tab.c"
     break;
 
-  case 28: /* EqExp: EqExp EQ RelExp  */
-#line 246 "src/sysy.y"
+  case 42: /* EqExp: EqExp EQ RelExp  */
+#line 365 "src/sysy.y"
                     {
     auto eq_exp = new EqExpAST();
     eq_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1439,11 +1606,11 @@ yyreduce:
     eq_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = eq_exp;
   }
-#line 1443 "build/sysy.tab.c"
+#line 1610 "build/sysy.tab.c"
     break;
 
-  case 29: /* EqExp: EqExp NE RelExp  */
-#line 254 "src/sysy.y"
+  case 43: /* EqExp: EqExp NE RelExp  */
+#line 373 "src/sysy.y"
                     {
     auto eq_exp = new EqExpAST();
     eq_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1452,22 +1619,22 @@ yyreduce:
     eq_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = eq_exp;
   }
-#line 1456 "build/sysy.tab.c"
+#line 1623 "build/sysy.tab.c"
     break;
 
-  case 30: /* LAndExp: EqExp  */
-#line 264 "src/sysy.y"
+  case 44: /* LAndExp: EqExp  */
+#line 384 "src/sysy.y"
           {
     auto land_exp = new LAndExpAST();
     land_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     land_exp -> mode = 1;
     (yyval.ast_val) = land_exp;
   }
-#line 1467 "build/sysy.tab.c"
+#line 1634 "build/sysy.tab.c"
     break;
 
-  case 31: /* LAndExp: LAndExp AND EqExp  */
-#line 270 "src/sysy.y"
+  case 45: /* LAndExp: LAndExp AND EqExp  */
+#line 390 "src/sysy.y"
                       {
     auto land_exp = new LAndExpAST();
     land_exp -> land_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1476,22 +1643,22 @@ yyreduce:
     land_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = land_exp;
   }
-#line 1480 "build/sysy.tab.c"
+#line 1647 "build/sysy.tab.c"
     break;
 
-  case 32: /* LOrExp: LAndExp  */
-#line 280 "src/sysy.y"
+  case 46: /* LOrExp: LAndExp  */
+#line 401 "src/sysy.y"
             {
     auto lor_exp = new LOrExpAST();
     lor_exp -> land_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     lor_exp -> mode = 1;
     (yyval.ast_val) = lor_exp;
   }
-#line 1491 "build/sysy.tab.c"
+#line 1658 "build/sysy.tab.c"
     break;
 
-  case 33: /* LOrExp: LOrExp OR LAndExp  */
-#line 286 "src/sysy.y"
+  case 47: /* LOrExp: LOrExp OR LAndExp  */
+#line 407 "src/sysy.y"
                       {
     auto lor_exp = new LOrExpAST();
     lor_exp -> lor_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1500,11 +1667,21 @@ yyreduce:
     lor_exp -> land_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = lor_exp;
   }
-#line 1504 "build/sysy.tab.c"
+#line 1671 "build/sysy.tab.c"
+    break;
+
+  case 48: /* ConstExp: Exp  */
+#line 419 "src/sysy.y"
+        {
+    auto const_exp = new ConstExpAST();
+    const_exp -> exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = const_exp;
+  }
+#line 1681 "build/sysy.tab.c"
     break;
 
 
-#line 1508 "build/sysy.tab.c"
+#line 1685 "build/sysy.tab.c"
 
       default: break;
     }
@@ -1697,7 +1874,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 297 "src/sysy.y"
+#line 425 "src/sysy.y"
 
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数

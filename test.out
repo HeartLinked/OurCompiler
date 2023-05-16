@@ -1,10 +1,3 @@
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } <= AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } } } }
-fun @main(): i32 {
-   %0 = add 0, 1
-   %1 = add 0, 2
-   %2 = le %0, %1
-   ret  %2
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { x, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { y, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } } } } } } } } },  } } }
 
-}
-
-当前时间：2023-05-16 15:05:40
+当前时间：2023-05-16 18:45:20

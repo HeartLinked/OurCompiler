@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
 using namespace std;
 
 extern int cnt;
@@ -76,6 +77,129 @@ class FuncDefAST : public BaseAST {
     // std::unique_ptr<BaseAST> funcbody;
 };
 
+// Decl := ConstDecl
+class DeclAST : public BaseAST {
+  public:
+    // 常量声明
+    std::unique_ptr<BaseAST> const_decl;
+
+    void Dump() const override {
+        cerr << "Dump DeclAST" << endl;
+        std::cout << "DeclAST { ";
+        const_decl->Dump();
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+        cerr << "Traverse DeclAST" << endl;
+        const_decl->Traverse();
+        return -1;
+    }
+};
+
+// ConstDecl := "const" Btype ConstDef {"," ConstDef} ";"
+class ConstDeclAST : public BaseAST {
+  public:
+    // 常量类型
+    std::unique_ptr<BaseAST> b_type;
+    // 常量定义
+    std::unique_ptr<vector<unique_ptr<BaseAST>> > const_defs;
+
+    void Dump() const override {
+        cerr << "Dump ConstDecl" << endl;
+        std::cout << "ConstDecl { ";
+        b_type->Dump();
+        std::cout << ", ";
+        for (auto &const_def : *const_defs) {
+            const_def->Dump();
+            std::cout << ", ";
+        }
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+     /*   cerr << "Traverse ConstDecl" << endl;
+        for (auto &const_def : const_defs) {
+            const_def->Traverse();
+        }
+        return -1;*/
+    }
+};
+
+// BType := "int"
+class BTypeAST : public BaseAST {
+  public:
+    // 类型
+    std::string btype;
+
+    void Dump() const override {
+        cerr << "Dump BTypeAST" << endl;
+        std::cout << "BTypeAST { ";
+        std::cout << btype;
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+    /*    cerr << "Traverse BtypeAST" << endl;
+        if (btype == "int") {
+            cout << "i32 ";
+        } else {
+            // TODO
+        }
+        return -1;  */
+    }
+};
+
+// ConstDef := IDENT "=" ConstInitVal
+class ConstDefAST : public BaseAST {
+  public:
+    // 常量名
+    std::string const_name;
+    // 常量初始值
+    std::unique_ptr<BaseAST> const_init_val;
+
+    void Dump() const override {
+        cerr << "Dump ConstDef" << endl;
+        std::cout << "ConstDef { ";
+        std::cout << const_name << ", ";
+        const_init_val->Dump();
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+     /*  cerr << "Traverse ConstDef" << endl;
+        cout << "@" << const_name << " = ";
+        const_init_val->Traverse();
+        cout << endl;
+        return -1; */
+    }
+};
+
+// ConstInitVal := ConstExp
+class ConstInitValAST : public BaseAST {
+  public:
+    // 常量表达式
+    std::unique_ptr<BaseAST> const_exp;
+
+    void Dump() const override {
+        cerr << "Dump ConstInitValAST" << endl;
+        std::cout << "ConstInitValAST { ";
+        const_exp->Dump();
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+      /*  cerr << "Traverse ConstInitValAST" << endl;
+        const_exp->Traverse();
+        return -1;  */
+    }
+};
+
+
+
+// ------------------------------
+
+// FuncType := Type
 class FuncTypeAST : public BaseAST {
   public:
     // 函数返回值类型
@@ -99,27 +223,61 @@ class FuncTypeAST : public BaseAST {
     }
 };
 
-// Block := '{' Stmt* '}'
 // Block := '{' Stmt '}'
 class BlockAST : public BaseAST {
   public:
     // 块内的语句，目前只有一条返回指令
-    std::unique_ptr<BaseAST> stmts;
+    // std::unique_ptr<BaseAST> block_item;
+    std::unique_ptr<vector<unique_ptr<BaseAST>> > block_items;
 
     void Dump() const override {
         cerr << "Dump BlockAST" << endl;
         std::cout << "BlockAST { ";
-        stmts->Dump();
+        for (auto &item : *block_items) {
+            item->Dump();
+            std::cout << ", ";
+        }
         std::cout << " }";
     }
 
     int Traverse() const override {
-        cerr << "Traverse BlockAST" << endl;
-        stmts->Traverse();
-        return -1;
+      /* cerr << "Traverse BlockAST" << endl;
+        block_item->Traverse();
+        return -1; */
     }
 
     // std::vector<std::unique_ptr<BaseAST>> stmts;
+};
+
+// BlockItem := Decl | Stmt
+class BlockItemAST : public BaseAST {
+  public:
+    int mode;
+    // 声明
+    std::unique_ptr<BaseAST> decl;
+    // 语句
+    std::unique_ptr<BaseAST> stmt;
+
+    void Dump() const override {
+        cerr << "Dump BlockItemAST" << endl;
+        std::cout << "BlockItemAST { ";
+        if (mode == 1) {
+            decl->Dump();
+        } else {
+            stmt->Dump();
+        }
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+      /*  cerr << "Traverse BlockItemAST" << endl;
+        if (decl) {
+            decl->Traverse();
+        } else {
+            stmt->Traverse();
+        }
+        return -1; */
+    }
 };
 
 // Stmt := "return" Exp ";"
@@ -161,6 +319,66 @@ class ExpAST : public BaseAST {
         cerr << "Traverse ExpAST" << endl;
         int x = lor_exp->Traverse();
         return x;
+    }
+};
+
+// Lval := IDENT
+class LValAST : public BaseAST {
+  public:
+    // 变量名
+    std::string name;
+
+    void Dump() const override {
+        cerr << "Dump Lval" << endl;
+        std::cout << "Lval { ";
+        std::cout << name;
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+    /*    cerr << "Traverse Lval" << endl;
+        cout << "   %" << name;
+        return -1;   */
+    }
+};
+
+// PrimaryExp := '(' Exp ')'
+// PrimaryExp := Number
+class PrimaryExpAST : public BaseAST {
+  public:
+    int mode; // 1为exp，2为lval, 3为number
+
+    std::unique_ptr<BaseAST> exp;
+
+    std::unique_ptr<BaseAST> lval;
+
+    int number;
+
+    void Dump() const override {
+        cerr << "Dump PrimaryExpAST" << endl;
+        std::cout << "PrimaryExp { ";
+        if (mode == 1) {
+            exp->Dump();
+        } else if(mode == 3){
+            std::cout << " " << number << " ";
+        } else {
+            lval->Dump();
+        }
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+        cerr << "Traverse PrimaryExpAST " << endl;
+        if (mode == 1) {
+            int x = exp->Traverse();
+            return x;
+        } else if(mode == 3){
+            int x = gen();
+            cout << "   %" << x << " = add 0, " << number << endl;
+            return x;
+        } else {
+          // TODO: lval
+        }
     }
 };
 
@@ -207,40 +425,6 @@ class UnaryExpAST : public BaseAST {
                 return x;
             else
                 return y;
-        }
-    }
-};
-
-// PrimaryExp := '(' Exp ')'
-// PrimaryExp := Number
-class PrimaryExpAST : public BaseAST {
-  public:
-    int mode; // 1为exp，2为number
-
-    std::unique_ptr<BaseAST> exp;
-
-    int number;
-
-    void Dump() const override {
-        cerr << "Dump PrimaryExpAST" << endl;
-        std::cout << "PrimaryExp { ";
-        if (mode == 1) {
-            exp->Dump();
-        } else {
-            std::cout << " " << number << " ";
-        }
-        std::cout << " }";
-    }
-
-    int Traverse() const override {
-        cerr << "Traverse PrimaryExpAST " << endl;
-        if (mode == 1) {
-            int x = exp->Traverse();
-            return x;
-        } else {
-            int x = gen();
-            cout << "   %" << x << " = add 0, " << number << endl;
-            return x;
         }
     }
 };
@@ -494,29 +678,21 @@ class LOrExpAST : public BaseAST {
       }
 };
 
-/*
-// FuncBody := (Decl | Stmt)*
-class FuncBodyAST : public BaseAST {
-  public:
-    // 函数体内的声明
-    std::vector<std::unique_ptr<BaseAST>> decls;
-    // 函数体内的语句
-    std::vector<std::unique_ptr<BaseAST>> stmts;
-};
+// ConstExp := Exp
+class ConstExpAST : public BaseAST {
+  public :
+      std::unique_ptr<BaseAST> exp;
 
-// ArgList := Arg (',' Arg)*
-class ArgListAST : public BaseAST {
-  public:
-    // 函数参数列表
-    std::vector<std::pair<std::string, std::string>> arglist;
-};
+      void Dump() const override {
+          cerr << "Dump ConstExp" << endl;
+          std::cout << "ConstExp { ";
+          exp->Dump();
+          std::cout << " }";
+      }
 
-// Arg := Type IDENT
-class ArgAST : public BaseAST {
-  public:
-    // 参数类型
-    std::string type;
-    // 参数名
-    std::string ident;
+      int Traverse() const override {
+        /*  cerr << "Traverse ConstExp" << endl;
+          int x = exp->Traverse();
+          return x;  */
+      }
 };
-*/

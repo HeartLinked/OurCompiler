@@ -44,7 +44,7 @@ int main(int argc, const char *argv[]) {
 
     cout << endl;
 
-    ParseAST(ast);
+    // ParseAST(ast);
 
     cout << endl;
 

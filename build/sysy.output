@@ -4,134 +4,191 @@
 
     1 CompUnit: FuncDef
 
-    2 FuncDef: FuncType IDENT '(' ')' Block
+    2 Decl: ConstDecl
 
-    3 FuncType: INT
+    3 ConstDecl: CONST BType ConstDefList ';'
 
-    4 Block: '{' Stmt '}'
+    4 ConstDefList: ConstDef
+    5             | ConstDef ',' ConstDefList
 
-    5 Stmt: RETURN Exp ';'
+    6 BType: INT
 
-    6 Exp: LOrExp
+    7 ConstDef: IDENT '=' ConstInitVal
 
-    7 PrimaryExp: '(' Exp ')'
-    8           | Number
+    8 ConstInitVal: ConstExp
 
-    9 UnaryExp: PrimaryExp
-   10         | UnaryOp UnaryExp
+    9 FuncDef: FuncType IDENT '(' ')' Block
 
-   11 UnaryOp: '+'
-   12        | '-'
-   13        | '!'
+   10 FuncType: INT
 
-   14 MulExp: UnaryExp
-   15       | MulExp '*' UnaryExp
-   16       | MulExp '/' UnaryExp
-   17       | MulExp '%' UnaryExp
+   11 Block: '{' BlockItemList '}'
 
-   18 AddExp: MulExp
-   19       | AddExp '+' MulExp
-   20       | AddExp '-' MulExp
+   12 BlockItemList: BlockItem
+   13              | BlockItem BlockItemList
 
-   21 RelExp: AddExp
-   22       | RelExp '<' AddExp
-   23       | RelExp '>' AddExp
-   24       | RelExp LE AddExp
-   25       | RelExp GE AddExp
+   14 BlockItem: Decl
+   15          | Stmt
 
-   26 EqExp: RelExp
-   27      | EqExp EQ RelExp
-   28      | EqExp NE RelExp
+   16 Stmt: RETURN Exp ';'
 
-   29 LAndExp: EqExp
-   30        | LAndExp AND EqExp
+   17 Exp: LOrExp
 
-   31 LOrExp: LAndExp
-   32       | LOrExp OR LAndExp
+   18 LVal: IDENT
 
-   33 Number: INT_CONST
+   19 PrimaryExp: '(' Exp ')'
+   20           | LVal
+   21           | Number
+
+   22 Number: INT_CONST
+
+   23 UnaryExp: PrimaryExp
+   24         | UnaryOp UnaryExp
+
+   25 UnaryOp: '+'
+   26        | '-'
+   27        | '!'
+
+   28 MulExp: UnaryExp
+   29       | MulExp '*' UnaryExp
+   30       | MulExp '/' UnaryExp
+   31       | MulExp '%' UnaryExp
+
+   32 AddExp: MulExp
+   33       | AddExp '+' MulExp
+   34       | AddExp '-' MulExp
+
+   35 RelExp: AddExp
+   36       | RelExp '<' AddExp
+   37       | RelExp '>' AddExp
+   38       | RelExp LE AddExp
+   39       | RelExp GE AddExp
+
+   40 EqExp: RelExp
+   41      | EqExp EQ RelExp
+   42      | EqExp NE RelExp
+
+   43 LAndExp: EqExp
+   44        | LAndExp AND EqExp
+
+   45 LOrExp: LAndExp
+   46       | LOrExp OR LAndExp
+
+   47 ConstExp: Exp
 
 
 终结语词，附有它们出现处的规则
 
     $end (0) 0
-    '!' (33) 13
-    '%' (37) 17
-    '(' (40) 2 7
-    ')' (41) 2 7
-    '*' (42) 15
-    '+' (43) 11 19
-    '-' (45) 12 20
-    '/' (47) 16
-    ';' (59) 5
-    '<' (60) 22
-    '>' (62) 23
-    '{' (123) 4
-    '}' (125) 4
+    '!' (33) 27
+    '%' (37) 31
+    '(' (40) 9 19
+    ')' (41) 9 19
+    '*' (42) 29
+    '+' (43) 25 33
+    ',' (44) 5
+    '-' (45) 26 34
+    '/' (47) 30
+    ';' (59) 3 16
+    '<' (60) 36
+    '=' (61) 7
+    '>' (62) 37
+    '{' (123) 11
+    '}' (125) 11
     error (256)
-    INT (258) 3
-    RETURN (259) 5
-    AND (260) 30
-    OR (261) 32
-    EQ (262) 27
-    NE (263) 28
-    LE (264) 24
-    GE (265) 25
-    IDENT <str_val> (266) 2
-    INT_CONST <int_val> (267) 33
+    INT (258) 6 10
+    RETURN (259) 16
+    AND (260) 44
+    OR (261) 46
+    EQ (262) 41
+    NE (263) 42
+    LE (264) 38
+    GE (265) 39
+    CONST (266) 3
+    IDENT <str_val> (267) 7 9 18
+    INT_CONST <int_val> (268) 22
 
 
 非终结语词，附有它们出现处的规则
 
-    $accept (26)
+    $accept (29)
         on left: 0
-    CompUnit (27)
+    CompUnit (30)
         on left: 1
         on right: 0
-    FuncDef <ast_val> (28)
+    Decl <ast_val> (31)
         on left: 2
-        on right: 1
-    FuncType <ast_val> (29)
+        on right: 14
+    ConstDecl <ast_val> (32)
         on left: 3
         on right: 2
-    Block <ast_val> (30)
-        on left: 4
-        on right: 2
-    Stmt <ast_val> (31)
-        on left: 5
-        on right: 4
-    Exp <ast_val> (32)
+    ConstDefList <ast_list_val> (33)
+        on left: 4 5
+        on right: 3 5
+    BType <ast_val> (34)
         on left: 6
-        on right: 5 7
-    PrimaryExp <ast_val> (33)
-        on left: 7 8
+        on right: 3
+    ConstDef <ast_val> (35)
+        on left: 7
+        on right: 4 5
+    ConstInitVal <ast_val> (36)
+        on left: 8
+        on right: 7
+    FuncDef <ast_val> (37)
+        on left: 9
+        on right: 1
+    FuncType <ast_val> (38)
+        on left: 10
         on right: 9
-    UnaryExp <ast_val> (34)
-        on left: 9 10
-        on right: 10 14 15 16 17
-    UnaryOp <str_val> (35)
-        on left: 11 12 13
-        on right: 10
-    MulExp <ast_val> (36)
-        on left: 14 15 16 17
-        on right: 15 16 17 18 19 20
-    AddExp <ast_val> (37)
-        on left: 18 19 20
-        on right: 19 20 21 22 23 24 25
-    RelExp <ast_val> (38)
-        on left: 21 22 23 24 25
-        on right: 22 23 24 25 26 27 28
-    EqExp <ast_val> (39)
-        on left: 26 27 28
-        on right: 27 28 29 30
-    LAndExp <ast_val> (40)
-        on left: 29 30
-        on right: 30 31 32
-    LOrExp <ast_val> (41)
-        on left: 31 32
-        on right: 6 32
-    Number <int_val> (42)
-        on left: 33
+    Block <ast_val> (39)
+        on left: 11
+        on right: 9
+    BlockItemList <ast_list_val> (40)
+        on left: 12 13
+        on right: 11 13
+    BlockItem <ast_val> (41)
+        on left: 14 15
+        on right: 12 13
+    Stmt <ast_val> (42)
+        on left: 16
+        on right: 15
+    Exp <ast_val> (43)
+        on left: 17
+        on right: 16 19 47
+    LVal <ast_val> (44)
+        on left: 18
+        on right: 20
+    PrimaryExp <ast_val> (45)
+        on left: 19 20 21
+        on right: 23
+    Number <int_val> (46)
+        on left: 22
+        on right: 21
+    UnaryExp <ast_val> (47)
+        on left: 23 24
+        on right: 24 28 29 30 31
+    UnaryOp <str_val> (48)
+        on left: 25 26 27
+        on right: 24
+    MulExp <ast_val> (49)
+        on left: 28 29 30 31
+        on right: 29 30 31 32 33 34
+    AddExp <ast_val> (50)
+        on left: 32 33 34
+        on right: 33 34 35 36 37 38 39
+    RelExp <ast_val> (51)
+        on left: 35 36 37 38 39
+        on right: 36 37 38 39 40 41 42
+    EqExp <ast_val> (52)
+        on left: 40 41 42
+        on right: 41 42 43 44
+    LAndExp <ast_val> (53)
+        on left: 43 44
+        on right: 44 45 46
+    LOrExp <ast_val> (54)
+        on left: 45 46
+        on right: 17 46
+    ConstExp <ast_val> (55)
+        on left: 47
         on right: 8
 
 
@@ -148,9 +205,9 @@
 
 状态 1
 
-    3 FuncType: INT •
+   10 FuncType: INT •
 
-    $default  使用规则 3 以归约 (FuncType)
+    $default  使用规则 10 以归约 (FuncType)
 
 
 状态 2
@@ -169,7 +226,7 @@
 
 状态 4
 
-    2 FuncDef: FuncType • IDENT '(' ')' Block
+    9 FuncDef: FuncType • IDENT '(' ')' Block
 
     IDENT  偏移，并进入状态 6
 
@@ -183,21 +240,21 @@
 
 状态 6
 
-    2 FuncDef: FuncType IDENT • '(' ')' Block
+    9 FuncDef: FuncType IDENT • '(' ')' Block
 
     '('  偏移，并进入状态 7
 
 
 状态 7
 
-    2 FuncDef: FuncType IDENT '(' • ')' Block
+    9 FuncDef: FuncType IDENT '(' • ')' Block
 
     ')'  偏移，并进入状态 8
 
 
 状态 8
 
-    2 FuncDef: FuncType IDENT '(' ')' • Block
+    9 FuncDef: FuncType IDENT '(' ')' • Block
 
     '{'  偏移，并进入状态 9
 
@@ -206,633 +263,851 @@
 
 状态 9
 
-    4 Block: '{' • Stmt '}'
+   11 Block: '{' • BlockItemList '}'
 
     RETURN  偏移，并进入状态 11
+    CONST   偏移，并进入状态 12
 
-    Stmt  转到状态 12
+    Decl           转到状态 13
+    ConstDecl      转到状态 14
+    BlockItemList  转到状态 15
+    BlockItem      转到状态 16
+    Stmt           转到状态 17
 
 
 状态 10
 
-    2 FuncDef: FuncType IDENT '(' ')' Block •
+    9 FuncDef: FuncType IDENT '(' ')' Block •
 
-    $default  使用规则 2 以归约 (FuncDef)
+    $default  使用规则 9 以归约 (FuncDef)
 
 
 状态 11
 
-    5 Stmt: RETURN • Exp ';'
+   16 Stmt: RETURN • Exp ';'
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    Exp         转到状态 18
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 23
-    RelExp      转到状态 24
-    EqExp       转到状态 25
-    LAndExp     转到状态 26
-    LOrExp      转到状态 27
-    Number      转到状态 28
+    Exp         转到状态 24
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 31
+    RelExp      转到状态 32
+    EqExp       转到状态 33
+    LAndExp     转到状态 34
+    LOrExp      转到状态 35
 
 
 状态 12
 
-    4 Block: '{' Stmt • '}'
+    3 ConstDecl: CONST • BType ConstDefList ';'
 
-    '}'  偏移，并进入状态 29
+    INT  偏移，并进入状态 36
+
+    BType  转到状态 37
 
 
 状态 13
 
-   33 Number: INT_CONST •
+   14 BlockItem: Decl •
 
-    $default  使用规则 33 以归约 (Number)
+    $default  使用规则 14 以归约 (BlockItem)
 
 
 状态 14
 
-    7 PrimaryExp: '(' • Exp ')'
+    2 Decl: ConstDecl •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    Exp         转到状态 30
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 23
-    RelExp      转到状态 24
-    EqExp       转到状态 25
-    LAndExp     转到状态 26
-    LOrExp      转到状态 27
-    Number      转到状态 28
+    $default  使用规则 2 以归约 (Decl)
 
 
 状态 15
 
-   11 UnaryOp: '+' •
+   11 Block: '{' BlockItemList • '}'
 
-    $default  使用规则 11 以归约 (UnaryOp)
+    '}'  偏移，并进入状态 38
 
 
 状态 16
 
-   12 UnaryOp: '-' •
+   12 BlockItemList: BlockItem •
+   13              | BlockItem • BlockItemList
 
-    $default  使用规则 12 以归约 (UnaryOp)
+    RETURN  偏移，并进入状态 11
+    CONST   偏移，并进入状态 12
+
+    $default  使用规则 12 以归约 (BlockItemList)
+
+    Decl           转到状态 13
+    ConstDecl      转到状态 14
+    BlockItemList  转到状态 39
+    BlockItem      转到状态 16
+    Stmt           转到状态 17
 
 
 状态 17
 
-   13 UnaryOp: '!' •
+   15 BlockItem: Stmt •
 
-    $default  使用规则 13 以归约 (UnaryOp)
+    $default  使用规则 15 以归约 (BlockItem)
 
 
 状态 18
 
-    5 Stmt: RETURN Exp • ';'
+   18 LVal: IDENT •
 
-    ';'  偏移，并进入状态 31
+    $default  使用规则 18 以归约 (LVal)
 
 
 状态 19
 
-    9 UnaryExp: PrimaryExp •
+   22 Number: INT_CONST •
 
-    $default  使用规则 9 以归约 (UnaryExp)
+    $default  使用规则 22 以归约 (Number)
 
 
 状态 20
 
-   14 MulExp: UnaryExp •
+   19 PrimaryExp: '(' • Exp ')'
 
-    $default  使用规则 14 以归约 (MulExp)
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    Exp         转到状态 40
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 31
+    RelExp      转到状态 32
+    EqExp       转到状态 33
+    LAndExp     转到状态 34
+    LOrExp      转到状态 35
 
 
 状态 21
 
-   10 UnaryExp: UnaryOp • UnaryExp
+   25 UnaryOp: '+' •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 32
-    UnaryOp     转到状态 21
-    Number      转到状态 28
+    $default  使用规则 25 以归约 (UnaryOp)
 
 
 状态 22
 
-   15 MulExp: MulExp • '*' UnaryExp
-   16       | MulExp • '/' UnaryExp
-   17       | MulExp • '%' UnaryExp
-   18 AddExp: MulExp •
+   26 UnaryOp: '-' •
 
-    '*'  偏移，并进入状态 33
-    '/'  偏移，并进入状态 34
-    '%'  偏移，并进入状态 35
-
-    $default  使用规则 18 以归约 (AddExp)
+    $default  使用规则 26 以归约 (UnaryOp)
 
 
 状态 23
 
-   19 AddExp: AddExp • '+' MulExp
-   20       | AddExp • '-' MulExp
-   21 RelExp: AddExp •
+   27 UnaryOp: '!' •
 
-    '+'  偏移，并进入状态 36
-    '-'  偏移，并进入状态 37
-
-    $default  使用规则 21 以归约 (RelExp)
+    $default  使用规则 27 以归约 (UnaryOp)
 
 
 状态 24
 
-   22 RelExp: RelExp • '<' AddExp
-   23       | RelExp • '>' AddExp
-   24       | RelExp • LE AddExp
-   25       | RelExp • GE AddExp
-   26 EqExp: RelExp •
+   16 Stmt: RETURN Exp • ';'
 
-    LE   偏移，并进入状态 38
-    GE   偏移，并进入状态 39
-    '<'  偏移，并进入状态 40
-    '>'  偏移，并进入状态 41
-
-    $default  使用规则 26 以归约 (EqExp)
+    ';'  偏移，并进入状态 41
 
 
 状态 25
 
-   27 EqExp: EqExp • EQ RelExp
-   28      | EqExp • NE RelExp
-   29 LAndExp: EqExp •
+   20 PrimaryExp: LVal •
 
-    EQ  偏移，并进入状态 42
-    NE  偏移，并进入状态 43
-
-    $default  使用规则 29 以归约 (LAndExp)
+    $default  使用规则 20 以归约 (PrimaryExp)
 
 
 状态 26
 
-   30 LAndExp: LAndExp • AND EqExp
-   31 LOrExp: LAndExp •
+   23 UnaryExp: PrimaryExp •
 
-    AND  偏移，并进入状态 44
-
-    $default  使用规则 31 以归约 (LOrExp)
+    $default  使用规则 23 以归约 (UnaryExp)
 
 
 状态 27
 
-    6 Exp: LOrExp •
-   32 LOrExp: LOrExp • OR LAndExp
+   21 PrimaryExp: Number •
 
-    OR  偏移，并进入状态 45
-
-    $default  使用规则 6 以归约 (Exp)
+    $default  使用规则 21 以归约 (PrimaryExp)
 
 
 状态 28
 
-    8 PrimaryExp: Number •
+   28 MulExp: UnaryExp •
 
-    $default  使用规则 8 以归约 (PrimaryExp)
+    $default  使用规则 28 以归约 (MulExp)
 
 
 状态 29
 
-    4 Block: '{' Stmt '}' •
+   24 UnaryExp: UnaryOp • UnaryExp
 
-    $default  使用规则 4 以归约 (Block)
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 42
+    UnaryOp     转到状态 29
 
 
 状态 30
 
-    7 PrimaryExp: '(' Exp • ')'
+   29 MulExp: MulExp • '*' UnaryExp
+   30       | MulExp • '/' UnaryExp
+   31       | MulExp • '%' UnaryExp
+   32 AddExp: MulExp •
 
-    ')'  偏移，并进入状态 46
+    '*'  偏移，并进入状态 43
+    '/'  偏移，并进入状态 44
+    '%'  偏移，并进入状态 45
+
+    $default  使用规则 32 以归约 (AddExp)
 
 
 状态 31
 
-    5 Stmt: RETURN Exp ';' •
+   33 AddExp: AddExp • '+' MulExp
+   34       | AddExp • '-' MulExp
+   35 RelExp: AddExp •
 
-    $default  使用规则 5 以归约 (Stmt)
+    '+'  偏移，并进入状态 46
+    '-'  偏移，并进入状态 47
+
+    $default  使用规则 35 以归约 (RelExp)
 
 
 状态 32
 
-   10 UnaryExp: UnaryOp UnaryExp •
+   36 RelExp: RelExp • '<' AddExp
+   37       | RelExp • '>' AddExp
+   38       | RelExp • LE AddExp
+   39       | RelExp • GE AddExp
+   40 EqExp: RelExp •
 
-    $default  使用规则 10 以归约 (UnaryExp)
+    LE   偏移，并进入状态 48
+    GE   偏移，并进入状态 49
+    '<'  偏移，并进入状态 50
+    '>'  偏移，并进入状态 51
+
+    $default  使用规则 40 以归约 (EqExp)
 
 
 状态 33
 
-   15 MulExp: MulExp '*' • UnaryExp
+   41 EqExp: EqExp • EQ RelExp
+   42      | EqExp • NE RelExp
+   43 LAndExp: EqExp •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    EQ  偏移，并进入状态 52
+    NE  偏移，并进入状态 53
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 47
-    UnaryOp     转到状态 21
-    Number      转到状态 28
+    $default  使用规则 43 以归约 (LAndExp)
 
 
 状态 34
 
-   16 MulExp: MulExp '/' • UnaryExp
+   44 LAndExp: LAndExp • AND EqExp
+   45 LOrExp: LAndExp •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    AND  偏移，并进入状态 54
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 48
-    UnaryOp     转到状态 21
-    Number      转到状态 28
+    $default  使用规则 45 以归约 (LOrExp)
 
 
 状态 35
 
-   17 MulExp: MulExp '%' • UnaryExp
+   17 Exp: LOrExp •
+   46 LOrExp: LOrExp • OR LAndExp
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    OR  偏移，并进入状态 55
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 49
-    UnaryOp     转到状态 21
-    Number      转到状态 28
+    $default  使用规则 17 以归约 (Exp)
 
 
 状态 36
 
-   19 AddExp: AddExp '+' • MulExp
+    6 BType: INT •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 50
-    Number      转到状态 28
+    $default  使用规则 6 以归约 (BType)
 
 
 状态 37
 
-   20 AddExp: AddExp '-' • MulExp
+    3 ConstDecl: CONST BType • ConstDefList ';'
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    IDENT  偏移，并进入状态 56
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 51
-    Number      转到状态 28
+    ConstDefList  转到状态 57
+    ConstDef      转到状态 58
 
 
 状态 38
 
-   24 RelExp: RelExp LE • AddExp
+   11 Block: '{' BlockItemList '}' •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 52
-    Number      转到状态 28
+    $default  使用规则 11 以归约 (Block)
 
 
 状态 39
 
-   25 RelExp: RelExp GE • AddExp
+   13 BlockItemList: BlockItem BlockItemList •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 53
-    Number      转到状态 28
+    $default  使用规则 13 以归约 (BlockItemList)
 
 
 状态 40
 
-   22 RelExp: RelExp '<' • AddExp
+   19 PrimaryExp: '(' Exp • ')'
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 54
-    Number      转到状态 28
+    ')'  偏移，并进入状态 59
 
 
 状态 41
 
-   23 RelExp: RelExp '>' • AddExp
+   16 Stmt: RETURN Exp ';' •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 55
-    Number      转到状态 28
+    $default  使用规则 16 以归约 (Stmt)
 
 
 状态 42
 
-   27 EqExp: EqExp EQ • RelExp
+   24 UnaryExp: UnaryOp UnaryExp •
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
-
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 23
-    RelExp      转到状态 56
-    Number      转到状态 28
+    $default  使用规则 24 以归约 (UnaryExp)
 
 
 状态 43
 
-   28 EqExp: EqExp NE • RelExp
+   29 MulExp: MulExp '*' • UnaryExp
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 23
-    RelExp      转到状态 57
-    Number      转到状态 28
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 60
+    UnaryOp     转到状态 29
 
 
 状态 44
 
-   30 LAndExp: LAndExp AND • EqExp
+   30 MulExp: MulExp '/' • UnaryExp
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 23
-    RelExp      转到状态 24
-    EqExp       转到状态 58
-    Number      转到状态 28
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 61
+    UnaryOp     转到状态 29
 
 
 状态 45
 
-   32 LOrExp: LOrExp OR • LAndExp
+   31 MulExp: MulExp '%' • UnaryExp
 
-    INT_CONST  偏移，并进入状态 13
-    '('        偏移，并进入状态 14
-    '+'        偏移，并进入状态 15
-    '-'        偏移，并进入状态 16
-    '!'        偏移，并进入状态 17
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    PrimaryExp  转到状态 19
-    UnaryExp    转到状态 20
-    UnaryOp     转到状态 21
-    MulExp      转到状态 22
-    AddExp      转到状态 23
-    RelExp      转到状态 24
-    EqExp       转到状态 25
-    LAndExp     转到状态 59
-    Number      转到状态 28
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 62
+    UnaryOp     转到状态 29
 
 
 状态 46
 
-    7 PrimaryExp: '(' Exp ')' •
+   33 AddExp: AddExp '+' • MulExp
 
-    $default  使用规则 7 以归约 (PrimaryExp)
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 63
 
 
 状态 47
 
-   15 MulExp: MulExp '*' UnaryExp •
+   34 AddExp: AddExp '-' • MulExp
 
-    $default  使用规则 15 以归约 (MulExp)
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 64
 
 
 状态 48
 
-   16 MulExp: MulExp '/' UnaryExp •
+   38 RelExp: RelExp LE • AddExp
 
-    $default  使用规则 16 以归约 (MulExp)
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 65
 
 
 状态 49
 
-   17 MulExp: MulExp '%' UnaryExp •
+   39 RelExp: RelExp GE • AddExp
 
-    $default  使用规则 17 以归约 (MulExp)
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 66
 
 
 状态 50
 
-   15 MulExp: MulExp • '*' UnaryExp
-   16       | MulExp • '/' UnaryExp
-   17       | MulExp • '%' UnaryExp
-   19 AddExp: AddExp '+' MulExp •
+   36 RelExp: RelExp '<' • AddExp
 
-    '*'  偏移，并进入状态 33
-    '/'  偏移，并进入状态 34
-    '%'  偏移，并进入状态 35
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    $default  使用规则 19 以归约 (AddExp)
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 67
 
 
 状态 51
 
-   15 MulExp: MulExp • '*' UnaryExp
-   16       | MulExp • '/' UnaryExp
-   17       | MulExp • '%' UnaryExp
-   20 AddExp: AddExp '-' MulExp •
+   37 RelExp: RelExp '>' • AddExp
 
-    '*'  偏移，并进入状态 33
-    '/'  偏移，并进入状态 34
-    '%'  偏移，并进入状态 35
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    $default  使用规则 20 以归约 (AddExp)
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 68
 
 
 状态 52
 
-   19 AddExp: AddExp • '+' MulExp
-   20       | AddExp • '-' MulExp
-   24 RelExp: RelExp LE AddExp •
+   41 EqExp: EqExp EQ • RelExp
 
-    '+'  偏移，并进入状态 36
-    '-'  偏移，并进入状态 37
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    $default  使用规则 24 以归约 (RelExp)
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 31
+    RelExp      转到状态 69
 
 
 状态 53
 
-   19 AddExp: AddExp • '+' MulExp
-   20       | AddExp • '-' MulExp
-   25 RelExp: RelExp GE AddExp •
+   42 EqExp: EqExp NE • RelExp
 
-    '+'  偏移，并进入状态 36
-    '-'  偏移，并进入状态 37
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    $default  使用规则 25 以归约 (RelExp)
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 31
+    RelExp      转到状态 70
 
 
 状态 54
 
-   19 AddExp: AddExp • '+' MulExp
-   20       | AddExp • '-' MulExp
-   22 RelExp: RelExp '<' AddExp •
+   44 LAndExp: LAndExp AND • EqExp
 
-    '+'  偏移，并进入状态 36
-    '-'  偏移，并进入状态 37
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    $default  使用规则 22 以归约 (RelExp)
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 31
+    RelExp      转到状态 32
+    EqExp       转到状态 71
 
 
 状态 55
 
-   19 AddExp: AddExp • '+' MulExp
-   20       | AddExp • '-' MulExp
-   23 RelExp: RelExp '>' AddExp •
+   46 LOrExp: LOrExp OR • LAndExp
 
-    '+'  偏移，并进入状态 36
-    '-'  偏移，并进入状态 37
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
 
-    $default  使用规则 23 以归约 (RelExp)
+    LVal        转到状态 25
+    PrimaryExp  转到状态 26
+    Number      转到状态 27
+    UnaryExp    转到状态 28
+    UnaryOp     转到状态 29
+    MulExp      转到状态 30
+    AddExp      转到状态 31
+    RelExp      转到状态 32
+    EqExp       转到状态 33
+    LAndExp     转到状态 72
 
 
 状态 56
 
-   22 RelExp: RelExp • '<' AddExp
-   23       | RelExp • '>' AddExp
-   24       | RelExp • LE AddExp
-   25       | RelExp • GE AddExp
-   27 EqExp: EqExp EQ RelExp •
+    7 ConstDef: IDENT • '=' ConstInitVal
 
-    LE   偏移，并进入状态 38
-    GE   偏移，并进入状态 39
-    '<'  偏移，并进入状态 40
-    '>'  偏移，并进入状态 41
-
-    $default  使用规则 27 以归约 (EqExp)
+    '='  偏移，并进入状态 73
 
 
 状态 57
 
-   22 RelExp: RelExp • '<' AddExp
-   23       | RelExp • '>' AddExp
-   24       | RelExp • LE AddExp
-   25       | RelExp • GE AddExp
-   28 EqExp: EqExp NE RelExp •
+    3 ConstDecl: CONST BType ConstDefList • ';'
 
-    LE   偏移，并进入状态 38
-    GE   偏移，并进入状态 39
-    '<'  偏移，并进入状态 40
-    '>'  偏移，并进入状态 41
-
-    $default  使用规则 28 以归约 (EqExp)
+    ';'  偏移，并进入状态 74
 
 
 状态 58
 
-   27 EqExp: EqExp • EQ RelExp
-   28      | EqExp • NE RelExp
-   30 LAndExp: LAndExp AND EqExp •
+    4 ConstDefList: ConstDef •
+    5             | ConstDef • ',' ConstDefList
 
-    EQ  偏移，并进入状态 42
-    NE  偏移，并进入状态 43
+    ','  偏移，并进入状态 75
 
-    $default  使用规则 30 以归约 (LAndExp)
+    $default  使用规则 4 以归约 (ConstDefList)
 
 
 状态 59
 
-   30 LAndExp: LAndExp • AND EqExp
-   32 LOrExp: LOrExp OR LAndExp •
+   19 PrimaryExp: '(' Exp ')' •
 
-    AND  偏移，并进入状态 44
+    $default  使用规则 19 以归约 (PrimaryExp)
 
-    $default  使用规则 32 以归约 (LOrExp)
+
+状态 60
+
+   29 MulExp: MulExp '*' UnaryExp •
+
+    $default  使用规则 29 以归约 (MulExp)
+
+
+状态 61
+
+   30 MulExp: MulExp '/' UnaryExp •
+
+    $default  使用规则 30 以归约 (MulExp)
+
+
+状态 62
+
+   31 MulExp: MulExp '%' UnaryExp •
+
+    $default  使用规则 31 以归约 (MulExp)
+
+
+状态 63
+
+   29 MulExp: MulExp • '*' UnaryExp
+   30       | MulExp • '/' UnaryExp
+   31       | MulExp • '%' UnaryExp
+   33 AddExp: AddExp '+' MulExp •
+
+    '*'  偏移，并进入状态 43
+    '/'  偏移，并进入状态 44
+    '%'  偏移，并进入状态 45
+
+    $default  使用规则 33 以归约 (AddExp)
+
+
+状态 64
+
+   29 MulExp: MulExp • '*' UnaryExp
+   30       | MulExp • '/' UnaryExp
+   31       | MulExp • '%' UnaryExp
+   34 AddExp: AddExp '-' MulExp •
+
+    '*'  偏移，并进入状态 43
+    '/'  偏移，并进入状态 44
+    '%'  偏移，并进入状态 45
+
+    $default  使用规则 34 以归约 (AddExp)
+
+
+状态 65
+
+   33 AddExp: AddExp • '+' MulExp
+   34       | AddExp • '-' MulExp
+   38 RelExp: RelExp LE AddExp •
+
+    '+'  偏移，并进入状态 46
+    '-'  偏移，并进入状态 47
+
+    $default  使用规则 38 以归约 (RelExp)
+
+
+状态 66
+
+   33 AddExp: AddExp • '+' MulExp
+   34       | AddExp • '-' MulExp
+   39 RelExp: RelExp GE AddExp •
+
+    '+'  偏移，并进入状态 46
+    '-'  偏移，并进入状态 47
+
+    $default  使用规则 39 以归约 (RelExp)
+
+
+状态 67
+
+   33 AddExp: AddExp • '+' MulExp
+   34       | AddExp • '-' MulExp
+   36 RelExp: RelExp '<' AddExp •
+
+    '+'  偏移，并进入状态 46
+    '-'  偏移，并进入状态 47
+
+    $default  使用规则 36 以归约 (RelExp)
+
+
+状态 68
+
+   33 AddExp: AddExp • '+' MulExp
+   34       | AddExp • '-' MulExp
+   37 RelExp: RelExp '>' AddExp •
+
+    '+'  偏移，并进入状态 46
+    '-'  偏移，并进入状态 47
+
+    $default  使用规则 37 以归约 (RelExp)
+
+
+状态 69
+
+   36 RelExp: RelExp • '<' AddExp
+   37       | RelExp • '>' AddExp
+   38       | RelExp • LE AddExp
+   39       | RelExp • GE AddExp
+   41 EqExp: EqExp EQ RelExp •
+
+    LE   偏移，并进入状态 48
+    GE   偏移，并进入状态 49
+    '<'  偏移，并进入状态 50
+    '>'  偏移，并进入状态 51
+
+    $default  使用规则 41 以归约 (EqExp)
+
+
+状态 70
+
+   36 RelExp: RelExp • '<' AddExp
+   37       | RelExp • '>' AddExp
+   38       | RelExp • LE AddExp
+   39       | RelExp • GE AddExp
+   42 EqExp: EqExp NE RelExp •
+
+    LE   偏移，并进入状态 48
+    GE   偏移，并进入状态 49
+    '<'  偏移，并进入状态 50
+    '>'  偏移，并进入状态 51
+
+    $default  使用规则 42 以归约 (EqExp)
+
+
+状态 71
+
+   41 EqExp: EqExp • EQ RelExp
+   42      | EqExp • NE RelExp
+   44 LAndExp: LAndExp AND EqExp •
+
+    EQ  偏移，并进入状态 52
+    NE  偏移，并进入状态 53
+
+    $default  使用规则 44 以归约 (LAndExp)
+
+
+状态 72
+
+   44 LAndExp: LAndExp • AND EqExp
+   46 LOrExp: LOrExp OR LAndExp •
+
+    AND  偏移，并进入状态 54
+
+    $default  使用规则 46 以归约 (LOrExp)
+
+
+状态 73
+
+    7 ConstDef: IDENT '=' • ConstInitVal
+
+    IDENT      偏移，并进入状态 18
+    INT_CONST  偏移，并进入状态 19
+    '('        偏移，并进入状态 20
+    '+'        偏移，并进入状态 21
+    '-'        偏移，并进入状态 22
+    '!'        偏移，并进入状态 23
+
+    ConstInitVal  转到状态 76
+    Exp           转到状态 77
+    LVal          转到状态 25
+    PrimaryExp    转到状态 26
+    Number        转到状态 27
+    UnaryExp      转到状态 28
+    UnaryOp       转到状态 29
+    MulExp        转到状态 30
+    AddExp        转到状态 31
+    RelExp        转到状态 32
+    EqExp         转到状态 33
+    LAndExp       转到状态 34
+    LOrExp        转到状态 35
+    ConstExp      转到状态 78
+
+
+状态 74
+
+    3 ConstDecl: CONST BType ConstDefList ';' •
+
+    $default  使用规则 3 以归约 (ConstDecl)
+
+
+状态 75
+
+    5 ConstDefList: ConstDef ',' • ConstDefList
+
+    IDENT  偏移，并进入状态 56
+
+    ConstDefList  转到状态 79
+    ConstDef      转到状态 58
+
+
+状态 76
+
+    7 ConstDef: IDENT '=' ConstInitVal •
+
+    $default  使用规则 7 以归约 (ConstDef)
+
+
+状态 77
+
+   47 ConstExp: Exp •
+
+    $default  使用规则 47 以归约 (ConstExp)
+
+
+状态 78
+
+    8 ConstInitVal: ConstExp •
+
+    $default  使用规则 8 以归约 (ConstInitVal)
+
+
+状态 79
+
+    5 ConstDefList: ConstDef ',' ConstDefList •
+
+    $default  使用规则 5 以归约 (ConstDefList)

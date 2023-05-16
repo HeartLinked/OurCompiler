@@ -39,13 +39,13 @@
 # define YY_YY_BUILD_SYSY_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 1 "src/sysy.y"
+#line 3 "src/sysy.y"
 
   #include <memory>
   #include <string>
@@ -70,8 +70,9 @@ extern int yydebug;
     NE = 263,                      /* NE  */
     LE = 264,                      /* LE  */
     GE = 265,                      /* GE  */
-    IDENT = 266,                   /* IDENT  */
-    INT_CONST = 267                /* INT_CONST  */
+    CONST = 266,                   /* CONST  */
+    IDENT = 267,                   /* IDENT  */
+    INT_CONST = 268                /* INT_CONST  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -80,13 +81,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "src/sysy.y"
+#line 28 "src/sysy.y"
 
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;   // AST
+  vector<std::unique_ptr<BaseAST>> *ast_list_val; // AST list
 
-#line 90 "build/sysy.tab.hpp"
+#line 92 "build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
