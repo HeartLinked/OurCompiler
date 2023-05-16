@@ -36,7 +36,7 @@ using namespace std;
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
-%type <ast_val> FuncDef FuncType Block Stmt PrimaryExp UnaryExp Exp
+%type <ast_val> FuncDef FuncType Block Stmt PrimaryExp UnaryExp Exp MulExp AddExp
 %type <str_val> UnaryOp
 %type <int_val> Number
 
@@ -99,9 +99,10 @@ Stmt
 
 
 Exp
-  : UnaryExp {
+  : AddExp {
+    // TODO 
     auto exp = new ExpAST();
-    exp -> unary_exp = unique_ptr<BaseAST>($1);
+    exp -> add_exp = unique_ptr<BaseAST>($1);
     $$ = exp;
   }
   ;
@@ -147,6 +148,61 @@ UnaryOp
   }
   ;
 
+MulExp
+  : UnaryExp {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> unary_exp = unique_ptr<BaseAST>($1);
+    mul_exp -> mode = 1;
+    $$ = mul_exp;
+  }
+  | MulExp '*' UnaryExp {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> mul_exp = unique_ptr<BaseAST>($1);
+    mul_exp -> mode = 2;
+    mul_exp -> op = "*";
+    mul_exp -> unary_exp = unique_ptr<BaseAST>($3);
+    $$ = mul_exp;
+  }
+  | MulExp '/' UnaryExp {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> mul_exp = unique_ptr<BaseAST>($1);
+    mul_exp -> mode = 2;
+    mul_exp -> op = "/";
+    mul_exp -> unary_exp = unique_ptr<BaseAST>($3);
+    $$ = mul_exp;
+  } 
+  | MulExp '%' UnaryExp {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> mul_exp = unique_ptr<BaseAST>($1);
+    mul_exp -> mode = 2;
+    mul_exp -> op = "%";
+    mul_exp -> unary_exp = unique_ptr<BaseAST>($3);
+    $$ = mul_exp;
+  }
+
+AddExp
+ : MulExp {
+    auto add_exp = new AddExpAST();
+    add_exp -> mul_exp = unique_ptr<BaseAST>($1);
+    add_exp -> mode = 1;
+    $$ = add_exp;
+ }
+  | AddExp '+' MulExp {
+    auto add_exp = new AddExpAST();
+    add_exp -> add_exp = unique_ptr<BaseAST>($1);
+    add_exp -> mode = 2;
+    add_exp -> op = "+";
+    add_exp -> mul_exp = unique_ptr<BaseAST>($3);
+    $$ = add_exp;
+  }
+  | AddExp '-' MulExp {
+    auto add_exp = new AddExpAST();
+    add_exp -> add_exp = unique_ptr<BaseAST>($1);
+    add_exp -> mode = 2;
+    add_exp -> op = "-";
+    add_exp -> mul_exp = unique_ptr<BaseAST>($3);
+    $$ = add_exp;
+  }
 
 Number
   : INT_CONST ;

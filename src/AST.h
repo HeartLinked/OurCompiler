@@ -25,6 +25,7 @@ class CompUnitAST : public BaseAST {
     std::unique_ptr<BaseAST> func_def;
 
     void Dump() const override {
+        cerr << "Dump CompUnitAST" << endl;
         std::cout << "CompUnitAST { ";
         func_def->Dump();
         std::cout << " }";
@@ -49,6 +50,7 @@ class FuncDefAST : public BaseAST {
     std::unique_ptr<BaseAST> func_block;
 
     void Dump() const override {
+        cerr << "Dump FuncDefAST" << endl;
         std::cout << "FuncDefAST { ";
         func_type->Dump();
         std::cout << ", " << func_name << ", ";
@@ -80,6 +82,7 @@ class FuncTypeAST : public BaseAST {
     std::string type;
 
     void Dump() const override {
+        cerr << "Dump FuncTypeAST" << endl;
         std::cout << "FuncTypeAST { ";
         std::cout << type;
         std::cout << " }";
@@ -104,6 +107,7 @@ class BlockAST : public BaseAST {
     std::unique_ptr<BaseAST> stmts;
 
     void Dump() const override {
+        cerr << "Dump BlockAST" << endl;
         std::cout << "BlockAST { ";
         stmts->Dump();
         std::cout << " }";
@@ -131,6 +135,7 @@ class StmtAST : public BaseAST {
     std::unique_ptr<BaseAST> exp;
 
     void Dump() const override {
+        cerr << "Dump StmtAST" << endl;
         std::cout << "StmtAST { ";
         // if (mode == 1) {
         //     std::cout << " " << stmt_ret << " ";
@@ -155,21 +160,22 @@ class StmtAST : public BaseAST {
     }
 };
 
-// Exp := UnaryExp
+// Exp := AddExp
 class ExpAST : public BaseAST {
   public:
     // 目前只支持一元表达式
-    std::unique_ptr<BaseAST> unary_exp;
+    std::unique_ptr<BaseAST> add_exp;
 
     void Dump() const override {
+        cerr << "Dump ExpAST" << endl;
         std::cout << "Exp { ";
-        unary_exp->Dump();
+        add_exp->Dump();
         std::cout << " }";
     }
 
     int Traverse() const override {
         cerr << "Traverse ExpAST" << endl;
-        int x = unary_exp->Traverse();
+        int x = add_exp->Traverse();
         return x;
     }
 };
@@ -188,6 +194,7 @@ class UnaryExpAST : public BaseAST {
     std::unique_ptr<BaseAST> unary_exp;
 
     void Dump() const override {
+        cerr << "Dump UnaryExpAST" << endl;
         std::cout << "UnaryExp { ";
         if (mode == 1) {
             primary_exp->Dump();
@@ -231,6 +238,7 @@ class PrimaryExpAST : public BaseAST {
     int number;
 
     void Dump() const override {
+        cerr << "Dump PrimaryExpAST" << endl;
         std::cout << "PrimaryExp { ";
         if (mode == 1) {
             exp->Dump();
@@ -250,6 +258,97 @@ class PrimaryExpAST : public BaseAST {
             cout << "   %" << x << " = add 0, " << number << endl;
             return x;
         }
+    }
+};
+
+// MulExp := UnaryExp
+// MulExp := MulExp ('*' | '/' | '%') UnaryExp
+class MulExpAST : public BaseAST {
+  public:
+    int mode; // 1为unary_exp，2为mul_exp
+    std::unique_ptr<BaseAST> unary_exp;
+    string op;
+    std::unique_ptr<BaseAST> mul_exp;
+
+    void Dump() const override {
+        cerr << "Dump MulExp" << endl;
+        std::cout << "MulExp { ";
+        if (mode == 1) {
+            unary_exp->Dump();
+        } else {
+            mul_exp->Dump();
+            cout << " " << op << " ";
+            unary_exp->Dump();
+        }
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+        /* cerr << "Traverse MulExp" << endl;
+          if (mode == 1) {
+              int x = unary_exp->Traverse();
+              return x;
+          } else {
+              int x = mul_exp->Traverse(), y = -1;
+              if (op == "*") {
+                  y = gen();
+                  cout << "   %" << y << " = mul %" << x << ", %" << x << endl;
+              } else if (op == "/") {
+                  y = gen();
+                  cout << "   %" << y << " = div %" << x << ", %" << x << endl;
+              } else if (op == "%") {
+                  y = gen();
+                  cout << "   %" << y << " = rem %" << x << ", %" << x << endl;
+              }
+              if (y == -1)
+                  return x;
+              else
+                  return y;
+          }*/
+    }
+};
+
+// AddExp := MulExp
+// AddExp := AddExp ('+' | '-') MulExp
+class AddExpAST : public BaseAST {
+  public:
+    int mode; // 1为mul_exp，2为add_exp
+    std::unique_ptr<BaseAST> mul_exp;
+    string op;
+    std::unique_ptr<BaseAST> add_exp;
+
+    void Dump() const override {
+        cerr << "Dump AddExpAST" << endl;
+        std::cout << "AddExp { ";
+        if (mode == 1) {
+            mul_exp->Dump();
+        } else {
+            add_exp->Dump();
+            cout << " " << op << " ";
+            mul_exp->Dump();
+        }
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+        /* cerr << "Traverse AddExp" << endl;
+          if (mode == 1) {
+              int x = mul_exp->Traverse();
+              return x;
+          } else {
+              int x = add_exp->Traverse(), y = -1;
+              if (op == "+") {
+                  y = gen();
+                  cout << "   %" << y << " = add %" << x << ", %" << x << endl;
+              } else if (op == "-") {
+                  y = gen();
+                  cout << "   %" << y << " = sub %" << x << ", %" << x << endl;
+              }
+              if (y == -1)
+                  return x;
+              else
+                  return y;
+          }*/
     }
 };
 

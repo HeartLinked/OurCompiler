@@ -125,17 +125,22 @@ enum yysymbol_kind_t
   YYSYMBOL_12_ = 12,                       /* '+'  */
   YYSYMBOL_13_ = 13,                       /* '-'  */
   YYSYMBOL_14_ = 14,                       /* '!'  */
-  YYSYMBOL_YYACCEPT = 15,                  /* $accept  */
-  YYSYMBOL_CompUnit = 16,                  /* CompUnit  */
-  YYSYMBOL_FuncDef = 17,                   /* FuncDef  */
-  YYSYMBOL_FuncType = 18,                  /* FuncType  */
-  YYSYMBOL_Block = 19,                     /* Block  */
-  YYSYMBOL_Stmt = 20,                      /* Stmt  */
-  YYSYMBOL_Exp = 21,                       /* Exp  */
-  YYSYMBOL_PrimaryExp = 22,                /* PrimaryExp  */
-  YYSYMBOL_UnaryExp = 23,                  /* UnaryExp  */
-  YYSYMBOL_UnaryOp = 24,                   /* UnaryOp  */
-  YYSYMBOL_Number = 25                     /* Number  */
+  YYSYMBOL_15_ = 15,                       /* '*'  */
+  YYSYMBOL_16_ = 16,                       /* '/'  */
+  YYSYMBOL_17_ = 17,                       /* '%'  */
+  YYSYMBOL_YYACCEPT = 18,                  /* $accept  */
+  YYSYMBOL_CompUnit = 19,                  /* CompUnit  */
+  YYSYMBOL_FuncDef = 20,                   /* FuncDef  */
+  YYSYMBOL_FuncType = 21,                  /* FuncType  */
+  YYSYMBOL_Block = 22,                     /* Block  */
+  YYSYMBOL_Stmt = 23,                      /* Stmt  */
+  YYSYMBOL_Exp = 24,                       /* Exp  */
+  YYSYMBOL_PrimaryExp = 25,                /* PrimaryExp  */
+  YYSYMBOL_UnaryExp = 26,                  /* UnaryExp  */
+  YYSYMBOL_UnaryOp = 27,                   /* UnaryOp  */
+  YYSYMBOL_MulExp = 28,                    /* MulExp  */
+  YYSYMBOL_AddExp = 29,                    /* AddExp  */
+  YYSYMBOL_Number = 30                     /* Number  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -463,16 +468,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   16
+#define YYLAST   27
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  15
+#define YYNTOKENS  18
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  11
+#define YYNNTS  13
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  15
+#define YYNRULES  22
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  28
+#define YYNSTATES  40
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   261
@@ -492,8 +497,8 @@ static const yytype_int8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    14,     2,     2,     2,     2,     2,     2,
-       7,     8,     2,    12,     2,    13,     2,     2,     2,     2,
+       2,     2,     2,    14,     2,     2,     2,    17,     2,     2,
+       7,     8,    15,    12,     2,    13,     2,    16,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,    11,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -522,8 +527,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    48,    48,    57,    68,    77,    92,   102,   110,   116,
-     124,   130,   139,   142,   145,   152
+       0,    48,    48,    57,    68,    77,    92,   102,   111,   117,
+     125,   131,   140,   143,   146,   152,   158,   166,   174,   184,
+     190,   198,   208
 };
 #endif
 
@@ -541,8 +547,9 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "INT", "RETURN",
   "IDENT", "INT_CONST", "'('", "')'", "'{'", "'}'", "';'", "'+'", "'-'",
-  "'!'", "$accept", "CompUnit", "FuncDef", "FuncType", "Block", "Stmt",
-  "Exp", "PrimaryExp", "UnaryExp", "UnaryOp", "Number", YY_NULLPTR
+  "'!'", "'*'", "'/'", "'%'", "$accept", "CompUnit", "FuncDef", "FuncType",
+  "Block", "Stmt", "Exp", "PrimaryExp", "UnaryExp", "UnaryOp", "MulExp",
+  "AddExp", "Number", YY_NULLPTR
 };
 
 static const char *
@@ -552,7 +559,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-9)
+#define YYPACT_NINF (-22)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -566,9 +573,10 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -1,    -9,     3,    -9,     0,    -9,    -3,     1,     2,     6,
-      -9,    -6,     4,    -9,    -6,    -9,    -9,    -9,     5,    -9,
-      -9,    -6,    -9,    -9,     7,    -9,    -9,    -9
+       1,   -22,     7,   -22,    13,   -22,    12,    14,    11,    17,
+     -22,    -1,    15,   -22,    -1,   -22,   -22,   -22,    16,   -22,
+     -22,    -1,   -14,     2,   -22,   -22,    18,   -22,   -22,    -1,
+      -1,    -1,    -1,    -1,   -22,   -22,   -22,   -22,   -14,   -14
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -577,22 +585,23 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     4,     0,     2,     0,     1,     0,     0,     0,     0,
-       3,     0,     0,    15,     0,    12,    13,    14,     0,    10,
-       7,     0,     9,     5,     0,     6,    11,     8
+       3,     0,     0,    22,     0,    12,    13,    14,     0,    10,
+      15,     0,    19,     7,     9,     5,     0,     6,    11,     0,
+       0,     0,     0,     0,     8,    16,    17,    18,    20,    21
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -9,    -9,    -9,    -9,    -9,    -9,    -2,    -9,    -8,    -9,
-      -9
+     -22,   -22,   -22,   -22,   -22,   -22,     9,   -22,   -21,   -22,
+     -16,   -22,   -22
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
        0,     2,     3,     4,    10,    12,    18,    19,    20,    21,
-      22
+      22,    23,    24
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -600,37 +609,42 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      13,    14,     1,     5,     7,     6,    15,    16,    17,     8,
-      11,     9,    24,    26,    23,    27,    25
+      28,    29,    30,    31,     1,    13,    14,     5,    35,    36,
+      37,    15,    16,    17,    32,    33,    38,    39,     6,     7,
+       9,    11,     8,    26,     0,    25,    34,    27
 };
 
 static const yytype_int8 yycheck[] =
 {
-       6,     7,     3,     0,     7,     5,    12,    13,    14,     8,
-       4,     9,    14,    21,    10,     8,    11
+      21,    15,    16,    17,     3,     6,     7,     0,    29,    30,
+      31,    12,    13,    14,    12,    13,    32,    33,     5,     7,
+       9,     4,     8,    14,    -1,    10,     8,    11
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    16,    17,    18,     0,     5,     7,     8,     9,
-      19,     4,    20,     6,     7,    12,    13,    14,    21,    22,
-      23,    24,    25,    10,    21,    11,    23,     8
+       0,     3,    19,    20,    21,     0,     5,     7,     8,     9,
+      22,     4,    23,     6,     7,    12,    13,    14,    24,    25,
+      26,    27,    28,    29,    30,    10,    24,    11,    26,    15,
+      16,    17,    12,    13,     8,    26,    26,    26,    28,    28
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    15,    16,    17,    18,    19,    20,    21,    22,    22,
-      23,    23,    24,    24,    24,    25
+       0,    18,    19,    20,    21,    22,    23,    24,    25,    25,
+      26,    26,    27,    27,    27,    28,    28,    28,    28,    29,
+      29,    29,    30
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     5,     1,     3,     3,     1,     3,     1,
-       1,     2,     1,     1,     1,     1
+       1,     2,     1,     1,     1,     1,     3,     3,     3,     1,
+       3,     3,     1
 };
 
 
@@ -1102,7 +1116,7 @@ yyreduce:
     comp_unit->func_def = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     ast = move(comp_unit);
   }
-#line 1106 "build/sysy.tab.c"
+#line 1120 "build/sysy.tab.c"
     break;
 
   case 3: /* FuncDef: FuncType IDENT '(' ')' Block  */
@@ -1114,7 +1128,7 @@ yyreduce:
     func_def->func_block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = func_def;
   }
-#line 1118 "build/sysy.tab.c"
+#line 1132 "build/sysy.tab.c"
     break;
 
   case 4: /* FuncType: INT  */
@@ -1125,7 +1139,7 @@ yyreduce:
     func_type -> type = "int";
     (yyval.ast_val) = func_type;
   }
-#line 1129 "build/sysy.tab.c"
+#line 1143 "build/sysy.tab.c"
     break;
 
   case 5: /* Block: '{' Stmt '}'  */
@@ -1135,7 +1149,7 @@ yyreduce:
     block -> stmts = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     (yyval.ast_val) = block;
   }
-#line 1139 "build/sysy.tab.c"
+#line 1153 "build/sysy.tab.c"
     break;
 
   case 6: /* Stmt: RETURN Exp ';'  */
@@ -1146,54 +1160,55 @@ yyreduce:
     // stmt->mode = 2;
     (yyval.ast_val) = stmt;
   }
-#line 1150 "build/sysy.tab.c"
+#line 1164 "build/sysy.tab.c"
     break;
 
-  case 7: /* Exp: UnaryExp  */
+  case 7: /* Exp: AddExp  */
 #line 102 "src/sysy.y"
-             {
+           {
+    // TODO 
     auto exp = new ExpAST();
-    exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = exp;
   }
-#line 1160 "build/sysy.tab.c"
+#line 1175 "build/sysy.tab.c"
     break;
 
   case 8: /* PrimaryExp: '(' Exp ')'  */
-#line 110 "src/sysy.y"
+#line 111 "src/sysy.y"
                 {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     primary_exp -> mode = 1;
     (yyval.ast_val) = primary_exp;
   }
-#line 1171 "build/sysy.tab.c"
+#line 1186 "build/sysy.tab.c"
     break;
 
   case 9: /* PrimaryExp: Number  */
-#line 116 "src/sysy.y"
+#line 117 "src/sysy.y"
            {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> number = (yyvsp[0].int_val);
     primary_exp -> mode = 2;
     (yyval.ast_val) = primary_exp;
   }
-#line 1182 "build/sysy.tab.c"
+#line 1197 "build/sysy.tab.c"
     break;
 
   case 10: /* UnaryExp: PrimaryExp  */
-#line 124 "src/sysy.y"
+#line 125 "src/sysy.y"
                {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> primary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     unary_exp -> mode = 1;
     (yyval.ast_val) = unary_exp;
   }
-#line 1193 "build/sysy.tab.c"
+#line 1208 "build/sysy.tab.c"
     break;
 
   case 11: /* UnaryExp: UnaryOp UnaryExp  */
-#line 130 "src/sysy.y"
+#line 131 "src/sysy.y"
                     {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> unary_op = *((yyvsp[-1].str_val));
@@ -1201,35 +1216,122 @@ yyreduce:
     unary_exp -> mode = 2;
     (yyval.ast_val) = unary_exp;
   }
-#line 1205 "build/sysy.tab.c"
+#line 1220 "build/sysy.tab.c"
     break;
 
   case 12: /* UnaryOp: '+'  */
-#line 139 "src/sysy.y"
+#line 140 "src/sysy.y"
         {
     (yyval.str_val) = new string("+");
   }
-#line 1213 "build/sysy.tab.c"
+#line 1228 "build/sysy.tab.c"
     break;
 
   case 13: /* UnaryOp: '-'  */
-#line 142 "src/sysy.y"
+#line 143 "src/sysy.y"
         {
     (yyval.str_val) = new string("-");
   }
-#line 1221 "build/sysy.tab.c"
+#line 1236 "build/sysy.tab.c"
     break;
 
   case 14: /* UnaryOp: '!'  */
-#line 145 "src/sysy.y"
+#line 146 "src/sysy.y"
         {
     (yyval.str_val) = new string("!");
   }
-#line 1229 "build/sysy.tab.c"
+#line 1244 "build/sysy.tab.c"
+    break;
+
+  case 15: /* MulExp: UnaryExp  */
+#line 152 "src/sysy.y"
+             {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    mul_exp -> mode = 1;
+    (yyval.ast_val) = mul_exp;
+  }
+#line 1255 "build/sysy.tab.c"
+    break;
+
+  case 16: /* MulExp: MulExp '*' UnaryExp  */
+#line 158 "src/sysy.y"
+                        {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    mul_exp -> mode = 2;
+    mul_exp -> op = "*";
+    mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = mul_exp;
+  }
+#line 1268 "build/sysy.tab.c"
+    break;
+
+  case 17: /* MulExp: MulExp '/' UnaryExp  */
+#line 166 "src/sysy.y"
+                        {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    mul_exp -> mode = 2;
+    mul_exp -> op = "/";
+    mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = mul_exp;
+  }
+#line 1281 "build/sysy.tab.c"
+    break;
+
+  case 18: /* MulExp: MulExp '%' UnaryExp  */
+#line 174 "src/sysy.y"
+                        {
+    auto mul_exp = new MulExpAST();
+    mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    mul_exp -> mode = 2;
+    mul_exp -> op = "%";
+    mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = mul_exp;
+  }
+#line 1294 "build/sysy.tab.c"
+    break;
+
+  case 19: /* AddExp: MulExp  */
+#line 184 "src/sysy.y"
+          {
+    auto add_exp = new AddExpAST();
+    add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    add_exp -> mode = 1;
+    (yyval.ast_val) = add_exp;
+ }
+#line 1305 "build/sysy.tab.c"
+    break;
+
+  case 20: /* AddExp: AddExp '+' MulExp  */
+#line 190 "src/sysy.y"
+                      {
+    auto add_exp = new AddExpAST();
+    add_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    add_exp -> mode = 2;
+    add_exp -> op = "+";
+    add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = add_exp;
+  }
+#line 1318 "build/sysy.tab.c"
+    break;
+
+  case 21: /* AddExp: AddExp '-' MulExp  */
+#line 198 "src/sysy.y"
+                      {
+    auto add_exp = new AddExpAST();
+    add_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    add_exp -> mode = 2;
+    add_exp -> op = "-";
+    add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = add_exp;
+  }
+#line 1331 "build/sysy.tab.c"
     break;
 
 
-#line 1233 "build/sysy.tab.c"
+#line 1335 "build/sysy.tab.c"
 
       default: break;
     }
@@ -1422,7 +1524,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 153 "src/sysy.y"
+#line 209 "src/sysy.y"
 
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数

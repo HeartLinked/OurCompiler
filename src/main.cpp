@@ -28,6 +28,10 @@ int main(int argc, const char *argv[]) {
      // 打开输入文件, 并且指定 lexer 在解析的时候读取这个文件
      yyin = fopen(input, "r");
      assert(yyin); */
+
+    std::cout.setf(std::ios::unitbuf);
+
+
     freopen("test.out", "w", stdout);
     yyin = fopen("hello.c", "r");
     // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
@@ -40,7 +44,7 @@ int main(int argc, const char *argv[]) {
 
     cout << endl;
 
-    ParseAST(ast);
+    // ParseAST(ast);
 
     cout << endl;
 
