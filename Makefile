@@ -1,5 +1,5 @@
 # Compiler and Linker
-CC          := clang++
+CC          := clang++-14
 # The Directories, Source, Includes, Objects, Binary and Resources
 SRCDIR      := src
 BUILDDIR    := build
