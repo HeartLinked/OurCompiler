@@ -144,22 +144,22 @@ class StmtAST : public BaseAST {
     }
 };
 
-// Exp := AddExp
+// Exp := LOrExp
 class ExpAST : public BaseAST {
   public:
     // 目前只支持一元表达式
-    std::unique_ptr<BaseAST> add_exp;
+    std::unique_ptr<BaseAST> lor_exp;
 
     void Dump() const override {
         cerr << "Dump ExpAST" << endl;
         std::cout << "Exp { ";
-        add_exp->Dump();
+        lor_exp->Dump();
         std::cout << " }";
     }
 
     int Traverse() const override {
         cerr << "Traverse ExpAST" << endl;
-        int x = add_exp->Traverse();
+        int x = lor_exp->Traverse();
         return x;
     }
 };
@@ -328,6 +328,170 @@ class AddExpAST : public BaseAST {
               return y;
           }
     }
+};
+
+// RelExp := AddExp
+// RelExp := RelExp ('<' | '>' | '<=' | '>=') AddExp
+class RelExpAST : public BaseAST {
+  public:
+    int mode; // 1为add_exp，2为rel_exp
+    std::unique_ptr<BaseAST> add_exp;
+    string op;
+    std::unique_ptr<BaseAST> rel_exp;
+
+    void Dump() const override {
+        cerr << "Dump RelExpAST" << endl;
+        std::cout << "RelExp { ";
+        if (mode == 1) {
+            add_exp->Dump();
+        } else {
+            rel_exp->Dump();
+            cout << " " << op << " ";
+            add_exp->Dump();
+        }
+        std::cout << " }";
+    }
+
+    int Traverse() const override {
+      cerr << "Traverse RelExp" << endl;
+        if (mode == 1) {
+            int x = add_exp->Traverse();
+            return x;
+        } else {
+            int x = rel_exp->Traverse(), y = -1, z = add_exp->Traverse();
+            if (op == "<") {
+                y = gen();
+                cout << "   %" << y << " = lt %" << x << ", %" << z << endl;
+            } else if (op == ">") {
+                y = gen();
+                cout << "   %" << y << " = gt %" << x << ", %" << z << endl;
+            } else if (op == "<=") {
+                y = gen();
+                cout << "   %" << y << " = le %" << x << ", %" << z << endl;
+            } else if (op == ">=") {
+                y = gen();
+                cout << "   %" << y << " = ge %" << x << ", %" << z << endl;
+            }
+            return y;
+        }
+    }
+};
+
+// EqExp := RelExp
+// EqExp := EqExp ('==' | '!=') RelExp
+class EqExpAST : public BaseAST{
+  public:
+      int mode; // 1为rel_exp，2为eq_exp
+      std::unique_ptr<BaseAST> rel_exp;
+      string op;
+      std::unique_ptr<BaseAST> eq_exp;
+
+      void Dump() const override {
+          cerr << "Dump EqExpAST" << endl;
+          std::cout << "EqExp { ";
+          if (mode == 1) {
+              rel_exp->Dump();
+          } else {
+              eq_exp->Dump();
+              cout << " " << op << " ";
+              rel_exp->Dump();
+          }
+          std::cout << " }";
+      }
+
+      int Traverse() const override {
+          cerr << "Traverse EqExp" << endl;
+          if (mode == 1) {
+              int x = rel_exp->Traverse();
+              return x;
+          } else {
+              int x = eq_exp->Traverse(), y = -1, z = rel_exp->Traverse();
+              if (op == "==") {
+                  y = gen();
+                  cout << "   %" << y << " = eq %" << x << ", %" << z << endl;
+              } else if (op == "!=") {
+                  y = gen();
+                  cout << "   %" << y << " = ne %" << x << ", %" << z << endl;
+              }
+              return y;
+          }
+      }
+};
+
+// LAndExp := EqExp
+// LAndExp := LAndExp '&&' EqExp
+class LAndExpAST : public BaseAST {
+  public:
+      int mode; // 1为eq_exp，2为land_exp
+      std::unique_ptr<BaseAST> eq_exp;
+      string op;
+      std::unique_ptr<BaseAST> land_exp;
+
+      void Dump() const override {
+          cerr << "Dump LAndExpAST" << endl;
+          std::cout << "LAndExp { ";
+          if (mode == 1) {
+              eq_exp->Dump();
+          } else {
+              land_exp->Dump();
+              cout << " " << op << " ";
+              eq_exp->Dump();
+          }
+          std::cout << " }";
+      }
+
+      int Traverse() const override {
+          cerr << "Traverse LAndExp" << endl;
+          if (mode == 1) {
+              int x = eq_exp->Traverse();
+              return x;
+          } else {
+              int x = land_exp->Traverse(), y = -1, z = eq_exp->Traverse();
+              if (op == "&&") {
+                  y = gen();
+                  cout << "   %" << y << " = and %" << x << ", %" << z << endl;
+              }
+              return y;
+          }
+      }
+};
+
+// LOrExp := LAndExp
+// LOrExp := LOrExp '||' LAndExp
+class LOrExpAST : public BaseAST {
+  public :
+      int mode; // 1为land_exp，2为lor_exp
+      std::unique_ptr<BaseAST> land_exp;
+      string op;
+      std::unique_ptr<BaseAST> lor_exp;
+
+      void Dump() const override {
+          cerr << "Dump LOrExpAST" << endl;
+          std::cout << "LOrExp { ";
+          if (mode == 1) {
+              land_exp->Dump();
+          } else {
+              lor_exp->Dump();
+              cout << " " << op << " ";
+              land_exp->Dump();
+          }
+          std::cout << " }";
+      }
+
+      int Traverse() const override {
+          cerr << "Traverse LOrExp" << endl;
+          if (mode == 1) {
+              int x = land_exp->Traverse();
+              return x;
+          } else {
+              int x = lor_exp->Traverse(), y = -1, z = land_exp->Traverse();
+              if (op == "||") {
+                  y = gen();
+                  cout << "   %" << y << " = or %" << x << ", %" << z << endl;
+              }
+              return y;
+          }
+      }
 };
 
 /*

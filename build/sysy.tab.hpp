@@ -64,8 +64,14 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     INT = 258,                     /* INT  */
     RETURN = 259,                  /* RETURN  */
-    IDENT = 260,                   /* IDENT  */
-    INT_CONST = 261                /* INT_CONST  */
+    AND = 260,                     /* AND  */
+    OR = 261,                      /* OR  */
+    EQ = 262,                      /* EQ  */
+    NE = 263,                      /* NE  */
+    LE = 264,                      /* LE  */
+    GE = 265,                      /* GE  */
+    IDENT = 266,                   /* IDENT  */
+    INT_CONST = 267                /* INT_CONST  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -80,7 +86,7 @@ union YYSTYPE
   int int_val;
   BaseAST *ast_val;   // AST
 
-#line 84 "build/sysy.tab.hpp"
+#line 90 "build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
