@@ -11,10 +11,22 @@ extern int cnt;
 
 int gen();
 
+
 class SymbolTable {
   public:
     // 插入新符号，如果符号已经存在，返回 false，否则返回 true
-    bool insertSymbol(const std::string &name, std::string value) {
+    bool insertConstSymbol(const std::string &name, std::string value) {
+        // 如果符号已经存在，返回 false
+        if (table.find(name) != table.end()) {
+            return false;
+        }
+        // 插入新符号
+        table[name] = value;
+        return true;
+    }
+
+    // 插入新符号，如果符号已经存在，返回 false，否则返回 true
+    bool insertVariaSymbol(const std::string &name, std::string value) {
         // 如果符号已经存在，返回 false
         if (table.find(name) != table.end()) {
             return false;
@@ -199,7 +211,7 @@ class ConstDefAST : public BaseAST {
         cerr << "Traverse ConstDef" << endl;
         int x = const_init_val->Traverse();
         // Insert const paramter const_name with symbol '%x'
-        symbolTable.insertSymbol(const_name, "%" + to_string(x));
+        symbolTable.insertConstSymbol(const_name, "%" + to_string(x));
         // cout << "Insert" << const_name << " as %" << x << endl;
         return -1;
     }

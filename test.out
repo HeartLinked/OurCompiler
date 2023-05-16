@@ -1,14 +1,17 @@
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { x, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { y, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { y } } } } } } } } } } } },  } } }
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { x, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } + MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } } }, ConstDef { z, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  5  } } } } + MulExp { UnaryExp { PrimaryExp {  6  } } } } } } } } } } } },  } } }, BlockItemAST { DeclAST { ConstDecl { BTypeAST { int }, ConstDef { y, ConstInitValAST { ConstExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp {  3  } } } } + MulExp { UnaryExp { PrimaryExp {  4  } } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } } + MulExp { UnaryExp { PrimaryExp { Lval { y } } } } } } } } } } } },  } } }
 fun @main(): i32 {
    %0 = add 0, 1
-   %1 = add 0, 1
+   %1 = add 0, 2
    %2 = add %0, %1
-   %3 = add 0, 1
-   %4 = add 0, 1
+   %3 = add 0, 5
+   %4 = add 0, 6
    %5 = add %3, %4
- get yfrom table as symbol5
-   ret  %5
+   %6 = add 0, 3
+   %7 = add 0, 4
+   %8 = add %6, %7
+   %9 = add %2, %8
+   ret  %9
 
 }
 
-当前时间：2023-05-16 20:23:17
+当前时间：2023-05-16 22:54:54
