@@ -1,14 +1,14 @@
 %option noyywrap
 %option nounput
 %option noinput
+%option yylineno
+
 
 %{
 
     #include <cstdlib>
     #include <string>
 
-    // 因为 Flex 会用到 Bison 中关于 token 的定义
-    // 所以需要 include Bison 生成的头文件
     #include "sysy.tab.hpp"
 
     using namespace std;

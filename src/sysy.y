@@ -39,8 +39,8 @@ using namespace std;
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
-%type <ast_val> LVal ConstDef FuncDef FuncType Block BlockItem Stmt PrimaryExp UnaryExp Exp MulExp AddExp LOrExp RelExp EqExp LAndExp Decl ConstDecl ConstInitVal BType ConstExp
-%type <ast_list_val> ConstDefList BlockItemList
+%type <ast_val> VarDecl VarDef InitVal LVal ConstDef FuncDef FuncType Block BlockItem Stmt PrimaryExp UnaryExp Exp MulExp AddExp LOrExp RelExp EqExp LAndExp Decl ConstDecl ConstInitVal BType ConstExp
+%type <ast_list_val> ConstDefList BlockItemList VarDefList 
 %type <str_val> UnaryOp
 %type <int_val> Number
 
@@ -60,6 +60,13 @@ Decl
   : ConstDecl{
     auto decl = new DeclAST();
     decl->const_decl = unique_ptr<BaseAST>($1);
+    decl->mode = 1;
+    $$ = decl;
+  }
+  | VarDecl {
+    auto decl = new DeclAST();
+    decl->var_decl = unique_ptr<BaseAST>($1);
+    decl->mode = 2;
     $$ = decl;
   }
   ;
@@ -116,7 +123,56 @@ ConstInitVal
     const_init_val->const_exp = unique_ptr<BaseAST>($1);
     $$ = const_init_val;
   }
-  ; 
+  ;
+
+VarDecl 
+  : BType VarDefList ';' {
+    auto var_decl = new VarDeclAST();
+    var_decl->b_type = unique_ptr<BaseAST>($1);
+    var_decl->var_defs = unique_ptr<vector<std::unique_ptr<BaseAST>>>($2);
+    $$ = var_decl;
+  }
+  ;   
+
+VarDefList
+  : VarDef {
+    auto var_def_list = new std::vector<std::unique_ptr<BaseAST>>();
+    var_def_list->push_back(move(unique_ptr<BaseAST>($1)));
+    $$ = var_def_list;
+  }
+  | VarDef ',' VarDefList {
+    auto var_def_list = new std::vector<std::unique_ptr<BaseAST>>();
+    var_def_list->push_back(move(unique_ptr<BaseAST>($1)));
+    for (auto &var_def : *$3) {
+      var_def_list->push_back(move(var_def));
+    }
+    $$ = var_def_list;
+  }
+  ;
+
+VarDef
+  : IDENT {
+    auto var_def = new VarDefAST();
+    var_def->var_name = *unique_ptr<string>($1);
+    var_def->mode = 1;
+    $$ = var_def;
+  }
+  | IDENT '=' InitVal {
+    auto var_def = new VarDefAST();
+    var_def->var_name = *unique_ptr<string>($1);
+    var_def->init_val = unique_ptr<BaseAST>($3);
+    var_def->mode = 2;
+    $$ = var_def;
+  }
+  ;
+
+InitVal
+  : Exp {
+    auto init_val = new InitValAST();
+    init_val->exp = unique_ptr<BaseAST>($1);
+    $$ = init_val;
+  }
+  ;
 
 // FuncDef := FuncType IDENT '(' ')' Block
 FuncDef
@@ -179,10 +235,17 @@ BlockItem
   ;
 
 Stmt
-  :
-  RETURN Exp ';' {
+  : LVal '=' Exp ';' {
+    auto stmt = new StmtAST();
+    stmt->mode = 2;
+    stmt->lval = unique_ptr<BaseAST>($1);
+    stmt->exp = unique_ptr<BaseAST>($3);
+    $$ = stmt;
+  }
+  | RETURN Exp ';' {
     auto stmt = new StmtAST();
     stmt->exp = unique_ptr<BaseAST>($2);
+    stmt->mode = 1;
     $$ = stmt;
   }
   ;
@@ -426,5 +489,9 @@ ConstExp
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数
 void yyerror(unique_ptr<BaseAST> &ast, const char *s) {
+  extern char* yytext;  // 声明 yytext
+  extern int yylineno;  // 声明 yylineno
   cerr << "error: " << s << endl;
+   cerr << "near " << yytext << endl;
+   cerr << "line " << yylineno << endl;
 }

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -16,7 +17,7 @@ class SymbolTable {
     // 插入新符号，如果符号已经存在，返回 false，否则返回 true
     bool insertConstSymbol(const std::string &name, std::string value) {
         // 如果符号已经存在，返回 false
-        if (table.find(name) != table.end()) {
+        if (table.find(name) != table.end() || table_variable.find(name) != table_variable.end()) {
             return false;
         }
         // 插入新符号
@@ -27,60 +28,75 @@ class SymbolTable {
     // 插入新符号，如果符号已经存在，返回 false，否则返回 true
     bool insertVirableSymbol(const std::string &name, std::string value) {
         // 如果符号已经存在，返回 false
-        if (table.find(name) != table.end()) {
+        if (table_variable.find(name) != table_variable.end() || table.find(name) != table.end()) {
             return false;
         }
         // 插入新符号
-        table[name] = value;
+        table_variable[name] = value;
         return true;
     }
 
     bool isConst(const std::string &name) const {
         auto iter = table.find(name);
         if (iter == table.end()) {
-            throw std::runtime_error("Symbol not found: " + name);
+            return false;
         }
-    //    if (iter->second[0] == '%') {
-    //        return false;
-    //    }
         return true;
     }
 
     bool isVirable(const std::string &name) const {
-        auto iter = table.find(name);
-        if (iter == table.end()) {
-            throw std::runtime_error("Symbol not found: " + name);
+        auto iter = table_variable.find(name);
+        if (iter == table_variable.end()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
-    // 获取符号的值，如果符号不存在，抛出异常
-    std::string getSymbol(const std::string &name) const {
+    int getConstValue(const std::string &name) const {
         auto iter = table.find(name);
-        if (iter == table.end()) {
-            throw std::runtime_error("Symbol not found: " + name);
+        string s = iter->second;
+        return stoi(s);
+    }
+
+    int getVirableValue(const std::string &name) const {
+        auto iter = table_variable.find(name);
+        string s = iter->second;
+        return stoi(s);
+    }
+
+    void output() {
+        cout << "const table:" << endl;
+        for (auto iter = table.begin(); iter != table.end(); iter++) {
+            cout << iter->first << " " << iter->second << endl;
         }
-        return iter->second;
+        cout << "--------------------------" << endl;
+        cout << "variable table:" << endl;
+        for (auto iter = table_variable.begin(); iter != table_variable.end(); iter++) {
+            cout << iter->first << " " << iter->second << endl;
+        }
+        cout << endl;
     }
 
   private:
     std::unordered_map<std::string, std::string> table;
+    std::unordered_map<std::string, std::string> table_variable;
 };
 
 extern SymbolTable symbolTable;
 
-// 发现遍历 AST 的时候返回值需要一个数据结构。先这么定义着
+// 遍历 AST 的返回值的数据结构
 struct Data {
 
-    // mode = 1 表示返回的是表达式的数值，且此时为常量
-    // mode = 2 表示返回的是表达式的变量符号字符串（实际为%+数） mode = -1
-    // 表示暂无返回内容。mode = 1 时 value 有效，mode = 2 时 symbol 有效
-
-    Data(int mode, int value, string symbol)
-        : mode(mode), value(value), symbol(symbol) {}
+    // mode = 1 表示返回的value是常量的数值
+    // mode = 2 表示返回的是变量本身，其中的变量名在 name 中，使用时需在前面加上@
+    // mdoe = 3 表示返回的是含变量的表达式，其内容在 symbol 中，使用时需在前面加上%
+    // mode = 0 表示返回的不是表达式类型
+    Data(int mode, int value, string name, string symbol)
+        : mode(mode), value(value), name(name), symbol(symbol) {}
 
     int mode;
     int value;
+    string name;
     string symbol;
 
 };
@@ -112,7 +128,7 @@ class CompUnitAST : public BaseAST {
         // Dump();  这里疑似暂时不用输出
         cerr << "Traverse CompUnitAST" << endl;
         func_def->Traverse();
-        return Data(-1, 0, "");
+        return Data(0, 0, "", "");
     }
 };
 
@@ -143,27 +159,35 @@ class FuncDefAST : public BaseAST {
         cout << "{" << endl;
         func_block->Traverse();
         cout << "}" << endl;
-        return Data(-1, 0, "");
+        return Data(0, 0, "", "");
     }
 };
 
 // Decl := ConstDecl
+// Decl := VarDecl
 class DeclAST : public BaseAST {
   public:
+    int mode; // 1: const 2: var
     // 常量声明
     std::unique_ptr<BaseAST> const_decl;
+    // 变量声明
+    std::unique_ptr<BaseAST> var_decl;
 
     void Dump() const override {
         cerr << "Dump DeclAST" << endl;
         std::cout << "DeclAST { ";
-        const_decl->Dump();
+        if(mode == 1) const_decl->Dump();
+        else var_decl->Dump();
         std::cout << " }";
     }
 
     Data Traverse() const override {
         cerr << "Traverse DeclAST" << endl;
-        const_decl->Traverse();
-        return Data(-1, 0, "");
+        if(mode == 1)
+            const_decl->Traverse();
+        else
+            var_decl->Traverse();
+        return Data(0, 0, "", "");
     }
 };
 
@@ -192,7 +216,7 @@ class ConstDeclAST : public BaseAST {
         for (auto &const_def : *const_defs) {
             const_def->Traverse();
         }
-        return Data(-1, 0, "");
+        return Data(0, 0, "", "");
     }
 };
 
@@ -210,13 +234,13 @@ class BTypeAST : public BaseAST {
     }
 
     Data Traverse() const override {
-        /*    cerr << "Traverse BtypeAST" << endl;
-            if (btype == "int") {
+        cerr << "Traverse BtypeAST" << endl;
+        /*    if (btype == "int") {
                 cout << "i32 ";
             } else {
                 // TODO
-            }
-            return -1;  */
+            }*/
+        return Data(0, 0, "", "");
     }
 };
 
@@ -240,8 +264,11 @@ class ConstDefAST : public BaseAST {
         cerr << "Traverse ConstDef" << endl;
         Data x = const_init_val->Traverse();
         // Insert const paramter const_name with symbol '%x'
-         symbolTable.insertConstSymbol(const_name, to_string(x.value));
-        //  cout << "Insert" << const_name << " as const number" << x.value << endl;
+        if(symbolTable.insertConstSymbol(const_name, to_string(x.value))){
+            // cerr << "Insert const " << const_name << " as const number " << x.value << endl;
+        } else {
+            cerr << "Error: const " << const_name << " has been defined" << endl;
+        }
         return x;
     }
 };
@@ -261,7 +288,110 @@ class ConstInitValAST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse ConstInitValAST" << endl;
-        Data d= const_exp->Traverse();
+        Data d = const_exp->Traverse();
+        return d;
+    }
+};
+
+// VarDecl := BType VarDef {"," VarDef} ";"
+class VarDeclAST : public BaseAST {
+  public:
+    // 变量类型
+    std::unique_ptr<BaseAST> b_type;
+    // 变量定义
+    std::unique_ptr<vector<unique_ptr<BaseAST>>> var_defs;
+
+    void Dump() const override {
+        cerr << "Dump VarDeclAST" << endl;
+        std::cout << "VarDeclAST { ";
+        b_type->Dump();
+        std::cout << ", ";
+        for (auto &var_def : *var_defs) {
+            var_def->Dump();
+            std::cout << ", ";
+        }
+        std::cout << " }";
+    }
+
+    Data Traverse() const override {
+        cerr << "Traverse VarDeclAST" << endl;
+        for (auto &var_def : *var_defs) {
+            var_def->Traverse();
+        }
+        return Data(0, 0, "", "");
+    }
+};
+
+// VarDef := IDENT
+// VarDef := IDENT "=" InitVal
+class VarDefAST : public BaseAST {
+  public:
+    int mode; // 1: IDENT 2: IDENT "=" InitVal
+    // 变量名
+    std::string var_name;
+    // 变量初始值
+    std::unique_ptr<BaseAST> init_val;
+
+    void Dump() const override {
+        cerr << "Dump VarDefAST" << endl;
+        std::cout << "VarDefAST { ";
+        std::cout << var_name << ", ";
+        if (init_val != nullptr) {
+            init_val->Dump();
+        }
+        std::cout << " }";
+    }
+
+    Data Traverse() const override {
+        cerr << "Traverse VarDefAST" << endl;
+        if(mode == 1){  // int a;
+            if(symbolTable.insertVirableSymbol(var_name, "0")){
+                cerr << "Insert" << var_name << " as var: 0" << endl;
+            } else {
+                cerr << "Error: redefined variable " << var_name << endl;
+            }
+            cout << "   @" << var_name << " = alloc i32" << endl;
+            cout << "   store 0, @" << var_name << endl;
+            return Data(0, 0, "", "");
+        }
+        else {           // int a = x + 1; 
+            Data d = init_val->Traverse();
+            if(symbolTable.insertVirableSymbol(var_name, to_string(d.value))){
+                cerr << "Insert" << var_name << " as variale"  <<endl;
+            } else {
+                cerr << "Error: redefined variable " << var_name << endl;
+            }
+            cout << "   @" << var_name << " = alloc i32" << endl;
+            if(d.mode == 1){
+                cout << "   store " << d.value << ", @" << var_name << endl;
+            } else if(d.mode == 2){
+                cout << "   store @" << d.name << ", @" << var_name << endl;
+            } else if(d.mode == 3) {
+                cout << "   store %" << d.symbol << ", @" << var_name << endl; 
+            } else {
+              throw runtime_error("Error: Init variable error");
+            }
+            return Data(0, 0, "", "");
+        }
+    }
+};
+
+// InitVal := Exp
+class InitValAST : public BaseAST {
+  public:
+    // 表达式
+    std::unique_ptr<BaseAST> exp;
+
+    void Dump() const override {
+        cerr << "Dump InitValAST" << endl;
+        std::cout << "InitValAST { ";
+        exp->Dump();
+        std::cout << " }";
+    }
+
+    Data Traverse() const override {
+        cerr << "Traverse InitValAST" << endl;
+        Data d = exp->Traverse();
         return d;
     }
 };
@@ -288,7 +418,7 @@ class FuncTypeAST : public BaseAST {
         } else {
             // TODO
         }
-        return Data(-1, 0, "");
+        return Data(0, 0, "", "");
     }
 };
 
@@ -312,7 +442,7 @@ class BlockAST : public BaseAST {
         for (auto &item : *block_items) {
             item->Traverse();
         }
-        return Data(-1, 0, "");
+        return Data(0, 0, "", "");
     }
 };
 
@@ -338,39 +468,66 @@ class BlockItemAST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse BlockItemAST" << endl;
+        cout << endl;
         if (mode == 1) {
             decl->Traverse();
         } else {
             stmt->Traverse();
         }
-        return Data(-1, 0, "");
+        return Data(0, 0, "", "");
     }
 };
 
 // Stmt := "return" Exp ";"
+// Stmt := LVal "=" Exp ";"
 class StmtAST : public BaseAST {
   public:
+
+    int mode; // 1: return 2: LVal "=" Exp
     // 返回值 exp (只有整数类型)
     std::unique_ptr<BaseAST> exp;
+    // 左值
+    std::unique_ptr<BaseAST> lval;
 
     void Dump() const override {
         cerr << "Dump StmtAST" << endl;
         std::cout << "StmtAST { ";
-        exp->Dump();
+        if(mode == 1) exp->Dump();
+        else {
+            lval->Dump();
+            exp->Dump();
+        }
         std::cout << " }";
     }
 
     Data Traverse() const override {
         cerr << "Traverse StmtAST" << endl;
-        Data x = exp->Traverse();
-        if(x.mode == 1) {
-            cout << "   ret " << x.value << endl;
-        } else if(x.mode == 2) {
-            cout << "   ret " << x.symbol << endl;
+        if(mode == 1) { // return
+            Data x = exp->Traverse();
+            if(x.mode == 1) {
+                cout << "   ret " << x.value << endl;
+            } else if(x.mode == 2) {
+                cout << "   ret @" << x.name << endl;
+            } else if(x.mode == 3) {
+                cout << "   ret %" << x.symbol << endl;
+            }
+        } else if (mode == 2) { // LVal "=" Exp
+            Data x = lval->Traverse();
+            if(x.mode != 2) {
+              throw runtime_error("Error: LVal is not a variable");
+            } 
+            Data y = exp->Traverse();
+            if(y.mode == 1){
+                cout << "   store " << y.value << ", @" << x.name << endl;
+            } else if(y.mode == 2){
+                cout << "   store @" << y.name << ", @" << x.name << endl;
+            } else if(y.mode == 3) {
+                cout << "   store %" << y.symbol << ", @" << x.name << endl; 
+            } else {
+                throw runtime_error("Error: Set vriable to a illegal variable");
+            }
         }
-        // cout << "   ret  %" << x << endl;
-        cout << endl;
-        return x;
+        return Data(0, 0, "", "");
     }
 };
 
@@ -409,18 +566,10 @@ class LValAST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse Lval" << endl;
-       // string symbol = symbolTable.getSymbol(name);
-
-        //int x = stoi(symbol.substr(1));
-        // cout << " get " << name << "from table :"  << endl;
         if(symbolTable.isConst(name)) {
-            string s = symbolTable.getSymbol(name);
-            // cout << s << endl;
-            return Data(1, stoi(s), s);
+            return Data(1, symbolTable.getConstValue(name), "", "");
         } else {
-            string s = symbolTable.getSymbol(name);
-            // cout << s << endl;
-            return Data(2, 0, s);
+            return Data(2, symbolTable.getVirableValue(name), name, "");
         }
     }
 };
@@ -456,12 +605,11 @@ class PrimaryExpAST : public BaseAST {
         if (mode == 1) {
             Data x = exp->Traverse();
             return x;
-        } else if (mode == 3) {
-            Data x = Data(1, number, "");
-            // cout << "   %" << x << " = add 0, " << number << endl;
+        } else if (mode == 2) {
+            Data x = lval->Traverse();
             return x;
         } else {
-            Data x = lval->Traverse();
+            Data x = Data(1, number, "", "");
             return x;
         }
     }
@@ -499,17 +647,39 @@ class UnaryExpAST : public BaseAST {
             return x;
         } else {
             Data x = unary_exp->Traverse();
-            int y = -1;
             if(x.mode == 1) {
-                 if (unary_op == "!") {
+                if (unary_op == "!") {
                     x.value = (x.value == 0);
                 } else if (unary_op == "-") {
                     x.value = -x.value;
                 }
-            } else if(x.mode == 2){
-               // TODO: 
-            } else {
-              cerr << " ERROR: UnaryExpAST x.mode == 3" << endl;
+                return x;
+            } else if (x.mode == 2) {
+                int y = -1;
+                if (unary_op == "!") {
+                    y = gen();
+                    cout << "   %" << y << " = eq 0, @" << x.name << endl;
+                    x.value = (x.value == 0);
+                } else if (unary_op == "-") {
+                    cout << "   %" << y << " = sub 0, @" << x.name << endl;
+                    x.value = -x.value;
+                } else {
+                    return x;
+                }
+                return Data(3, x.value, "", to_string(y));
+            } else if (x.mode == 3) {
+                int y = -1;
+                if (unary_op == "!") {
+                    y = gen();
+                    cout << "   %" << y << " = eq 0, %" << x.symbol << endl;
+                    x.value = (x.value == 0);
+                } else if (unary_op == "-") {
+                    cout << "   %" << y << " = sub 0, %" << x.symbol << endl;
+                    x.value = -x.value;
+                } else {
+                    return x;
+                }
+                return Data(3, x.value, "", to_string(y));
             }
         }
     }
@@ -545,28 +715,100 @@ class MulExpAST : public BaseAST {
         } else {
             Data x = mul_exp->Traverse(), z = unary_exp->Traverse();
             int y = -1;
-            if(x.mode == 1 && z.mode == 1) {
-                if (op == "*") {
-                    y = x.value * z.value;
-                } else if (op == "/") {
-                    y = x.value / z.value;
-                } else if (op == "%") {
-                    y = x.value % z.value;
+            if (op == "*") {
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value * z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = mul " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = mul " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = mul @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = mul @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = mul @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = mul %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = mul %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = mul %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to mul non-exp type");
                 }
-                return Data(1, y, "");
-            } else {
-                throw std::runtime_error("try to modify const" + x.mode);
-            }
-         /*  if (op == "*") {
-                y = gen();
-                cout << "   %" << y << " = mul %" << x << ", %" << z << endl;
+                return Data(3, x.value * z.value, "", to_string(y));
             } else if (op == "/") {
-                y = gen();
-                cout << "   %" << y << " = div %" << x << ", %" << z << endl;
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value / z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = div " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = div " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = div @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = div @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = div @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = div %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = div %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = div %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to div non-exp type");
+                }
+                return Data(3, x.value / z.value, "", to_string(y));
             } else if (op == "%") {
-                y = gen();
-                cout << "   %" << y << " = rem %" << x << ", %" << z << endl;
-            }*/
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value % z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = rem " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = rem " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = rem @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = rem @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = rem @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = rem %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = rem %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = rem %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to rem non-exp type");
+                }
+                return Data(3, x.value % z.value, "", to_string(y));
+            } 
         }
     }
 };
@@ -601,24 +843,69 @@ class AddExpAST : public BaseAST {
         } else {
             Data x = add_exp->Traverse(), z = mul_exp->Traverse();
             int y = -1;
-            if(x.mode == 1 && z.mode == 1) {
-                if (op == "+") {
-                    y = x.value + z.value;
-                } else if (op == "-") {
-                    y = x.value - z.value;
+            if(op == "+") {
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value + z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = add " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = add " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = add @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = add @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = add @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = add %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = add %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = add %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to add non-exp type");
                 }
-                return Data(1, y, "");
-            } else {
-                throw std::runtime_error("try to modify const" + x.mode);
+                return Data(3, x.value + z.value, "", to_string(y));
+            } else if(op == "-") {
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value - z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = sub " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = sub " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = sub @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = sub @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = sub @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = sub %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = sub %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = sub %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to sub non-exp type");
+                }
+                return Data(3, x.value - z.value, "", to_string(y));
             }
-         /*   if (op == "+") {
-                y = gen();
-                cout << "   %" << y << " = add %" << x << ", %" << z << endl;
-            } else if (op == "-") {
-                y = gen();
-                cout << "   %" << y << " = sub %" << x << ", %" << z << endl;
-            }
-            return y;  */
         }
     }
 };
@@ -653,34 +940,131 @@ class RelExpAST : public BaseAST {
         } else {
             Data x = rel_exp->Traverse(), z = add_exp->Traverse();
             int y = -1;
-            if(x.mode == 1 && z.mode == 1) {
-                if (op == "<") {
-                    y = (x.value < z.value);
-                } else if (op == ">") {
-                    y = x.value > z.value;
-                } else if (op == "<=") {
-                    y = x.value <= z.value;
-                } else if (op == ">=") {
-                    y = x.value >= z.value;
+            if(op == "<") {
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value < z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = lt " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = lt " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = lt @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = lt @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = lt @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = lt %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = lt %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = lt %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to compare non-exp type");
                 }
-                return Data(1, y, "");
+                return Data(3, (x.value < z.value), "", to_string(y));
+            } else if(op == ">") { 
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, x.value > z.value, "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = gt " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = gt " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = gt @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = gt @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = gt @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = gt %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = gt %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = gt %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to compare non-exp type");
+                }
+                return Data(3, (x.value > z.value), "", to_string(y));
+            } else if(op == "<=") {
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, (x.value <= z.value), "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = le " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = le " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = le @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = le @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = le @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = le %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = le %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = le %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to compare non-exp type");
+                }
+                return Data(3, (x.value <= z.value), "", to_string(y));
             } else {
-                throw std::runtime_error("try to modify const" + x.mode);
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, (x.value >= z.value), "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = ge " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = ge " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = ge @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = ge @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = ge @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = ge %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = ge %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = ge %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to compare non-exp type");
+                }
+                return Data(3, (x.value >= z.value), "", to_string(y));
             }
-      /*    if (op == "<") {
-                y = gen();
-                cout << "   %" << y << " = lt %" << x << ", %" << z << endl;
-            } else if (op == ">") {
-                y = gen();
-                cout << "   %" << y << " = gt %" << x << ", %" << z << endl;
-            } else if (op == "<=") {
-                y = gen();
-                cout << "   %" << y << " = le %" << x << ", %" << z << endl;
-            } else if (op == ">=") {
-                y = gen();
-                cout << "   %" << y << " = ge %" << x << ", %" << z << endl;
-            }  
-            return y;   */
         }
     }
 };
@@ -715,24 +1099,69 @@ class EqExpAST : public BaseAST {
         } else {
             Data x = eq_exp->Traverse(), z = rel_exp->Traverse();
             int y = -1;
-            if(x.mode == 1 && z.mode == 1) {
-                if (op == "==") {
-                    y = x.value == z.value;
-                } else if (op == "!=") {
-                    y = x.value != z.value;
+            if(op == "==") {
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, (x.value == z.value), "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = eq " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = eq " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = eq @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = eq @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = eq @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = eq %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = eq %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = eq %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to compare non-exp type");
                 }
-                return Data(1, y, "");
+                return Data(3, (x.value == z.value), "", to_string(y));
             } else {
-                throw std::runtime_error("try to modify const" + x.mode);
+                if(x.mode == 1 && z.mode == 1) {
+                    return Data(1, (x.value != z.value), "", "");
+                } else if(x.mode == 1 && z.mode == 2) {
+                    y = gen();
+                    cout << "   %" << y << " = ne " << x.value << ", @" << z.name << endl;
+                } else if(x.mode == 1 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = ne " << x.value << ", %" << z.symbol << endl;
+                } else if(x.mode == 2 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = ne @" << x.name << ", " << z.value << endl;
+                } else if(x.mode == 2 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = ne @" << x.name << ", @" << z.name << endl;
+                } else if(x.mode == 2 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = ne @" << x.name << ", %" << z.symbol << endl;
+                } else if(x.mode == 3 && z.mode == 1) {
+                  y = gen();
+                  cout << "   %" << y << " = ne %" << x.symbol << ", " << z.value << endl;
+                } else if(x.mode == 3 && z.mode == 2) {
+                  y = gen();
+                  cout << "   %" << y << " = ne %" << x.symbol << ", @" << z.name << endl;
+                } else if(x.mode == 3 && z.mode == 3) {
+                  y = gen();
+                  cout << "   %" << y << " = ne %" << x.symbol << ", %" << z.symbol << endl;
+                } else {
+                  throw runtime_error("Error: try to compare non-exp type");
+                }
+                return Data(3, (x.value != z.value), "", to_string(y));
             }
-      /*     if (op == "==") {
-                y = gen();
-                cout << "   %" << y << " = eq %" << x << ", %" << z << endl;
-            } else if (op == "!=") {
-                y = gen();
-                cout << "   %" << y << " = ne %" << x << ", %" << z << endl;
-            }
-            return y;   */
         }
     }
 };
@@ -766,20 +1195,59 @@ class LAndExpAST : public BaseAST {
             return x;
         } else {
             Data x = land_exp->Traverse(), z = eq_exp->Traverse();
-            int y = -1;
             if(x.mode == 1 && z.mode == 1) {
-                if (op == "&&") {
-                    y = x.value && z.value;
-                }
-                return Data(1, y, "");
+                return Data(1, (x.value && z.value), "", "");
+            } else if(x.mode == 1 && z.mode == 2) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne " << x.value << ", 0" << endl;
+                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 1 && z.mode == 3) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne " << x.value << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 2 && z.mode == 1) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << b << " = ne " << z.value << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 2 && z.mode == 2) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 2 && z.mode == 3) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 3 && z.mode == 1) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne " << z.value << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 3 && z.mode == 2) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
+            } else if(x.mode == 3 && z.mode == 3) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
+                cout << "   %" << y << " = and %" << a << ", %" << b << endl;
+                return Data(3, (x.value&&z.value), "", to_string(y));
             } else {
-                throw std::runtime_error("try to modify const" + x.mode);
+                throw runtime_error("Error: try to && non-exp type");
             }
-           /* if (op == "&&") {
-                y = gen();
-                cout << "   %" << y << " = and %" << x << ", %" << z << endl;
-            }
-            return y; */
         }
     }
 };
@@ -813,21 +1281,59 @@ class LOrExpAST : public BaseAST {
             return x;
         } else {
             Data x = lor_exp->Traverse(), z = land_exp->Traverse();
-            int y = -1;
             if(x.mode == 1 && z.mode == 1) {
-                if (op == "||") {
-                    y = x.value || z.value;
-                }
-                return Data(1, y, "");
+                return Data(1, (x.value || z.value), "", "");
+            } else if(x.mode == 1 && z.mode == 2) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne " << x.value << ", 0" << endl;
+                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 1 && z.mode == 3) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne " << x.value << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 2 && z.mode == 1) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << b << " = ne " << z.value << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 2 && z.mode == 2) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 2 && z.mode == 3) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 3 && z.mode == 1) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne " << z.value << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 3 && z.mode == 2) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
+            } else if(x.mode == 3 && z.mode == 3) {
+                int a = gen(), b = gen(), y = gen();
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
+                cout << "   %" << y << " = or %" << a << ", %" << b << endl;
+                return Data(3, (x.value||z.value), "", to_string(y));
             } else {
-                throw std::runtime_error("try to modify const" + x.mode);
+                throw runtime_error("Error: try to || non-exp type");
             }
-
-         /*   if (op == "||") {
-                y = gen();
-                cout << "   %" << y << " = or %" << x << ", %" << z << endl;
-            }  */
-            // return y;
         }
     }
 };

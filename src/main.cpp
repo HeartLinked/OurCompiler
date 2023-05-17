@@ -37,27 +37,26 @@ int main(int argc, const char *argv[]) {
 
     freopen("test.out", "w", stdout);
     yyin = fopen("hello.c", "r");
-    // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
-    unique_ptr<BaseAST> ast;
 
+
+    unique_ptr<BaseAST> ast;
     auto ret = yyparse(ast);
     assert(!ret);
 
     ast->Dump();
-
-    cout << endl;
+    cout << endl << endl;
 
     ParseAST(ast);
-
     cout << endl;
 
-    std::time_t currentTime = std::time(nullptr);
+    symbolTable.output();
+    
 
+    std::time_t currentTime = std::time(nullptr);
     // 将时间格式化为字符串
     char buffer[80];
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S",
                   std::localtime(&currentTime));
-
     // 输出格式化后的时间字符串
     std::cout << "当前时间：" << buffer << std::endl;
 
