@@ -11,7 +11,6 @@ extern int cnt;
 
 int gen();
 
-
 class SymbolTable {
   public:
     // 插入新符号，如果符号已经存在，返回 false，否则返回 true
@@ -26,7 +25,7 @@ class SymbolTable {
     }
 
     // 插入新符号，如果符号已经存在，返回 false，否则返回 true
-    bool insertVariaSymbol(const std::string &name, std::string value) {
+    bool insertVirableSymbol(const std::string &name, std::string value) {
         // 如果符号已经存在，返回 false
         if (table.find(name) != table.end()) {
             return false;
@@ -36,9 +35,23 @@ class SymbolTable {
         return true;
     }
 
-    // 检查符号是否存在
-    bool exists(const std::string &name) const {
-        return table.find(name) != table.end();
+    bool isConst(const std::string &name) const {
+        auto iter = table.find(name);
+        if (iter == table.end()) {
+            throw std::runtime_error("Symbol not found: " + name);
+        }
+    //    if (iter->second[0] == '%') {
+    //        return false;
+    //    }
+        return true;
+    }
+
+    bool isVirable(const std::string &name) const {
+        auto iter = table.find(name);
+        if (iter == table.end()) {
+            throw std::runtime_error("Symbol not found: " + name);
+        }
+        return false;
     }
 
     // 获取符号的值，如果符号不存在，抛出异常
@@ -56,6 +69,22 @@ class SymbolTable {
 
 extern SymbolTable symbolTable;
 
+// 发现遍历 AST 的时候返回值需要一个数据结构。先这么定义着
+struct Data {
+
+    // mode = 1 表示返回的是表达式的数值，且此时为常量
+    // mode = 2 表示返回的是表达式的变量符号字符串（实际为%+数） mode = -1
+    // 表示暂无返回内容。mode = 1 时 value 有效，mode = 2 时 symbol 有效
+
+    Data(int mode, int value, string symbol)
+        : mode(mode), value(value), symbol(symbol) {}
+
+    int mode;
+    int value;
+    string symbol;
+
+};
+
 // 所有 AST 的基类
 class BaseAST {
   public:
@@ -63,7 +92,7 @@ class BaseAST {
 
     virtual void Dump() const = 0;
 
-    virtual int Traverse() const = 0;
+    virtual Data Traverse() const = 0;
 };
 
 // CompUnit := FuncDef
@@ -79,11 +108,11 @@ class CompUnitAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         // Dump();  这里疑似暂时不用输出
         cerr << "Traverse CompUnitAST" << endl;
         func_def->Traverse();
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -107,14 +136,14 @@ class FuncDefAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse FuncDefAST" << endl;
         cout << "fun @" << func_name << "(): ";
         func_type->Traverse();
         cout << "{" << endl;
         func_block->Traverse();
         cout << "}" << endl;
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -131,10 +160,10 @@ class DeclAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse DeclAST" << endl;
         const_decl->Traverse();
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -158,12 +187,12 @@ class ConstDeclAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse ConstDecl" << endl;
         for (auto &const_def : *const_defs) {
             const_def->Traverse();
         }
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -180,7 +209,7 @@ class BTypeAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         /*    cerr << "Traverse BtypeAST" << endl;
             if (btype == "int") {
                 cout << "i32 ";
@@ -207,13 +236,13 @@ class ConstDefAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse ConstDef" << endl;
-        int x = const_init_val->Traverse();
+        Data x = const_init_val->Traverse();
         // Insert const paramter const_name with symbol '%x'
-        symbolTable.insertConstSymbol(const_name, "%" + to_string(x));
-        // cout << "Insert" << const_name << " as %" << x << endl;
-        return -1;
+         symbolTable.insertConstSymbol(const_name, to_string(x.value));
+        //  cout << "Insert" << const_name << " as const number" << x.value << endl;
+        return x;
     }
 };
 
@@ -230,10 +259,10 @@ class ConstInitValAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse ConstInitValAST" << endl;
-        int x = const_exp->Traverse();
-        return x;
+        Data d= const_exp->Traverse();
+        return d;
     }
 };
 
@@ -252,14 +281,14 @@ class FuncTypeAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse FuncTypeAST" << endl;
         if (type == "int") {
             cout << "i32 ";
         } else {
             // TODO
         }
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -278,12 +307,12 @@ class BlockAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse BlockAST" << endl;
         for (auto &item : *block_items) {
             item->Traverse();
         }
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -307,14 +336,14 @@ class BlockItemAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse BlockItemAST" << endl;
         if (mode == 1) {
             decl->Traverse();
         } else {
             stmt->Traverse();
         }
-        return -1;
+        return Data(-1, 0, "");
     }
 };
 
@@ -331,12 +360,17 @@ class StmtAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse StmtAST" << endl;
-        int x = exp->Traverse();
-        cout << "   ret  %" << x << endl;
+        Data x = exp->Traverse();
+        if(x.mode == 1) {
+            cout << "   ret " << x.value << endl;
+        } else if(x.mode == 2) {
+            cout << "   ret " << x.symbol << endl;
+        }
+        // cout << "   ret  %" << x << endl;
         cout << endl;
-        return -1;
+        return x;
     }
 };
 
@@ -353,9 +387,9 @@ class ExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse ExpAST" << endl;
-        int x = lor_exp->Traverse();
+        Data x = lor_exp->Traverse();
         return x;
     }
 };
@@ -373,16 +407,26 @@ class LValAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse Lval" << endl;
-        string symbol = symbolTable.getSymbol(name);
-        int x = stoi(symbol.substr(1));
-        // cout << " get " << name << "from table as symbol" << x << endl;
-        return x;
+       // string symbol = symbolTable.getSymbol(name);
+
+        //int x = stoi(symbol.substr(1));
+        // cout << " get " << name << "from table :"  << endl;
+        if(symbolTable.isConst(name)) {
+            string s = symbolTable.getSymbol(name);
+            // cout << s << endl;
+            return Data(1, stoi(s), s);
+        } else {
+            string s = symbolTable.getSymbol(name);
+            // cout << s << endl;
+            return Data(2, 0, s);
+        }
     }
 };
 
 // PrimaryExp := '(' Exp ')'
+// PrimaryExp := Lval
 // PrimaryExp := Number
 class PrimaryExpAST : public BaseAST {
   public:
@@ -407,17 +451,17 @@ class PrimaryExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse PrimaryExpAST " << endl;
         if (mode == 1) {
-            int x = exp->Traverse();
+            Data x = exp->Traverse();
             return x;
         } else if (mode == 3) {
-            int x = gen();
-            cout << "   %" << x << " = add 0, " << number << endl;
+            Data x = Data(1, number, "");
+            // cout << "   %" << x << " = add 0, " << number << endl;
             return x;
         } else {
-            int x = lval->Traverse();
+            Data x = lval->Traverse();
             return x;
         }
     }
@@ -448,24 +492,25 @@ class UnaryExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse UnaryExpAST" << endl;
         if (mode == 1) {
-            int x = primary_exp->Traverse();
+            Data x = primary_exp->Traverse();
             return x;
         } else {
-            int x = unary_exp->Traverse(), y = -1;
-            if (unary_op == "!") {
-                y = gen();
-                cout << "   %" << y << " = eq 0, %" << x << endl;
-            } else if (unary_op == "-") {
-                y = gen();
-                cout << "   %" << y << " = sub 0, %" << x << endl;
+            Data x = unary_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1) {
+                 if (unary_op == "!") {
+                    x.value = (x.value == 0);
+                } else if (unary_op == "-") {
+                    x.value = -x.value;
+                }
+            } else if(x.mode == 2){
+               // TODO: 
+            } else {
+              cerr << " ERROR: UnaryExpAST x.mode == 3" << endl;
             }
-            if (y == -1)
-                return x;
-            else
-                return y;
         }
     }
 };
@@ -492,14 +537,27 @@ class MulExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse MulExp" << endl;
         if (mode == 1) {
-            int x = unary_exp->Traverse();
+            Data x = unary_exp->Traverse();
             return x;
         } else {
-            int x = mul_exp->Traverse(), y = -1, z = unary_exp->Traverse();
-            if (op == "*") {
+            Data x = mul_exp->Traverse(), z = unary_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1 && z.mode == 1) {
+                if (op == "*") {
+                    y = x.value * z.value;
+                } else if (op == "/") {
+                    y = x.value / z.value;
+                } else if (op == "%") {
+                    y = x.value % z.value;
+                }
+                return Data(1, y, "");
+            } else {
+                throw std::runtime_error("try to modify const" + x.mode);
+            }
+         /*  if (op == "*") {
                 y = gen();
                 cout << "   %" << y << " = mul %" << x << ", %" << z << endl;
             } else if (op == "/") {
@@ -508,8 +566,7 @@ class MulExpAST : public BaseAST {
             } else if (op == "%") {
                 y = gen();
                 cout << "   %" << y << " = rem %" << x << ", %" << z << endl;
-            }
-            return y;
+            }*/
         }
     }
 };
@@ -536,21 +593,32 @@ class AddExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse AddExp" << endl;
         if (mode == 1) {
-            int x = mul_exp->Traverse();
+            Data x = mul_exp->Traverse();
             return x;
         } else {
-            int x = add_exp->Traverse(), y = -1, z = mul_exp->Traverse();
-            if (op == "+") {
+            Data x = add_exp->Traverse(), z = mul_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1 && z.mode == 1) {
+                if (op == "+") {
+                    y = x.value + z.value;
+                } else if (op == "-") {
+                    y = x.value - z.value;
+                }
+                return Data(1, y, "");
+            } else {
+                throw std::runtime_error("try to modify const" + x.mode);
+            }
+         /*   if (op == "+") {
                 y = gen();
                 cout << "   %" << y << " = add %" << x << ", %" << z << endl;
             } else if (op == "-") {
                 y = gen();
                 cout << "   %" << y << " = sub %" << x << ", %" << z << endl;
             }
-            return y;
+            return y;  */
         }
     }
 };
@@ -577,14 +645,29 @@ class RelExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse RelExp" << endl;
         if (mode == 1) {
-            int x = add_exp->Traverse();
+            Data x = add_exp->Traverse();
             return x;
         } else {
-            int x = rel_exp->Traverse(), y = -1, z = add_exp->Traverse();
-            if (op == "<") {
+            Data x = rel_exp->Traverse(), z = add_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1 && z.mode == 1) {
+                if (op == "<") {
+                    y = (x.value < z.value);
+                } else if (op == ">") {
+                    y = x.value > z.value;
+                } else if (op == "<=") {
+                    y = x.value <= z.value;
+                } else if (op == ">=") {
+                    y = x.value >= z.value;
+                }
+                return Data(1, y, "");
+            } else {
+                throw std::runtime_error("try to modify const" + x.mode);
+            }
+      /*    if (op == "<") {
                 y = gen();
                 cout << "   %" << y << " = lt %" << x << ", %" << z << endl;
             } else if (op == ">") {
@@ -596,8 +679,8 @@ class RelExpAST : public BaseAST {
             } else if (op == ">=") {
                 y = gen();
                 cout << "   %" << y << " = ge %" << x << ", %" << z << endl;
-            }
-            return y;
+            }  
+            return y;   */
         }
     }
 };
@@ -624,21 +707,32 @@ class EqExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse EqExp" << endl;
         if (mode == 1) {
-            int x = rel_exp->Traverse();
+            Data x = rel_exp->Traverse();
             return x;
         } else {
-            int x = eq_exp->Traverse(), y = -1, z = rel_exp->Traverse();
-            if (op == "==") {
+            Data x = eq_exp->Traverse(), z = rel_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1 && z.mode == 1) {
+                if (op == "==") {
+                    y = x.value == z.value;
+                } else if (op == "!=") {
+                    y = x.value != z.value;
+                }
+                return Data(1, y, "");
+            } else {
+                throw std::runtime_error("try to modify const" + x.mode);
+            }
+      /*     if (op == "==") {
                 y = gen();
                 cout << "   %" << y << " = eq %" << x << ", %" << z << endl;
             } else if (op == "!=") {
                 y = gen();
                 cout << "   %" << y << " = ne %" << x << ", %" << z << endl;
             }
-            return y;
+            return y;   */
         }
     }
 };
@@ -665,18 +759,27 @@ class LAndExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse LAndExp" << endl;
         if (mode == 1) {
-            int x = eq_exp->Traverse();
+            Data x = eq_exp->Traverse();
             return x;
         } else {
-            int x = land_exp->Traverse(), y = -1, z = eq_exp->Traverse();
-            if (op == "&&") {
+            Data x = land_exp->Traverse(), z = eq_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1 && z.mode == 1) {
+                if (op == "&&") {
+                    y = x.value && z.value;
+                }
+                return Data(1, y, "");
+            } else {
+                throw std::runtime_error("try to modify const" + x.mode);
+            }
+           /* if (op == "&&") {
                 y = gen();
                 cout << "   %" << y << " = and %" << x << ", %" << z << endl;
             }
-            return y;
+            return y; */
         }
     }
 };
@@ -703,18 +806,28 @@ class LOrExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse LOrExp" << endl;
         if (mode == 1) {
-            int x = land_exp->Traverse();
+            Data x = land_exp->Traverse();
             return x;
         } else {
-            int x = lor_exp->Traverse(), y = -1, z = land_exp->Traverse();
-            if (op == "||") {
+            Data x = lor_exp->Traverse(), z = land_exp->Traverse();
+            int y = -1;
+            if(x.mode == 1 && z.mode == 1) {
+                if (op == "||") {
+                    y = x.value || z.value;
+                }
+                return Data(1, y, "");
+            } else {
+                throw std::runtime_error("try to modify const" + x.mode);
+            }
+
+         /*   if (op == "||") {
                 y = gen();
                 cout << "   %" << y << " = or %" << x << ", %" << z << endl;
-            }
-            return y;
+            }  */
+            // return y;
         }
     }
 };
@@ -731,9 +844,9 @@ class ConstExpAST : public BaseAST {
         std::cout << " }";
     }
 
-    int Traverse() const override {
+    Data Traverse() const override {
         cerr << "Traverse ConstExp" << endl;
-        int x = exp->Traverse();
+        Data x = exp->Traverse();
         return x;
     }
 };
