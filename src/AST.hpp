@@ -35,6 +35,14 @@ class SymbolTable {
         table_variable[name] = value;
         return true;
     }
+    
+    void changeValue(const std::string &name, std::string value) {
+        if (table_variable.find(name) != table_variable.end()) {
+            table_variable[name] = value;
+        } else {
+            table[name] = value;
+        }
+    }
 
     bool isConst(const std::string &name) const {
         auto iter = table.find(name);
@@ -89,7 +97,7 @@ struct Data {
 
     // mode = 1 表示返回的value是常量的数值
     // mode = 2 表示返回的是变量本身，其中的变量名在 name 中，使用时需在前面加上@
-    // mdoe = 3 表示返回的是含变量的表达式，其内容在 symbol 中，使用时需在前面加上%
+    // mode = 3 表示返回的是含变量的表达式，其内容在 symbol 中，使用时需在前面加上%
     // mode = 0 表示返回的不是表达式类型
     Data(int mode, int value, string name, string symbol)
         : mode(mode), value(value), name(name), symbol(symbol) {}
@@ -506,9 +514,7 @@ class StmtAST : public BaseAST {
             Data x = exp->Traverse();
             if(x.mode == 1) {
                 cout << "   ret " << x.value << endl;
-            } else if(x.mode == 2) {
-                cout << "   ret @" << x.name << endl;
-            } else if(x.mode == 3) {
+            } else if(x.mode == 2 || x.mode == 3) {
                 cout << "   ret %" << x.symbol << endl;
             }
         } else if (mode == 2) { // LVal "=" Exp
@@ -517,6 +523,7 @@ class StmtAST : public BaseAST {
               throw runtime_error("Error: LVal is not a variable");
             } 
             Data y = exp->Traverse();
+            symbolTable.changeValue(x.name, to_string(y.value));
             if(y.mode == 1){
                 cout << "   store " << y.value << ", @" << x.name << endl;
             } else if(y.mode == 2){
@@ -566,10 +573,12 @@ class LValAST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse Lval" << endl;
+        int y = gen();
+        cout << "   %"<< y << " = load @" << name << endl;
         if(symbolTable.isConst(name)) {
-            return Data(1, symbolTable.getConstValue(name), "", "");
+            return Data(1, symbolTable.getConstValue(name), "", to_string(y));
         } else {
-            return Data(2, symbolTable.getVirableValue(name), name, "");
+            return Data(2, symbolTable.getVirableValue(name), name, to_string(y));
         }
     }
 };
@@ -658,10 +667,10 @@ class UnaryExpAST : public BaseAST {
                 int y = -1;
                 if (unary_op == "!") {
                     y = gen();
-                    cout << "   %" << y << " = eq 0, @" << x.name << endl;
+                    cout << "   %" << y << " = eq 0, %" << x.symbol << endl;
                     x.value = (x.value == 0);
                 } else if (unary_op == "-") {
-                    cout << "   %" << y << " = sub 0, @" << x.name << endl;
+                    cout << "   %" << y << " = sub 0, %" << x.symbol << endl;
                     x.value = -x.value;
                 } else {
                     return x;
@@ -720,25 +729,25 @@ class MulExpAST : public BaseAST {
                     return Data(1, x.value * z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = mul " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = mul " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = mul " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = mul @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = mul %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = mul @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = mul %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = mul @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = mul %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = mul %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = mul %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = mul %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = mul %" << x.symbol << ", %" << z.symbol << endl;
@@ -751,25 +760,25 @@ class MulExpAST : public BaseAST {
                     return Data(1, x.value / z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = div " << x.value << ", @" << z.name << endl;
+                  cout << "   %" << y << " = div " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = div " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = div @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = div %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = div @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = div %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = div @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = div %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = div %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = div %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = div %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = div %" << x.symbol << ", %" << z.symbol << endl;
@@ -782,25 +791,25 @@ class MulExpAST : public BaseAST {
                     return Data(1, x.value % z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = rem " << x.value << ", @" << z.name << endl;
+                  cout << "   %" << y << " = rem " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = rem " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = rem @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = rem %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = rem @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = rem %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = rem @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = rem %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = rem %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = rem %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = rem %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = rem %" << x.symbol << ", %" << z.symbol << endl;
@@ -848,25 +857,25 @@ class AddExpAST : public BaseAST {
                     return Data(1, x.value + z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = add " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = add " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = add " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = add @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = add %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = add @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = add %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = add @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = add %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = add %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = add %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = add %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = add %" << x.symbol << ", %" << z.symbol << endl;
@@ -879,25 +888,25 @@ class AddExpAST : public BaseAST {
                     return Data(1, x.value - z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = sub " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = sub " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = sub " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = sub @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = sub %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = sub @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = sub %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = sub @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = sub %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = sub %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = sub %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = sub %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = sub %" << x.symbol << ", %" << z.symbol << endl;
@@ -945,25 +954,25 @@ class RelExpAST : public BaseAST {
                     return Data(1, x.value < z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = lt " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = lt " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = lt " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = lt @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = lt %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = lt @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = lt %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = lt @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = lt %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = lt %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = lt %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = lt %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = lt %" << x.symbol << ", %" << z.symbol << endl;
@@ -976,25 +985,25 @@ class RelExpAST : public BaseAST {
                     return Data(1, x.value > z.value, "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = gt " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = gt " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = gt " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = gt @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = gt %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = gt @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = gt %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = gt @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = gt %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = gt %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = gt %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = gt %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = gt %" << x.symbol << ", %" << z.symbol << endl;
@@ -1007,25 +1016,25 @@ class RelExpAST : public BaseAST {
                     return Data(1, (x.value <= z.value), "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = le " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = le " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = le " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = le @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = le %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = le @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = le %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = le @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = le %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = le %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = le %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = le %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = le %" << x.symbol << ", %" << z.symbol << endl;
@@ -1038,25 +1047,25 @@ class RelExpAST : public BaseAST {
                     return Data(1, (x.value >= z.value), "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = ge " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = ge " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = ge " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = ge @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = ge %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = ge @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = ge %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = ge @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = ge %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = ge %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = ge %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = ge %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = ge %" << x.symbol << ", %" << z.symbol << endl;
@@ -1104,25 +1113,25 @@ class EqExpAST : public BaseAST {
                     return Data(1, (x.value == z.value), "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = eq " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = eq " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = eq " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = eq @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = eq %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = eq @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = eq %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = eq @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = eq %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = eq %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = eq %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = eq %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = eq %" << x.symbol << ", %" << z.symbol << endl;
@@ -1135,25 +1144,25 @@ class EqExpAST : public BaseAST {
                     return Data(1, (x.value != z.value), "", "");
                 } else if(x.mode == 1 && z.mode == 2) {
                     y = gen();
-                    cout << "   %" << y << " = ne " << x.value << ", @" << z.name << endl;
+                    cout << "   %" << y << " = ne " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 1 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = ne " << x.value << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 1) {
                   y = gen();
-                  cout << "   %" << y << " = ne @" << x.name << ", " << z.value << endl;
+                  cout << "   %" << y << " = ne %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 2 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = ne @" << x.name << ", @" << z.name << endl;
+                  cout << "   %" << y << " = ne %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 2 && z.mode == 3) {
                   y = gen();
-                  cout << "   %" << y << " = ne @" << x.name << ", %" << z.symbol << endl;
+                  cout << "   %" << y << " = ne %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 1) {
                   y = gen();
                   cout << "   %" << y << " = ne %" << x.symbol << ", " << z.value << endl;
                 } else if(x.mode == 3 && z.mode == 2) {
                   y = gen();
-                  cout << "   %" << y << " = ne %" << x.symbol << ", @" << z.name << endl;
+                  cout << "   %" << y << " = ne %" << x.symbol << ", %" << z.symbol << endl;
                 } else if(x.mode == 3 && z.mode == 3) {
                   y = gen();
                   cout << "   %" << y << " = ne %" << x.symbol << ", %" << z.symbol << endl;
@@ -1200,7 +1209,7 @@ class LAndExpAST : public BaseAST {
             } else if(x.mode == 1 && z.mode == 2) {
                 int a = gen(), b = gen(), y = gen();
                 cout << "   %" << a << " = ne " << x.value << ", 0" << endl;
-                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = and %" << a << ", %" << b << endl;
                 return Data(3, (x.value&&z.value), "", to_string(y));
             } else if(x.mode == 1 && z.mode == 3) {
@@ -1211,19 +1220,19 @@ class LAndExpAST : public BaseAST {
                 return Data(3, (x.value&&z.value), "", to_string(y));
             } else if(x.mode == 2 && z.mode == 1) {
                 int a = gen(), b = gen(), y = gen();
-                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
                 cout << "   %" << b << " = ne " << z.value << ", 0" << endl;
                 cout << "   %" << y << " = and %" << a << ", %" << b << endl;
                 return Data(3, (x.value&&z.value), "", to_string(y));
             } else if(x.mode == 2 && z.mode == 2) {
                 int a = gen(), b = gen(), y = gen();
-                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
-                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = and %" << a << ", %" << b << endl;
                 return Data(3, (x.value&&z.value), "", to_string(y));
             } else if(x.mode == 2 && z.mode == 3) {
                 int a = gen(), b = gen(), y = gen();
-                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
                 cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = and %" << a << ", %" << b << endl;
                 return Data(3, (x.value&&z.value), "", to_string(y));
@@ -1236,7 +1245,7 @@ class LAndExpAST : public BaseAST {
             } else if(x.mode == 3 && z.mode == 2) {
                 int a = gen(), b = gen(), y = gen();
                 cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
-                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = and %" << a << ", %" << b << endl;
                 return Data(3, (x.value&&z.value), "", to_string(y));
             } else if(x.mode == 3 && z.mode == 3) {
@@ -1286,7 +1295,7 @@ class LOrExpAST : public BaseAST {
             } else if(x.mode == 1 && z.mode == 2) {
                 int a = gen(), b = gen(), y = gen();
                 cout << "   %" << a << " = ne " << x.value << ", 0" << endl;
-                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = or %" << a << ", %" << b << endl;
                 return Data(3, (x.value||z.value), "", to_string(y));
             } else if(x.mode == 1 && z.mode == 3) {
@@ -1297,19 +1306,19 @@ class LOrExpAST : public BaseAST {
                 return Data(3, (x.value||z.value), "", to_string(y));
             } else if(x.mode == 2 && z.mode == 1) {
                 int a = gen(), b = gen(), y = gen();
-                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
                 cout << "   %" << b << " = ne " << z.value << ", 0" << endl;
                 cout << "   %" << y << " = or %" << a << ", %" << b << endl;
                 return Data(3, (x.value||z.value), "", to_string(y));
             } else if(x.mode == 2 && z.mode == 2) {
                 int a = gen(), b = gen(), y = gen();
-                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
-                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = or %" << a << ", %" << b << endl;
                 return Data(3, (x.value||z.value), "", to_string(y));
             } else if(x.mode == 2 && z.mode == 3) {
                 int a = gen(), b = gen(), y = gen();
-                cout << "   %" << a << " = ne @" << x.name << ", 0" << endl;
+                cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
                 cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = or %" << a << ", %" << b << endl;
                 return Data(3, (x.value||z.value), "", to_string(y));
@@ -1322,7 +1331,7 @@ class LOrExpAST : public BaseAST {
             } else if(x.mode == 3 && z.mode == 2) {
                 int a = gen(), b = gen(), y = gen();
                 cout << "   %" << a << " = ne %" << x.symbol << ", 0" << endl;
-                cout << "   %" << b << " = ne @" << z.name << ", 0" << endl;
+                cout << "   %" << b << " = ne %" << z.symbol << ", 0" << endl;
                 cout << "   %" << y << " = or %" << a << ", %" << b << endl;
                 return Data(3, (x.value||z.value), "", to_string(y));
             } else if(x.mode == 3 && z.mode == 3) {
