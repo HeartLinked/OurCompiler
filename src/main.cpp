@@ -1,5 +1,5 @@
-#include "AST.h"
-#include "CodeGen.h"
+#include "AST.hpp"
+#include "CodeGen.hpp"
 #include <cassert>
 #include <cstdio>
 #include <ctime>
@@ -50,7 +50,7 @@ int main(int argc, const char *argv[]) {
     cout << endl;
 
     symbolTable.output();
-    
+
 
     std::time_t currentTime = std::time(nullptr);
     // 将时间格式化为字符串
