@@ -1,10 +1,12 @@
 #pragma once
 
+#include "DsDef.hpp"
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -12,112 +14,7 @@ extern int cnt;
 
 int gen();
 
-class SymbolTable {
-  public:
-    // 插入新符号，如果符号已经存在，返回 false，否则返回 true
-    bool insertConstSymbol(const std::string &name, std::string value) {
-        // 如果符号已经存在，返回 false
-        if (table.find(name) != table.end() || table_variable.find(name) != table_variable.end()) {
-            return false;
-        }
-        // 插入新符号
-        table[name] = value;
-        return true;
-    }
-
-    // 插入新符号，如果符号已经存在，返回 false，否则返回 true
-    bool insertVirableSymbol(const std::string &name, std::string value) {
-        // 如果符号已经存在，返回 false
-        if (table_variable.find(name) != table_variable.end() || table.find(name) != table.end()) {
-            return false;
-        }
-        // 插入新符号
-        table_variable[name] = value;
-        return true;
-    }
-    
-    void changeValue(const std::string &name, std::string value) {
-        if (table_variable.find(name) != table_variable.end()) {
-            table_variable[name] = value;
-        } else {
-            table[name] = value;
-        }
-    }
-
-    bool isConst(const std::string &name) const {
-        auto iter = table.find(name);
-        if (iter == table.end()) {
-            return false;
-        }
-        return true;
-    }
-
-    bool isVirable(const std::string &name) const {
-        auto iter = table_variable.find(name);
-        if (iter == table_variable.end()) {
-            return false;
-        }
-        return true;
-    }
-
-    int getConstValue(const std::string &name) const {
-        auto iter = table.find(name);
-        string s = iter->second;
-        return stoi(s);
-    }
-
-    int getVirableValue(const std::string &name) const {
-        auto iter = table_variable.find(name);
-        string s = iter->second;
-        return stoi(s);
-    }
-
-    void output() {
-        cout << "const table:" << endl;
-        for (auto iter = table.begin(); iter != table.end(); iter++) {
-            cout << iter->first << " " << iter->second << endl;
-        }
-        cout << "--------------------------" << endl;
-        cout << "variable table:" << endl;
-        for (auto iter = table_variable.begin(); iter != table_variable.end(); iter++) {
-            cout << iter->first << " " << iter->second << endl;
-        }
-        cout << endl;
-    }
-
-  private:
-    std::unordered_map<std::string, std::string> table;
-    std::unordered_map<std::string, std::string> table_variable;
-};
-
-extern SymbolTable symbolTable;
-
-// 遍历 AST 的返回值的数据结构
-struct Data {
-
-    // mode = 1 表示返回的value是常量的数值
-    // mode = 2 表示返回的是变量本身，其中的变量名在 name 中，使用时需在前面加上@
-    // mode = 3 表示返回的是含变量的表达式，其内容在 symbol 中，使用时需在前面加上%
-    // mode = 0 表示返回的不是表达式类型
-    Data(int mode, int value, string name, string symbol)
-        : mode(mode), value(value), name(name), symbol(symbol) {}
-
-    int mode;
-    int value;
-    string name;
-    string symbol;
-
-};
-
-// 所有 AST 的基类
-class BaseAST {
-  public:
-    virtual ~BaseAST() = default;
-
-    virtual void Dump() const = 0;
-
-    virtual Data Traverse() const = 0;
-};
+extern stack<BlockSymbolTable*> symbolTableStack;
 
 // CompUnit := FuncDef
 class CompUnitAST : public BaseAST {
@@ -272,8 +169,9 @@ class ConstDefAST : public BaseAST {
         cerr << "Traverse ConstDef" << endl;
         Data x = const_init_val->Traverse();
         // Insert const paramter const_name with symbol '%x'
-        if(symbolTable.insertConstSymbol(const_name, to_string(x.value))){
-            // cerr << "Insert const " << const_name << " as const number " << x.value << endl;
+        BlockSymbolTable* t= symbolTableStack.top();
+        if(t -> insertConstSymbol(const_name, to_string(x.value))){
+            //  cerr << "Insert const " << const_name << " as const number " << x.value << endl;
         } else {
             cerr << "Error: const " << const_name << " has been defined" << endl;
         }
@@ -353,7 +251,8 @@ class VarDefAST : public BaseAST {
     Data Traverse() const override {
         cerr << "Traverse VarDefAST" << endl;
         if(mode == 1){  // int a;
-            if(symbolTable.insertVirableSymbol(var_name, "0")){
+            BlockSymbolTable* t= symbolTableStack.top();
+            if(t -> insertVirableSymbol(var_name, "0")){
                 cerr << "Insert" << var_name << " as var: 0" << endl;
             } else {
                 cerr << "Error: redefined variable " << var_name << endl;
@@ -364,7 +263,8 @@ class VarDefAST : public BaseAST {
         }
         else {           // int a = x + 1; 
             Data d = init_val->Traverse();
-            if(symbolTable.insertVirableSymbol(var_name, to_string(d.value))){
+            BlockSymbolTable* t= symbolTableStack.top();
+            if(t -> insertVirableSymbol(var_name, to_string(d.value))){
                 cerr << "Insert" << var_name << " as variale"  <<endl;
             } else {
                 cerr << "Error: redefined variable " << var_name << endl;
@@ -447,9 +347,16 @@ class BlockAST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse BlockAST" << endl;
+        BlockSymbolTable *blockSymbolTable = new BlockSymbolTable();
+        if(!symbolTableStack.empty()){
+            blockSymbolTable->father = symbolTableStack.top();
+        }
+        symbolTableStack.push(blockSymbolTable);
         for (auto &item : *block_items) {
             item->Traverse();
         }
+        symbolTableStack.pop();
+        delete blockSymbolTable;
         return Data(0, 0, "", "");
     }
 };
@@ -488,22 +395,33 @@ class BlockItemAST : public BaseAST {
 
 // Stmt := "return" Exp ";"
 // Stmt := LVal "=" Exp ";"
+// Stmt := Exp ";"
+// Stmt := ";"
+// Stmt := Block
 class StmtAST : public BaseAST {
   public:
 
-    int mode; // 1: return 2: LVal "=" Exp
+    int mode; // 1: return 2: LVal "=" Exp 3: Exp 4: ";"
     // 返回值 exp (只有整数类型)
     std::unique_ptr<BaseAST> exp;
     // 左值
     std::unique_ptr<BaseAST> lval;
+    // 语句块
+    std::unique_ptr<BaseAST> block;
 
     void Dump() const override {
         cerr << "Dump StmtAST" << endl;
         std::cout << "StmtAST { ";
         if(mode == 1) exp->Dump();
-        else {
+        else if(mode == 2){
             lval->Dump();
             exp->Dump();
+        } else if(mode == 3) {
+            exp->Dump();
+        } else if(mode == 4) {
+            std::cout << ";";
+        } else {
+            block->Dump();
         }
         std::cout << " }";
     }
@@ -523,7 +441,8 @@ class StmtAST : public BaseAST {
               throw runtime_error("Error: LVal is not a variable");
             } 
             Data y = exp->Traverse();
-            symbolTable.changeValue(x.name, to_string(y.value));
+            BlockSymbolTable *blockSymbolTable = symbolTableStack.top();
+            blockSymbolTable -> changeValue(x.name, to_string(y.value));
             if(y.mode == 1){
                 cout << "   store " << y.value << ", @" << x.name << endl;
             } else if(y.mode == 2){
@@ -533,6 +452,19 @@ class StmtAST : public BaseAST {
             } else {
                 throw runtime_error("Error: Set vriable to a illegal variable");
             }
+            /* 
+                cout << endl << "-----------begin----------" << endl;
+                blockSymbolTable->table.output();
+                cout << "--------------------------" << endl;
+                blockSymbolTable -> father -> table.output();
+                cout << "-----------end------------" << endl << endl;
+            */
+        } else if(mode == 3) {
+            exp->Traverse();
+        } else if(mode == 4) {
+            // do nothing
+        } else {
+            block->Traverse();
         }
         return Data(0, 0, "", "");
     }
@@ -575,10 +507,11 @@ class LValAST : public BaseAST {
         cerr << "Traverse Lval" << endl;
         int y = gen();
         cout << "   %"<< y << " = load @" << name << endl;
-        if(symbolTable.isConst(name)) {
-            return Data(1, symbolTable.getConstValue(name), "", to_string(y));
+        BlockSymbolTable* blockSymbolTable = symbolTableStack.top();
+        if(blockSymbolTable -> isConst(name)) {
+            return Data(1, blockSymbolTable -> getConstValue(name), "", to_string(y));
         } else {
-            return Data(2, symbolTable.getVirableValue(name), name, to_string(y));
+            return Data(2, blockSymbolTable -> getVirableValue(name), name, to_string(y));
         }
     }
 };

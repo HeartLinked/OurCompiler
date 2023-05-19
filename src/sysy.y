@@ -242,6 +242,23 @@ Stmt
     stmt->exp = unique_ptr<BaseAST>($3);
     $$ = stmt;
   }
+  | Exp ';' {
+    auto stmt = new StmtAST();
+    stmt->mode = 3;
+    stmt->exp = unique_ptr<BaseAST>($1);
+    $$ = stmt;
+  }
+  | ';'{
+    auto stmt = new StmtAST();
+    stmt->mode = 4;
+    $$ = stmt;
+  }
+  | Block {
+    auto stmt = new StmtAST();
+    stmt->mode = 5;
+    stmt->block = unique_ptr<BaseAST>($1);
+    $$ = stmt;
+  }
   | RETURN Exp ';' {
     auto stmt = new StmtAST();
     stmt->exp = unique_ptr<BaseAST>($2);

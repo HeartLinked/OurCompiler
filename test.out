@@ -1,27 +1,28 @@
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { x, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  10  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Lval { x }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } * UnaryExp { PrimaryExp {  3  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { x }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } } + MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } } } } } } } } },  } } }
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { b,  },  } } }, BlockItemAST { StmtAST { Lval { b }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { b }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  4  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  3  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } } } } } } } },  } } }
 
 fun @main(): i32 {
 
-   @x = alloc i32
-   store 10, @x
+   @a = alloc i32
+   store 1, @a
 
-   %0 = load @x
-   %1 = load @x
-   %2 = mul %1, 3
-   store %2, @x
 
-   %3 = load @x
-   %4 = load @x
-   %5 = add %4, 2
-   store %5, @x
+   @b = alloc i32
+   store 0, @b
 
-   %6 = load @x
-   ret %6
+   %0 = load @b
+   store 1, @b
+
+   %1 = load @a
+   store 2, @a
+
+   %2 = load @b
+   store 4, @b
+
+   %3 = load @a
+   store 3, @a
+
+   %4 = load @a
+   ret %4
 }
 
-const table:
---------------------------
-variable table:
-x 32
-
-当前时间：2023-05-17 20:53:29
+当前时间：2023-05-19 19:49:29

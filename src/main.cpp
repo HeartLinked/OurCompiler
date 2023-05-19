@@ -1,11 +1,15 @@
 #include "AST.hpp"
 #include "CodeGen.hpp"
+#include "DsDef.hpp"
 #include <cassert>
 #include <cstdio>
 #include <ctime>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -18,7 +22,7 @@ extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 extern void ParseAST(unique_ptr<BaseAST> &ast);
 
-SymbolTable symbolTable;
+stack<BlockSymbolTable*> symbolTableStack;
 
 
 int main(int argc, const char *argv[]) {
@@ -49,7 +53,7 @@ int main(int argc, const char *argv[]) {
     ParseAST(ast);
     cout << endl;
 
-    symbolTable.output();
+   // symbolTable.output();
 
 
     std::time_t currentTime = std::time(nullptr);
