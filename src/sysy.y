@@ -34,12 +34,13 @@ using namespace std;
 
 // lexer 返回的所有 token 种类的声明
 // 注意 IDENT 和 INT_CONST 会返回 token 的值, 分别对应 str_val 和 int_val
-%token INT RETURN AND OR EQ NE LE GE CONST
+%token INT RETURN AND OR EQ NE LE GE CONST IF ELSE
 %token <str_val> IDENT
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
 %type <ast_val> VarDecl VarDef InitVal LVal ConstDef FuncDef FuncType Block BlockItem Stmt PrimaryExp UnaryExp Exp MulExp AddExp LOrExp RelExp EqExp LAndExp Decl ConstDecl ConstInitVal BType ConstExp
+%type <ast_val> open_statement closed_statement  
 %type <ast_list_val> ConstDefList BlockItemList VarDefList 
 %type <str_val> UnaryOp
 %type <int_val> Number
@@ -235,7 +236,38 @@ BlockItem
   ;
 
 Stmt
-  : LVal '=' Exp ';' {
+  : open_statement{ 
+  }
+  | closed_statement {
+  }
+
+ open_statement
+  : IF '(' Exp ')' Stmt{
+    auto stmt = new StmtAST();
+    stmt->mode = 6;
+    stmt->exp = unique_ptr<BaseAST>($3); 
+    stmt->if_stmt = unique_ptr<BaseAST>($5);
+    $$ = stmt;
+  }
+  | IF '(' Exp ')' closed_statement ELSE open_statement{
+    auto stmt = new StmtAST();
+    stmt->mode = 7;
+    stmt->exp = unique_ptr<BaseAST>($3); 
+    stmt->if_stmt = unique_ptr<BaseAST>($5);
+    stmt->else_stmt = unique_ptr<BaseAST>($7);
+    $$ = stmt;
+  }
+
+closed_statement
+  : IF '(' Exp ')' closed_statement ELSE closed_statement{
+    auto stmt = new StmtAST();
+    stmt->mode = 7;
+    stmt->exp = unique_ptr<BaseAST>($3);
+    stmt->if_stmt = unique_ptr<BaseAST>($5);
+    stmt->else_stmt = unique_ptr<BaseAST>($7);
+    $$ = stmt; 
+  }
+  | LVal '=' Exp ';' {
     auto stmt = new StmtAST();
     stmt->mode = 2;
     stmt->lval = unique_ptr<BaseAST>($1);

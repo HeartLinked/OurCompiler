@@ -1,28 +1,54 @@
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { b,  },  } } }, BlockItemAST { StmtAST { Lval { b }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { b }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  4  } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  3  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } } } } } } } },  } } }
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { if (Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { Lval { a }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } },  } } } }, BlockItemAST { StmtAST { if (Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } - MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { if (Exp { LOrExp { LAndExp { EqExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } - MulExp { UnaryExp { PrimaryExp {  2  } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } } } } } } } },  } } else StmtAST { BlockAST { BlockItemAST { StmtAST { Lval { a }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } },  } } } },  } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } } } } } } } },  } } }
 
 fun @main(): i32 {
+%entry:
 
    @a = alloc i32
-   store 1, @a
-
-
-   @b = alloc i32
-   store 0, @b
-
-   %0 = load @b
-   store 1, @b
-
-   %1 = load @a
    store 2, @a
 
-   %2 = load @b
-   store 4, @b
+   %0 = load @a
+   br %0, %ifA, %endifelseA
 
-   %3 = load @a
-   store 3, @a
+%ifA:
+
+   %1 = load @a
+   %2 = load @a
+   %3 = add %2, 1
+   store %3, @a
+
+%endifelseA:
 
    %4 = load @a
-   ret %4
+   %5 = sub %4, 1
+   br %5, %ifC, %endifelseC
+
+%ifC:
+
+   %6 = load @a
+   %7 = sub %6, 2
+   %8 = eq %7, 1
+   br %8, %ifB, %elseB
+
+%ifB:
+
+   %9 = load @a
+   ret %9
+   jump %endifelseB
+
+%elseB:
+
+   %10 = load @a
+   %11 = load @a
+   %12 = add %11, 1
+   store %12, @a
+   jump %endifelseB
+
+%endifelseB:
+
+%endifelseC:
+
+   %13 = load @a
+   ret %13
 }
 
-当前时间：2023-05-19 19:49:29
+当前时间：2023-05-20 14:38:17

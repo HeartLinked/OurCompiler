@@ -1,11 +1,15 @@
 int main() {
-  int a = 1;
-  {
-    int b;
-    b = 1;
-    a = 2;
-    b = 4;
-    a = 3;
+  int a = 2;
+  if(a) {
+    a = a + 1;
+  } 
+  if(a - 1) {
+    if(a - 2 == 1) {
+      return a;
+    } else {
+      a = a + 1;
+    }
   }
+  //else a = 0;
   return a;
 }

@@ -14,6 +14,12 @@ extern int cnt;
 
 int gen();
 
+char gen2();
+
+char ifGen3();
+
+char elseGen4();
+
 extern stack<BlockSymbolTable*> symbolTableStack;
 
 // CompUnit := FuncDef
@@ -346,17 +352,26 @@ class BlockAST : public BaseAST {
     }
 
     Data Traverse() const override {
+        string t = "";
         cerr << "Traverse BlockAST" << endl;
         BlockSymbolTable *blockSymbolTable = new BlockSymbolTable();
         if(!symbolTableStack.empty()){
             blockSymbolTable->father = symbolTableStack.top();
+            t = string("block")+gen2();
+            // cout << "---------enter " << t << "----------" << endl;
+        } else {
+            cout << "%entry:" << endl;
+            // cout << "---------enter entry----------" << endl;
         }
+        
         symbolTableStack.push(blockSymbolTable);
         for (auto &item : *block_items) {
             item->Traverse();
         }
         symbolTableStack.pop();
         delete blockSymbolTable;
+        // if(t != "") cout << "---------end " << t << "----------" << endl;
+        // else cout << "---------end entry------------" << endl;
         return Data(0, 0, "", "");
     }
 };
@@ -398,16 +413,22 @@ class BlockItemAST : public BaseAST {
 // Stmt := Exp ";"
 // Stmt := ";"
 // Stmt := Block
+// Stmt := "if" "(" Exp ")" Stmt ["else" Stmt]
 class StmtAST : public BaseAST {
   public:
-
-    int mode; // 1: return 2: LVal "=" Exp 3: Exp 4: ";"
+    // 1: return 2: LVal "=" Exp 3: Exp 4: ";" 5: Block 6: if 7: if else
+    int mode; 
     // 返回值 exp (只有整数类型)
     std::unique_ptr<BaseAST> exp;
     // 左值
     std::unique_ptr<BaseAST> lval;
     // 语句块
     std::unique_ptr<BaseAST> block;
+    // if 语句
+    std::unique_ptr<BaseAST> if_stmt;
+    mutable string if_label = "";
+    // else 语句
+    std::unique_ptr<BaseAST> else_stmt;
 
     void Dump() const override {
         cerr << "Dump StmtAST" << endl;
@@ -420,8 +441,22 @@ class StmtAST : public BaseAST {
             exp->Dump();
         } else if(mode == 4) {
             std::cout << ";";
-        } else {
+        } else if(mode == 5) {
             block->Dump();
+        } else if(mode == 6) {
+            std::cout << "if (";
+            exp->Dump();
+            std::cout << ") ";
+            if_stmt->Dump();
+            if_label = ifGen3();
+        } else if(mode == 7) {
+            std::cout << "if (";
+            exp->Dump();
+            std::cout << ") ";
+            if_stmt->Dump();
+            if_label = ifGen3();
+            std::cout << " else ";
+            else_stmt->Dump();
         }
         std::cout << " }";
     }
@@ -452,19 +487,29 @@ class StmtAST : public BaseAST {
             } else {
                 throw runtime_error("Error: Set vriable to a illegal variable");
             }
-            /* 
-                cout << endl << "-----------begin----------" << endl;
-                blockSymbolTable->table.output();
-                cout << "--------------------------" << endl;
-                blockSymbolTable -> father -> table.output();
-                cout << "-----------end------------" << endl << endl;
-            */
         } else if(mode == 3) {
             exp->Traverse();
         } else if(mode == 4) {
             // do nothing
-        } else {
+        } else if(mode == 5) {
             block->Traverse();
+        } else if(mode == 6) {
+          // TODO
+            Data x = exp->Traverse();
+            cout << "   br %" << x.symbol << ", %if" << if_label << ", %endifelse" << if_label << endl;
+            cout << endl << "%if" << if_label << ":" << endl;
+            if_stmt->Traverse();
+            cout << endl << "%endifelse" << if_label << ":" << endl;
+        } else if(mode == 7) {
+            Data x = exp->Traverse();
+            cout << "   br %" << x.symbol << ", %if" << if_label << ", %else" << if_label << endl;
+            cout << endl << "%if" << if_label << ":" << endl;
+            if_stmt->Traverse();
+            cout << "   jump %endifelse" << if_label << endl; 
+            cout << endl << "%else" << if_label << ":" << endl;
+            else_stmt->Traverse();
+            cout << "   jump %endifelse" << if_label << endl; 
+            cout << endl << "%endifelse" << if_label << ":" << endl;
         }
         return Data(0, 0, "", "");
     }
