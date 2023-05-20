@@ -3,7 +3,13 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include "AST.h"
+#include "AST.hpp"
+#include "koopa.h"
+#include<fstream>
+#include "IRGen.hpp"
+#include<string.h>
+#include<cstring>
+#include "utils.hpp"
 using namespace std;
 
 // 声明 lexer 的输入, 以及 parser 函数
@@ -14,28 +20,51 @@ using namespace std;
 extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 extern void ParseAST(unique_ptr<BaseAST> &ast);
-
+SymbolTable symbolTable;
+// string riscvCode;
 int main(int argc, const char *argv[]) {
   // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
   // compiler 模式 输入文件 -o 输出文件
- /* assert(argc == 5);
-  auto mode = argv[1];
-  auto input = argv[2];
-  auto output = argv[4];
+  /* assert(argc == 5);
+    auto mode = argv[1];
+    auto input = argv[2];
+    auto output = argv[4];
 
-  // 打开输入文件, 并且指定 lexer 在解析的时候读取这个文件
-  yyin = fopen(input, "r");
-  assert(yyin); */
+    // 打开输入文件, 并且指定 lexer 在解析的时候读取这个文件
+    yyin = fopen(input, "r");
+    assert(yyin); */
+
+  cout.setf(std::ios::unitbuf);
+
   freopen("test.out", "w", stdout);
   yyin = fopen("hello.c", "r");
-  // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
-  unique_ptr<BaseAST> ast;
 
+
+  unique_ptr<BaseAST> ast;
   auto ret = yyparse(ast);
   assert(!ret);
 
-  // ParseAST(ast);
-
   ast->Dump();
+  cout << endl << endl;
+
+  ParseAST(ast);
+  cout << endl;
+
+  symbolTable.output();
+
+
+  time_t currentTime = time(nullptr);
+  // 将时间格式化为字符串
+  char buffer[80];
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S",
+                localtime(&currentTime));
+  // 输出格式化后的时间字符串
+  cout << "当前时间：" << buffer << endl;
+
+  fclose(stdout);
+  char buf[1024] = {0};
+  TransferIR(buf, "testForIR.out");
+  freopen("IRtest.out", "w", stdout);
+  IRGenerate(buf);
   return 0;
 }

@@ -1,14 +1,14 @@
 %option noyywrap
 %option nounput
 %option noinput
+%option yylineno
+
 
 %{
 
     #include <cstdlib>
     #include <string>
 
-    // 因为 Flex 会用到 Bison 中关于 token 的定义
-    // 所以需要 include Bison 生成的头文件
     #include "sysy.tab.hpp"
 
     using namespace std;
@@ -36,8 +36,16 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 {LineComment}   { /* 忽略, 不做任何操作 */ }
 
 
+"&&"            { return AND; }
+"||"            { return OR; }
+"<="            { return LE; }
+">="            { return GE; }
+"=="            { return EQ; }
+"!="            { return NE; }
+
 "int"           { return INT; }
 "return"        { return RETURN; }
+"const"         { return CONST; }
 
 {Identifier}    { yylval.str_val = new string(yytext); return IDENT; }
 

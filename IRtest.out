@@ -1,0 +1,14 @@
+	.text
+	.globl main
+main:
+  addi  sp, sp, -16
+  li    t0, 6
+  li    t1, 0
+  xor   t0, t0, t1
+  seqz  t0, t0
+  sw    t0, 0(sp)
+  li    a0, 0
+  addi  sp, sp, 16
+  ret
+
+

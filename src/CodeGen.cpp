@@ -1,5 +1,7 @@
-#include "CodeGen.h"
+#include "CodeGen.hpp"
 #include <memory>
+#include <unordered_map>
+#include <string>
 
 using namespace std;
 

@@ -281,9 +281,9 @@ typedef struct {
 ///
 enum koopa_raw_binary_op {
   /// Not equal to.
-  KOOPA_RBO_NOT_EQ,
+  KOOPA_RBO_NOT_EQ=0,
   /// Equal to.
-  KOOPA_RBO_EQ,
+  KOOPA_RBO_EQ=1,
   /// Greater than.
   KOOPA_RBO_GT,
   /// Less than.

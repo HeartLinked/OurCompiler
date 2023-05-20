@@ -1,1 +1,23 @@
-CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { StmtAST { Exp { UnaryExp { + UnaryExp { PrimaryExp { Exp { UnaryExp { - UnaryExp { - UnaryExp { ! UnaryExp { PrimaryExp {  6  } } } } } } } } } } } } } }
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } },  } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { b, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } },  } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } + MulExp { UnaryExp { PrimaryExp { Lval { b } } } } } - MulExp { UnaryExp { PrimaryExp { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a } } } } } + MulExp { UnaryExp { PrimaryExp { Lval { b } } } } } } } } } } } } } } } } } } } } },  } } }
+
+fun @main(): i32 {
+
+   @a = alloc i32
+   store 1, @a
+
+   @b = alloc i32
+   store 2, @b
+
+   %0 = add @a, @b
+   %1 = add @a, @b
+   %2 = sub %0, %1
+   ret %2
+}
+
+const table:
+--------------------------
+variable table:
+b 2
+a 1
+
+当前时间：2023-05-20 10:32:26
