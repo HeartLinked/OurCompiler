@@ -414,10 +414,11 @@ class BlockItemAST : public BaseAST {
 // Stmt := ";"
 // Stmt := Block
 // Stmt := "if" "(" Exp ")" Stmt ["else" Stmt]
+// Stmt := "while" "(" Exp ")" Stmt
 class StmtAST : public BaseAST {
   public:
-    // 1: return 2: LVal "=" Exp 3: Exp 4: ";" 5: Block 6: if 7: if else
-    int mode; 
+    // 1: return 2: LVal "=" Exp 3: Exp 4: ";" 5: Block 
+    int mode;  // 6: if 7: if else 8: while
     // 返回值 exp (只有整数类型)
     std::unique_ptr<BaseAST> exp;
     // 左值
@@ -429,6 +430,8 @@ class StmtAST : public BaseAST {
     mutable string if_label = "";
     // else 语句
     std::unique_ptr<BaseAST> else_stmt;
+    // while 语句
+    std::unique_ptr<BaseAST> while_stmt;
 
     void Dump() const override {
         cerr << "Dump StmtAST" << endl;
@@ -457,6 +460,11 @@ class StmtAST : public BaseAST {
             if_label = ifGen3();
             std::cout << " else ";
             else_stmt->Dump();
+        } else if (mode == 8) {
+            std::cout << "while (";
+            exp->Dump();
+            std::cout << ") ";
+            while_stmt->Dump();
         }
         std::cout << " }";
     }
@@ -494,11 +502,11 @@ class StmtAST : public BaseAST {
         } else if(mode == 5) {
             block->Traverse();
         } else if(mode == 6) {
-          // TODO
             Data x = exp->Traverse();
             cout << "   br %" << x.symbol << ", %if" << if_label << ", %endifelse" << if_label << endl;
             cout << endl << "%if" << if_label << ":" << endl;
             if_stmt->Traverse();
+            cout << "   jump %endifelse" << if_label << endl; 
             cout << endl << "%endifelse" << if_label << ":" << endl;
         } else if(mode == 7) {
             Data x = exp->Traverse();
@@ -510,6 +518,14 @@ class StmtAST : public BaseAST {
             else_stmt->Traverse();
             cout << "   jump %endifelse" << if_label << endl; 
             cout << endl << "%endifelse" << if_label << ":" << endl;
+        } else if (mode == 8) {
+          // TODO:
+            cout << endl << "%while" << if_label << ":" << endl;
+            Data x = exp->Traverse();
+            cout << "   br %" << x.symbol << ", %while" << if_label << ", %endwhile" << if_label << endl;
+            while_stmt->Traverse();
+            cout << "   jump %while" << if_label << endl;
+            cout << endl << "%endwhile" << if_label << ":" << endl;
         }
         return Data(0, 0, "", "");
     }
