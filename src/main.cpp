@@ -23,7 +23,7 @@ extern int yyparse(unique_ptr<BaseAST> &ast);
 extern void ParseAST(unique_ptr<BaseAST> &ast);
 
 stack<BlockSymbolTable*> symbolTableStack;
-
+stack<string> whileLevelsStack; 
 
 int main(int argc, const char *argv[]) {
     // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:

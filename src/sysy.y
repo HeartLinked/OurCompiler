@@ -311,6 +311,16 @@ closed_statement
     stmt->mode = 1;
     $$ = stmt;
   }
+  | BREAK ';' {
+    auto stmt = new StmtAST();
+    stmt->mode = 9;
+    $$ = stmt;
+  }
+  | CONTINUE ';' {
+    auto stmt = new StmtAST();
+    stmt->mode = 10;
+    $$ = stmt;
+  }
   ;
 
 Exp
