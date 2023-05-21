@@ -24,6 +24,8 @@ extern void ParseAST(unique_ptr<BaseAST> &ast);
 
 stack<BlockSymbolTable*> symbolTableStack;
 stack<string> whileLevelsStack; 
+vector<string> s1 = {};
+paramentsTable paraments = paramentsTable(false, s1);
 
 int main(int argc, const char *argv[]) {
     // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
@@ -38,15 +40,17 @@ int main(int argc, const char *argv[]) {
      assert(yyin); */
 
     std::cout.setf(std::ios::unitbuf);
+    std::cerr.setf(std::ios::unitbuf);
+
 
     freopen("test.out", "w", stdout);
     yyin = fopen("hello.c", "r");
 
-
+    cout << "Start parsing..." << endl;
     unique_ptr<BaseAST> ast;
     auto ret = yyparse(ast);
     assert(!ret);
-
+    cout << "Parse success!" << endl;
     ast->Dump();
     cout << endl << endl;
 

@@ -29,33 +29,58 @@ using namespace std;
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;   // AST
+  FuncFParamsAST *func_fparams_val; // FuncFParams
   vector<std::unique_ptr<BaseAST>> *ast_list_val; // AST list
 }
 
 // lexer 返回的所有 token 种类的声明
 // 注意 IDENT 和 INT_CONST 会返回 token 的值, 分别对应 str_val 和 int_val
-%token INT RETURN AND OR EQ NE LE GE CONST IF ELSE WHILE CONTINUE BREAK
+%token INT RETURN AND OR EQ NE LE GE CONST IF ELSE WHILE CONTINUE BREAK VOID
 %token <str_val> IDENT
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
 %type <ast_val> VarDecl VarDef InitVal LVal ConstDef FuncDef FuncType Block BlockItem Stmt PrimaryExp UnaryExp Exp MulExp AddExp LOrExp RelExp EqExp LAndExp Decl ConstDecl ConstInitVal BType ConstExp
-%type <ast_val> open_statement closed_statement  
+%type <ast_val> open_statement closed_statement CompUnit2 FuncFParam
 %type <ast_list_val> ConstDefList BlockItemList VarDefList 
+%type <func_fparams_val> FuncFParams
 %type <str_val> UnaryOp
 %type <int_val> Number
 
 
 %%
 
-// CompUnit := FuncDef
 CompUnit
   : FuncDef {
     auto comp_unit = make_unique<CompUnitAST>();
     comp_unit->func_def = unique_ptr<BaseAST>($1);
+    comp_unit->mode = 1;
+    ast = move(comp_unit);
+  }
+  | CompUnit2 {
+    auto comp_unit = make_unique<CompUnitAST>();
+    comp_unit->comp_unit2 = unique_ptr<BaseAST>($1);
+    comp_unit->mode = 2;
     ast = move(comp_unit);
   }
   ;
+
+CompUnit2
+  : FuncDef FuncDef{
+    auto comp_unit2 = new CompUnit2AST();
+    comp_unit2->func_def1 = unique_ptr<BaseAST>($1);
+    comp_unit2->func_def2 = unique_ptr<BaseAST>($2);
+    comp_unit2->mode = 1;
+    $$ = comp_unit2;
+  }
+  | CompUnit2 FuncDef {
+    auto comp_unit2 = new CompUnit2AST();
+    comp_unit2->comp_unit2 = unique_ptr<BaseAST>($1);
+    comp_unit2->func_def1 = unique_ptr<BaseAST>($2);
+    comp_unit2->mode = 2;
+    $$ = comp_unit2;
+  }
+
 
 Decl
   : ConstDecl{
@@ -182,14 +207,58 @@ FuncDef
     func_def->func_type = unique_ptr<BaseAST>($1);
     func_def->func_name = *unique_ptr<string>($2);
     func_def->func_block = unique_ptr<BaseAST>($5);
+    func_def->mode = 1;
+    $$ = func_def;
+  }
+  | FuncType IDENT '(' FuncFParams ')' Block {
+    cerr << "FuncDef" << endl;
+    auto func_def = new FuncDefAST();
+    func_def->func_type = unique_ptr<BaseAST>($1);
+    func_def->func_name = *unique_ptr<string>($2);
+    func_def->func_fparams = unique_ptr<BaseAST>($4);
+    func_def->func_block = unique_ptr<BaseAST>($6);
+    func_def->mode = 2;
     $$ = func_def;
   }
   ;
+
+FuncFParams
+  : FuncFParam {
+    cerr << "FuncFParams" << endl;
+    auto func_fparams = new FuncFParamsAST();
+    cerr << "FuncFParams2" << endl;
+    func_fparams -> func_fparams.push_back(move(unique_ptr<BaseAST>($1)));
+    cerr << "FuncFParams3" << endl;
+    $$ = func_fparams;
+    cerr << "FuncFParams4" << endl;
+  }
+  | FuncFParam ',' FuncFParams {
+    auto func_fparams = new FuncFParamsAST();
+    func_fparams -> func_fparams.push_back(move(unique_ptr<BaseAST>($1)));
+    for (auto &func_fparam : ($3 -> func_fparams)) {
+      func_fparams -> func_fparams.push_back(move(func_fparam));
+    }
+    $$ = func_fparams;
+  }
+  ;
+
+FuncFParam
+  : BType IDENT {
+    auto func_fparam = new FuncFParamAST();
+    func_fparam -> btype = unique_ptr<BaseAST>($1);
+    func_fparam -> param_name = *unique_ptr<string>($2);
+    $$ = func_fparam;
+  }  
 
 FuncType
   : INT {
     auto func_type = new FuncTypeAST();
     func_type -> type = "int";
+    $$ = func_type;
+  }
+  | VOID {
+    auto func_type = new FuncTypeAST();
+    func_type -> type = "void";
     $$ = func_type;
   }
   ;
@@ -199,6 +268,11 @@ Block
   : '{' BlockItemList '}' {
     auto block = new BlockAST();
     block -> block_items = unique_ptr<vector<std::unique_ptr<BaseAST>>>($2);
+    $$ = block;
+  }
+  | '{' '}' {
+    auto block = new BlockAST();
+    block -> block_items = nullptr;
     $$ = block;
   }
   ;

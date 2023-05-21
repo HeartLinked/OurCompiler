@@ -187,3 +187,9 @@ struct BlockSymbolTable{
         return 0;
     }
 };
+
+struct paramentsTable{
+    bool valid;
+    std::vector<std::string> paraments;
+    paramentsTable(bool valid, std::vector<std::string> paraments):valid(valid), paraments(paraments){}
+};
