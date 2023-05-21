@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AST.hpp"
 #include <cassert>
 #include <cstdio>
 #include <iostream>

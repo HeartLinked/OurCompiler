@@ -104,10 +104,27 @@ public:
     {
         this->append("  la    " + to + ", " + name + "\n");
     }
+    
+    void jump(const std::string &target){
+        this->append("  j     " + target + "\n");
+    }
+
+    void bnez(const std::string &rs, const std::string &target){
+        this->two("bnez", rs, target);
+    }
 
     //output
     const char* c_str()
     {
         return riscv_str.c_str();
     }
+};
+
+class TempLabel{
+    private:
+        int count=0;
+    public:
+        std::string StickTable(){
+            return "LABEL"+std::to_string(count++);
+        }
 };

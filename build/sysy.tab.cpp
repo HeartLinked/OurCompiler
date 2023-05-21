@@ -146,8 +146,13 @@ extern int yydebug;
     LE = 264,
     GE = 265,
     CONST = 266,
-    IDENT = 267,
-    INT_CONST = 268
+    IF = 267,
+    ELSE = 268,
+    WHILE = 269,
+    CONTINUE = 270,
+    BREAK = 271,
+    IDENT = 272,
+    INT_CONST = 273
   };
 #endif
 
@@ -162,7 +167,7 @@ union YYSTYPE
   BaseAST *ast_val;   // AST
   vector<std::unique_ptr<BaseAST>> *ast_list_val; // AST list
 
-#line 166 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 171 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -481,19 +486,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   66
+#define YYLAST   106
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  29
+#define YYNTOKENS  34
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  31
+#define YYNNTS  33
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  56
+#define YYNRULES  66
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  95
+#define YYNSTATES  116
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   268
+#define YYMAXUTOK   273
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -508,16 +513,16 @@ static const yytype_int8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    23,     2,     2,     2,    26,     2,     2,
-      17,    18,    24,    21,    15,    22,     2,    25,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    14,
-      27,    16,    28,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    28,     2,     2,     2,    31,     2,     2,
+      22,    23,    29,    26,    20,    27,     2,    30,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    19,
+      32,    21,    33,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    19,     2,    20,     2,     2,     2,     2,
+       2,     2,     2,    24,     2,    25,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -531,19 +536,21 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12,    13
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    52,    52,    60,    66,    75,    85,    90,   102,   111,
-     121,   129,   138,   143,   154,   160,   170,   179,   189,   198,
-     206,   211,   223,   229,   238,   245,   254,   262,   270,   276,
-     282,   291,   295,   301,   311,   314,   317,   323,   329,   337,
-     345,   356,   362,   370,   381,   387,   395,   403,   411,   422,
-     428,   436,   447,   453,   464,   470,   482
+       0,    53,    53,    61,    67,    76,    86,    91,   103,   112,
+     122,   130,   139,   144,   155,   161,   171,   180,   190,   199,
+     207,   212,   224,   230,   239,   241,   245,   252,   260,   269,
+     277,   284,   291,   297,   302,   308,   317,   325,   333,   339,
+     345,   354,   358,   364,   374,   377,   380,   386,   392,   400,
+     408,   419,   425,   433,   444,   450,   458,   466,   474,   485,
+     491,   499,   510,   516,   527,   533,   545
 };
 #endif
 
@@ -553,13 +560,15 @@ static const yytype_int16 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "INT", "RETURN", "AND", "OR", "EQ", "NE",
-  "LE", "GE", "CONST", "IDENT", "INT_CONST", "';'", "','", "'='", "'('",
-  "')'", "'{'", "'}'", "'+'", "'-'", "'!'", "'*'", "'/'", "'%'", "'<'",
-  "'>'", "$accept", "CompUnit", "Decl", "ConstDecl", "ConstDefList",
-  "BType", "ConstDef", "ConstInitVal", "VarDecl", "VarDefList", "VarDef",
-  "InitVal", "FuncDef", "FuncType", "Block", "BlockItemList", "BlockItem",
-  "Stmt", "Exp", "LVal", "PrimaryExp", "Number", "UnaryExp", "UnaryOp",
-  "MulExp", "AddExp", "RelExp", "EqExp", "LAndExp", "LOrExp", "ConstExp", YY_NULLPTR
+  "LE", "GE", "CONST", "IF", "ELSE", "WHILE", "CONTINUE", "BREAK", "IDENT",
+  "INT_CONST", "';'", "','", "'='", "'('", "')'", "'{'", "'}'", "'+'",
+  "'-'", "'!'", "'*'", "'/'", "'%'", "'<'", "'>'", "$accept", "CompUnit",
+  "Decl", "ConstDecl", "ConstDefList", "BType", "ConstDef", "ConstInitVal",
+  "VarDecl", "VarDefList", "VarDef", "InitVal", "FuncDef", "FuncType",
+  "Block", "BlockItemList", "BlockItem", "Stmt", "open_statement",
+  "closed_statement", "Exp", "LVal", "PrimaryExp", "Number", "UnaryExp",
+  "UnaryOp", "MulExp", "AddExp", "RelExp", "EqExp", "LAndExp", "LOrExp",
+  "ConstExp", YY_NULLPTR
 };
 #endif
 
@@ -569,12 +578,13 @@ static const char *const yytname[] =
 static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,    59,    44,    61,    40,    41,   123,
-     125,    43,    45,    33,    42,    47,    37,    60,    62
+     265,   266,   267,   268,   269,   270,   271,   272,   273,    59,
+      44,    61,    40,    41,   123,   125,    43,    45,    33,    42,
+      47,    37,    60,    62
 };
 # endif
 
-#define YYPACT_NINF (-33)
+#define YYPACT_NINF (-79)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -588,16 +598,18 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       4,   -33,    11,   -33,     3,   -33,    26,    12,     2,     6,
-     -33,   -33,    -9,    41,   -33,   -33,   -33,    33,   -33,    27,
-       6,   -33,    30,   -33,    -9,   -33,   -33,   -33,    34,   -33,
-     -33,   -33,   -33,    -9,     7,    13,    -8,    29,    44,    45,
-      38,    36,    39,    40,   -33,   -33,    -9,    43,   -33,   -33,
-      -9,    -9,    -9,    -9,    -9,    -9,    -9,    -9,    -9,    -9,
-      -9,    -9,    -9,    42,    48,    49,    -9,   -33,    33,    51,
-     -33,   -33,   -33,   -33,     7,     7,    13,    13,    13,    13,
-      -8,    -8,    29,    44,    -9,   -33,    38,   -33,   -33,   -33,
-     -33,   -33,   -33,   -33,   -33
+       1,   -79,     7,   -79,    -5,   -79,    -3,    13,     0,    -1,
+     -79,   -79,    33,    38,    11,    21,   -79,   -79,   -79,    33,
+     -79,   -79,   -79,   -79,   -79,    28,   -79,   -79,    51,    -1,
+     -79,   -79,   -79,    58,    57,   -79,   -79,   -79,    33,    40,
+     -12,    -4,    59,    74,    75,    61,   -79,    65,    33,    33,
+      60,    63,    67,    68,   -79,   -79,   -79,    33,   -79,    33,
+      33,    33,    33,    33,    33,    33,    33,    33,    33,    33,
+      33,    33,   -79,    66,    70,    72,    71,    73,   -79,    33,
+     -79,    28,    76,   -79,   -79,   -79,    40,    40,   -12,   -12,
+     -12,   -12,    -4,    -4,    59,    74,    33,   -79,    65,    30,
+      30,   -79,   -79,   -79,   -79,   -79,   -79,   -79,   -79,   -79,
+      80,   -79,   -79,    30,   -79,   -79
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -606,33 +618,35 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,    18,     0,     2,     0,     1,     0,     0,     0,     0,
-      17,     8,     0,     0,    27,    22,     3,     0,     4,     0,
-      20,    23,     0,    31,     0,    34,    35,    36,     0,    29,
-      32,    30,    37,     0,    41,    44,    49,    52,    54,    26,
-       0,    14,     0,    12,    19,    21,     0,     0,    25,    33,
+      17,     8,     0,     0,     0,     0,    37,    41,    33,     0,
+      44,    45,    46,    22,     3,     0,     4,    34,     0,    20,
+      23,    24,    25,     0,    39,    42,    40,    47,     0,    51,
+      54,    59,    62,    64,    36,     0,    39,     0,     0,     0,
+       0,    14,     0,    12,    19,    21,    32,     0,    43,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     6,     0,    11,     0,     0,
-      28,    38,    39,    40,    42,    43,    47,    48,    45,    46,
-      50,    51,    53,    55,     0,     5,     0,    15,    16,    13,
-      24,     9,    56,    10,     7
+       0,     0,    35,     0,     0,     6,     0,     0,    38,     0,
+      11,     0,     0,    48,    49,    50,    52,    53,    57,    58,
+      55,    56,    60,    61,    63,    65,     0,     5,     0,     0,
+       0,    15,    16,    13,    31,     9,    66,    10,     7,    26,
+      25,    28,    30,     0,    27,    29
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -33,   -33,   -33,   -33,   -32,    46,   -33,   -33,   -33,   -12,
-     -33,   -33,   -33,   -33,   -33,    37,   -33,   -33,   -24,    -4,
-     -33,   -33,   -27,   -33,   -15,   -29,   -19,     5,     1,   -33,
-     -33
+     -79,   -79,   -79,   -79,     2,    84,   -79,   -79,   -79,    17,
+     -79,   -79,   -79,   -79,    91,    77,   -79,     3,   -78,   -60,
+     -11,    -9,   -79,   -79,   -29,   -79,    10,    -2,     6,    31,
+      32,   -79,   -79
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,    15,    16,    64,    17,    65,    91,    18,    42,
-      43,    87,     3,     4,    10,    19,    20,    21,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      93
+      -1,     2,    23,    24,    74,    25,    75,   105,    26,    52,
+      53,   101,     3,     4,    27,    28,    29,    30,    31,    32,
+      33,    46,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,   107
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -640,51 +654,62 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      47,    55,    56,    14,    23,    22,    49,     1,    24,    11,
-      12,     5,    25,    26,    27,     6,    22,    13,    14,    57,
-      58,     9,    69,    71,    72,    73,    76,    77,    78,    79,
-       8,    50,    51,    52,    53,    54,    59,    60,    74,    75,
-      80,    81,    88,     7,    11,    41,    46,    44,    48,    61,
-      63,    62,    66,    67,    94,    68,    89,    45,    84,    40,
-      92,    70,    85,    83,    86,    90,    82
+      34,    45,    11,    12,     1,    64,    65,     5,    50,    58,
+      13,    14,     6,    15,    62,    63,    16,    17,    18,     7,
+      34,    19,   111,     9,     9,    20,    21,    22,    66,    67,
+      83,    84,    85,    48,    12,   114,     8,    76,    77,   110,
+     112,    11,    14,    49,    15,    51,    82,    16,    17,    18,
+      16,    17,    19,   115,     9,    19,    20,    21,    22,    20,
+      21,    22,    88,    89,    90,    91,    68,    69,   102,    59,
+      60,    61,    86,    87,    92,    93,    54,    56,    57,    70,
+      72,    71,    73,    78,    79,   106,    80,    96,    81,    97,
+      34,    34,    98,   113,    99,   104,   100,    47,   103,    10,
+     108,    94,   109,    95,    34,     0,    55
 };
 
 static const yytype_int8 yycheck[] =
 {
-      24,     9,    10,    12,    13,     9,    33,     3,    17,     3,
-       4,     0,    21,    22,    23,    12,    20,    11,    12,    27,
-      28,    19,    46,    50,    51,    52,    55,    56,    57,    58,
-      18,    24,    25,    26,    21,    22,     7,     8,    53,    54,
-      59,    60,    66,    17,     3,    12,    16,    20,    14,     5,
-      12,     6,    16,    14,    86,    15,    68,    20,    16,    13,
-      84,    18,    14,    62,    15,    14,    61
+       9,    12,     3,     4,     3,     9,    10,     0,    19,    38,
+      11,    12,    17,    14,    26,    27,    17,    18,    19,    22,
+      29,    22,   100,    24,    24,    26,    27,    28,    32,    33,
+      59,    60,    61,    22,     4,   113,    23,    48,    49,    99,
+     100,     3,    12,    22,    14,    17,    57,    17,    18,    19,
+      17,    18,    22,   113,    24,    22,    26,    27,    28,    26,
+      27,    28,    64,    65,    66,    67,     7,     8,    79,    29,
+      30,    31,    62,    63,    68,    69,    25,    19,    21,     5,
+      19,     6,    17,    23,    21,    96,    19,    21,    20,    19,
+      99,   100,    20,    13,    23,    19,    23,    13,    81,     8,
+      98,    70,    99,    71,   113,    -1,    29
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    30,    41,    42,     0,    12,    17,    18,    19,
-      43,     3,     4,    11,    12,    31,    32,    34,    37,    44,
-      45,    46,    48,    13,    17,    21,    22,    23,    47,    48,
-      49,    50,    51,    52,    53,    54,    55,    56,    57,    58,
-      34,    12,    38,    39,    20,    44,    16,    47,    14,    51,
-      24,    25,    26,    21,    22,     9,    10,    27,    28,     7,
-       8,     5,     6,    12,    33,    35,    16,    14,    15,    47,
-      18,    51,    51,    51,    53,    53,    54,    54,    54,    54,
-      55,    55,    56,    57,    16,    14,    15,    40,    47,    38,
-      14,    36,    47,    59,    33
+       0,     3,    35,    46,    47,     0,    17,    22,    23,    24,
+      48,     3,     4,    11,    12,    14,    17,    18,    19,    22,
+      26,    27,    28,    36,    37,    39,    42,    48,    49,    50,
+      51,    52,    53,    54,    55,    56,    57,    58,    59,    60,
+      61,    62,    63,    64,    65,    54,    55,    39,    22,    22,
+      54,    17,    43,    44,    25,    49,    19,    21,    58,    29,
+      30,    31,    26,    27,     9,    10,    32,    33,     7,     8,
+       5,     6,    19,    17,    38,    40,    54,    54,    23,    21,
+      19,    20,    54,    58,    58,    58,    60,    60,    61,    61,
+      61,    61,    62,    62,    63,    64,    21,    19,    20,    23,
+      23,    45,    54,    43,    19,    41,    54,    66,    38,    51,
+      53,    52,    53,    13,    52,    53
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    29,    30,    31,    31,    32,    33,    33,    34,    35,
-      36,    37,    38,    38,    39,    39,    40,    41,    42,    43,
-      44,    44,    45,    45,    46,    46,    47,    48,    49,    49,
-      49,    50,    51,    51,    52,    52,    52,    53,    53,    53,
-      53,    54,    54,    54,    55,    55,    55,    55,    55,    56,
-      56,    56,    57,    57,    58,    58,    59
+       0,    34,    35,    36,    36,    37,    38,    38,    39,    40,
+      41,    42,    43,    43,    44,    44,    45,    46,    47,    48,
+      49,    49,    50,    50,    51,    51,    52,    52,    52,    53,
+      53,    53,    53,    53,    53,    53,    54,    55,    56,    56,
+      56,    57,    58,    58,    59,    59,    59,    60,    60,    60,
+      60,    61,    61,    61,    62,    62,    62,    62,    62,    63,
+      63,    63,    64,    64,    65,    65,    66
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -692,7 +717,8 @@ static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     1,     1,     4,     1,     3,     1,     3,
        1,     3,     1,     3,     1,     3,     1,     5,     1,     3,
-       1,     2,     1,     1,     4,     3,     1,     1,     3,     1,
+       1,     2,     1,     1,     1,     1,     5,     7,     5,     7,
+       5,     4,     2,     1,     1,     3,     1,     1,     3,     1,
        1,     1,     1,     2,     1,     1,     1,     1,     3,     3,
        3,     1,     3,     3,     1,     3,     3,     3,     3,     1,
        3,     3,     1,     3,     1,     3,     1
@@ -1393,60 +1419,60 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 52 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 53 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
             {
     auto comp_unit = make_unique<CompUnitAST>();
     comp_unit->func_def = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     ast = move(comp_unit);
   }
-#line 1403 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1429 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 3:
-#line 60 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 61 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
              {
     auto decl = new DeclAST();
     decl->const_decl = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     decl->mode = 1;
     (yyval.ast_val) = decl;
   }
-#line 1414 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1440 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 4:
-#line 66 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 67 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
             {
     auto decl = new DeclAST();
     decl->var_decl = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     decl->mode = 2;
     (yyval.ast_val) = decl;
   }
-#line 1425 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1451 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 5:
-#line 75 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 76 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                                  {
     auto const_decl = new ConstDeclAST();
     const_decl->b_type = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
     const_decl->const_defs = unique_ptr<vector<std::unique_ptr<BaseAST>>>((yyvsp[-1].ast_list_val));
     (yyval.ast_val) = const_decl;
   }
-#line 1436 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1462 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 6:
-#line 85 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 86 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
              {
     auto const_def_list = new std::vector<std::unique_ptr<BaseAST>>();
     const_def_list->push_back(move(unique_ptr<BaseAST>((yyvsp[0].ast_val))));
     (yyval.ast_list_val) = const_def_list;
   }
-#line 1446 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1472 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 7:
-#line 90 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 91 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                               {
     auto const_def_list = new std::vector<std::unique_ptr<BaseAST>>();
     const_def_list->push_back(move(unique_ptr<BaseAST>((yyvsp[-2].ast_val))));
@@ -1455,63 +1481,63 @@ yyreduce:
     }
     (yyval.ast_list_val) = const_def_list;
   }
-#line 1459 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1485 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 8:
-#line 102 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 103 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     auto b_type = new BTypeAST();
     b_type->btype = "int";
     (yyval.ast_val) = b_type;
   }
-#line 1469 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1495 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 9:
-#line 111 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 112 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                            {
     auto const_def = new ConstDefAST();
     const_def->const_name = *unique_ptr<string>((yyvsp[-2].str_val));
     const_def->const_init_val = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = const_def;
   }
-#line 1480 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1506 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 10:
-#line 121 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 122 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
              {
     auto const_init_val = new ConstInitValAST();
     const_init_val->const_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = const_init_val;
   }
-#line 1490 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1516 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 11:
-#line 129 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 130 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                          {
     auto var_decl = new VarDeclAST();
     var_decl->b_type = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
     var_decl->var_defs = unique_ptr<vector<std::unique_ptr<BaseAST>>>((yyvsp[-1].ast_list_val));
     (yyval.ast_val) = var_decl;
   }
-#line 1501 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1527 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 12:
-#line 138 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 139 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
            {
     auto var_def_list = new std::vector<std::unique_ptr<BaseAST>>();
     var_def_list->push_back(move(unique_ptr<BaseAST>((yyvsp[0].ast_val))));
     (yyval.ast_list_val) = var_def_list;
   }
-#line 1511 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1537 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 13:
-#line 143 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 144 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                           {
     auto var_def_list = new std::vector<std::unique_ptr<BaseAST>>();
     var_def_list->push_back(move(unique_ptr<BaseAST>((yyvsp[-2].ast_val))));
@@ -1520,22 +1546,22 @@ yyreduce:
     }
     (yyval.ast_list_val) = var_def_list;
   }
-#line 1524 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1550 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 14:
-#line 154 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 155 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
           {
     auto var_def = new VarDefAST();
     var_def->var_name = *unique_ptr<string>((yyvsp[0].str_val));
     var_def->mode = 1;
     (yyval.ast_val) = var_def;
   }
-#line 1535 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1561 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 15:
-#line 160 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 161 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto var_def = new VarDefAST();
     var_def->var_name = *unique_ptr<string>((yyvsp[-2].str_val));
@@ -1543,21 +1569,21 @@ yyreduce:
     var_def->mode = 2;
     (yyval.ast_val) = var_def;
   }
-#line 1547 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1573 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 16:
-#line 170 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 171 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     auto init_val = new InitValAST();
     init_val->exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = init_val;
   }
-#line 1557 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1583 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 17:
-#line 179 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 180 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                                  {
     auto func_def = new FuncDefAST();
     func_def->func_type = unique_ptr<BaseAST>((yyvsp[-4].ast_val));
@@ -1565,41 +1591,41 @@ yyreduce:
     func_def->func_block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = func_def;
   }
-#line 1569 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1595 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 18:
-#line 189 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 190 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     auto func_type = new FuncTypeAST();
     func_type -> type = "int";
     (yyval.ast_val) = func_type;
   }
-#line 1579 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1605 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 19:
-#line 198 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 199 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                           {
     auto block = new BlockAST();
     block -> block_items = unique_ptr<vector<std::unique_ptr<BaseAST>>>((yyvsp[-1].ast_list_val));
     (yyval.ast_val) = block;
   }
-#line 1589 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1615 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 20:
-#line 206 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 207 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
               {
     auto blockitem_list = new std::vector<std::unique_ptr<BaseAST>>();
     blockitem_list -> push_back(move(unique_ptr<BaseAST>((yyvsp[0].ast_val))));
     (yyval.ast_list_val) = blockitem_list;
   }
-#line 1599 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1625 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 21:
-#line 211 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 212 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                             {
     auto blockitem_list = new std::vector<std::unique_ptr<BaseAST>>();
     blockitem_list -> push_back(move(unique_ptr<BaseAST>((yyvsp[-1].ast_val))));
@@ -1608,33 +1634,109 @@ yyreduce:
     }
     (yyval.ast_list_val) = blockitem_list;
   }
-#line 1612 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1638 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 22:
-#line 223 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 224 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
          {
     auto blockitem = new BlockItemAST();
     blockitem -> decl = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     blockitem -> mode = 1;
     (yyval.ast_val) = blockitem;
   }
-#line 1623 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1649 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 23:
-#line 229 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 230 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
          {
     auto blockitem = new BlockItemAST();
     blockitem -> stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     blockitem -> mode = 2;
     (yyval.ast_val) = blockitem;
   }
-#line 1634 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1660 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
   case 24:
-#line 238 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 239 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                  { 
+  }
+#line 1667 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 25:
+#line 241 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                     {
+  }
+#line 1674 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 26:
+#line 245 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                       {
+    auto stmt = new StmtAST();
+    stmt->mode = 6;
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val)); 
+    stmt->if_stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = stmt;
+  }
+#line 1686 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 27:
+#line 252 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                                                       {
+    auto stmt = new StmtAST();
+    stmt->mode = 7;
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-4].ast_val)); 
+    stmt->if_stmt = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    stmt->else_stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = stmt;
+  }
+#line 1699 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 28:
+#line 260 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                                     {
+    auto stmt = new StmtAST();
+    stmt->mode = 8;
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    stmt->while_stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = stmt;
+  }
+#line 1711 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 29:
+#line 269 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                                                         {
+    auto stmt = new StmtAST();
+    stmt->mode = 7;
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-4].ast_val));
+    stmt->if_stmt = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    stmt->else_stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = stmt; 
+  }
+#line 1724 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 30:
+#line 277 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+                                       {
+    auto stmt = new StmtAST();
+    stmt->mode = 8;
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
+    stmt->while_stmt = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = stmt;
+  }
+#line 1736 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 31:
+#line 284 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                      {
     auto stmt = new StmtAST();
     stmt->mode = 2;
@@ -1642,86 +1744,118 @@ yyreduce:
     stmt->exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     (yyval.ast_val) = stmt;
   }
-#line 1646 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1748 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 25:
-#line 245 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 32:
+#line 291 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+            {
+    auto stmt = new StmtAST();
+    stmt->mode = 3;
+    stmt->exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
+    (yyval.ast_val) = stmt;
+  }
+#line 1759 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 33:
+#line 297 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+       {
+    auto stmt = new StmtAST();
+    stmt->mode = 4;
+    (yyval.ast_val) = stmt;
+  }
+#line 1769 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 34:
+#line 302 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+          {
+    auto stmt = new StmtAST();
+    stmt->mode = 5;
+    stmt->block = unique_ptr<BaseAST>((yyvsp[0].ast_val));
+    (yyval.ast_val) = stmt;
+  }
+#line 1780 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+    break;
+
+  case 35:
+#line 308 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                    {
     auto stmt = new StmtAST();
     stmt->exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     stmt->mode = 1;
     (yyval.ast_val) = stmt;
   }
-#line 1657 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1791 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 26:
-#line 254 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 36:
+#line 317 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
            {
     auto exp = new ExpAST();
     exp -> lor_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = exp;
   }
-#line 1667 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1801 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 27:
-#line 262 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 37:
+#line 325 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
           {
     auto lval = new LValAST();
     lval -> name = *unique_ptr<string>((yyvsp[0].str_val));
     (yyval.ast_val) = lval;
   }
-#line 1677 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1811 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 28:
-#line 270 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 38:
+#line 333 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                 {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> exp = unique_ptr<BaseAST>((yyvsp[-1].ast_val));
     primary_exp -> mode = 1;
     (yyval.ast_val) = primary_exp;
   }
-#line 1688 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1822 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 29:
-#line 276 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 39:
+#line 339 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
          {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> lval = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     primary_exp -> mode = 2;
     (yyval.ast_val) = primary_exp;
   }
-#line 1699 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1833 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 30:
-#line 282 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 40:
+#line 345 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
            {
     auto primary_exp = new PrimaryExpAST();
     primary_exp -> number = (yyvsp[0].int_val);
     primary_exp -> mode = 3;
     (yyval.ast_val) = primary_exp;
   }
-#line 1710 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1844 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 32:
-#line 295 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 42:
+#line 358 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> primary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     unary_exp -> mode = 1;
     (yyval.ast_val) = unary_exp;
   }
-#line 1721 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1855 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 33:
-#line 301 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 43:
+#line 364 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                     {
     auto unary_exp = new UnaryExpAST();
     unary_exp -> unary_op = *((yyvsp[-1].str_val));
@@ -1729,46 +1863,46 @@ yyreduce:
     unary_exp -> mode = 2;
     (yyval.ast_val) = unary_exp;
   }
-#line 1733 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1867 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 34:
-#line 311 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 44:
+#line 374 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     (yyval.str_val) = new string("+");
   }
-#line 1741 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1875 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 35:
-#line 314 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 45:
+#line 377 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     (yyval.str_val) = new string("-");
   }
-#line 1749 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1883 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 36:
-#line 317 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 46:
+#line 380 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     (yyval.str_val) = new string("!");
   }
-#line 1757 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1891 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 37:
-#line 323 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 47:
+#line 386 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
              {
     auto mul_exp = new MulExpAST();
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     mul_exp -> mode = 1;
     (yyval.ast_val) = mul_exp;
   }
-#line 1768 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1902 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 38:
-#line 329 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 48:
+#line 392 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                         {
     auto mul_exp = new MulExpAST();
     mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1777,11 +1911,11 @@ yyreduce:
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = mul_exp;
   }
-#line 1781 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1915 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 39:
-#line 337 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 49:
+#line 400 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                         {
     auto mul_exp = new MulExpAST();
     mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1790,11 +1924,11 @@ yyreduce:
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = mul_exp;
   }
-#line 1794 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1928 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 40:
-#line 345 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 50:
+#line 408 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                         {
     auto mul_exp = new MulExpAST();
     mul_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1803,22 +1937,22 @@ yyreduce:
     mul_exp -> unary_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = mul_exp;
   }
-#line 1807 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1941 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 41:
-#line 356 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 51:
+#line 419 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
           {
     auto add_exp = new AddExpAST();
     add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     add_exp -> mode = 1;
     (yyval.ast_val) = add_exp;
  }
-#line 1818 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1952 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 42:
-#line 362 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 52:
+#line 425 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto add_exp = new AddExpAST();
     add_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1827,11 +1961,11 @@ yyreduce:
     add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = add_exp;
   }
-#line 1831 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1965 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 43:
-#line 370 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 53:
+#line 433 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto add_exp = new AddExpAST();
     add_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1840,22 +1974,22 @@ yyreduce:
     add_exp -> mul_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = add_exp;
   }
-#line 1844 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1978 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 44:
-#line 381 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 54:
+#line 444 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
            {
     auto rel_exp = new RelExpAST();
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     rel_exp -> mode = 1;
     (yyval.ast_val) = rel_exp;
   }
-#line 1855 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 1989 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 45:
-#line 387 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 55:
+#line 450 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1864,11 +1998,11 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1868 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2002 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 46:
-#line 395 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 56:
+#line 458 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1877,11 +2011,11 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1881 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2015 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 47:
-#line 403 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 57:
+#line 466 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                      {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1890,11 +2024,11 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1894 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2028 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 48:
-#line 411 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 58:
+#line 474 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                      {
     auto rel_exp = new RelExpAST();
     rel_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1903,22 +2037,22 @@ yyreduce:
     rel_exp -> add_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = rel_exp;
   }
-#line 1907 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2041 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 49:
-#line 422 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 59:
+#line 485 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
            {
     auto eq_exp = new EqExpAST();
     eq_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     eq_exp -> mode = 1;
     (yyval.ast_val) = eq_exp;
   }
-#line 1918 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2052 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 50:
-#line 428 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 60:
+#line 491 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                     {
     auto eq_exp = new EqExpAST();
     eq_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1927,11 +2061,11 @@ yyreduce:
     eq_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = eq_exp;
   }
-#line 1931 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2065 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 51:
-#line 436 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 61:
+#line 499 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                     {
     auto eq_exp = new EqExpAST();
     eq_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1940,22 +2074,22 @@ yyreduce:
     eq_exp -> rel_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = eq_exp;
   }
-#line 1944 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2078 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 52:
-#line 447 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 62:
+#line 510 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
           {
     auto land_exp = new LAndExpAST();
     land_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     land_exp -> mode = 1;
     (yyval.ast_val) = land_exp;
   }
-#line 1955 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2089 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 53:
-#line 453 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 63:
+#line 516 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto land_exp = new LAndExpAST();
     land_exp -> land_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1964,22 +2098,22 @@ yyreduce:
     land_exp -> eq_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = land_exp;
   }
-#line 1968 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2102 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 54:
-#line 464 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 64:
+#line 527 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
             {
     auto lor_exp = new LOrExpAST();
     lor_exp -> land_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     lor_exp -> mode = 1;
     (yyval.ast_val) = lor_exp;
   }
-#line 1979 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2113 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 55:
-#line 470 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 65:
+#line 533 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
                       {
     auto lor_exp = new LOrExpAST();
     lor_exp -> lor_exp = unique_ptr<BaseAST>((yyvsp[-2].ast_val));
@@ -1988,21 +2122,21 @@ yyreduce:
     lor_exp -> land_exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = lor_exp;
   }
-#line 1992 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2126 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
-  case 56:
-#line 482 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+  case 66:
+#line 545 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
         {
     auto const_exp = new ConstExpAST();
     const_exp -> exp = unique_ptr<BaseAST>((yyvsp[0].ast_val));
     (yyval.ast_val) = const_exp;
   }
-#line 2002 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2136 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
     break;
 
 
-#line 2006 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
+#line 2140 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.cpp"
 
       default: break;
     }
@@ -2234,7 +2368,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 488 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
+#line 551 "/root/compiler/Flex-Bison-Part1/src/sysy.y"
 
 
 // 定义错误处理函数, 其中第二个参数是错误信息, parser 如果发生错误 (例如输入的程序出现了语法错误), 就会调用这个函数

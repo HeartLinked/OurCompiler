@@ -103,7 +103,7 @@ public:
 LocalAllocate la;
 FunctionControl fc;
 RiscvGen rg;
-
+TempLabel tb;
 //局部变量分配栈地址
 void AllocateLocalAddress(const koopa_raw_function_t &func)
 {
@@ -343,7 +343,7 @@ void Visit(const koopa_raw_value_t &value)
             break;
         case KOOPA_RVT_LOAD:
             //加载指令
-            cerr << "not define load now" << endl;
+            // cerr << "not define load now" << endl;
             Visit(kind.data.load);
             rg.store("t0", "sp", la.getOffset(value));
             break;
@@ -363,10 +363,12 @@ void Visit(const koopa_raw_value_t &value)
         case KOOPA_RVT_BRANCH:
           //分支指令
           cerr << "not define branch now" << endl;
+          Visit(kind.data.branch);
           break;
         case KOOPA_RVT_JUMP:
           //跳转指令
-          cerr << "not define jump now" << endl;
+        //   cerr << "not define jump now" << endl;
+          Visit(kind.data.jump);
           break;
         case KOOPA_RVT_GET_PTR:
           //得到指针指令
@@ -554,4 +556,32 @@ void Visit(const koopa_raw_store_t &store)
     }
 
     return ;
+}
+
+// 访问jump指令
+void Visit(const koopa_raw_jump_t &jump){
+    auto name = string(jump.target->name + 1);
+    rg.jump(name);
+    return;
+}
+
+// 访问branch指令
+void Visit(const koopa_raw_branch_t &branch){
+    auto true_bb = branch.true_bb;
+    auto false_bb = branch.false_bb;
+    koopa_raw_value_t v = branch.cond;
+    if(v->kind.tag == KOOPA_RVT_INTEGER){
+        rg.li("t0", Visit(v->kind.data.integer));
+    }else{
+        rg.load("t0", "sp", la.getOffset(v));
+    }
+    // 这里，用条件跳转指令跳转范围只有4KB，过不了long_func测试用例
+    // 1MB。
+    // 因此只用bnez实现分支，然后用jump调到目的地。
+    string tmp_label = tb.StickTable();
+    rg.bnez("t0", tmp_label);
+    rg.jump(string(false_bb->name + 1));
+    rg.label(tmp_label);
+    rg.jump(string(true_bb->name + 1));
+    return;
 }

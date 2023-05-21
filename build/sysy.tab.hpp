@@ -66,8 +66,13 @@ extern int yydebug;
     LE = 264,
     GE = 265,
     CONST = 266,
-    IDENT = 267,
-    INT_CONST = 268
+    IF = 267,
+    ELSE = 268,
+    WHILE = 269,
+    CONTINUE = 270,
+    BREAK = 271,
+    IDENT = 272,
+    INT_CONST = 273
   };
 #endif
 
@@ -82,7 +87,7 @@ union YYSTYPE
   BaseAST *ast_val;   // AST
   vector<std::unique_ptr<BaseAST>> *ast_list_val; // AST list
 
-#line 86 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.hpp"
+#line 91 "/root/compiler/Flex-Bison-Part1/build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
