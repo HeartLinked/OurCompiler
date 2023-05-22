@@ -191,7 +191,8 @@ struct BlockSymbolTable{
 struct paramentsTable{
     bool valid;
     std::vector<std::string> paraments;
-    paramentsTable(bool valid, std::vector<std::string> paraments):valid(valid), paraments(paraments){}
+    std::vector<std::string> paraments2;
+    paramentsTable(bool valid, std::vector<std::string> paraments, std::vector<std::string> p):valid(valid), paraments(paraments), paraments2(p){}
 };
 
 struct mapTable{
@@ -211,6 +212,7 @@ struct mapTable{
     }
 
     string get(std::string from){
+        if(this->from.find(from) == this->from.end()) return from;
         return this->from[from];
     }
 

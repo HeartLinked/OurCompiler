@@ -175,7 +175,7 @@ class FuncFParamAST : public BaseAST {
     // 参数类型
     std::unique_ptr<BaseAST> btype;
     // 参数名
-    std::string param_name;
+    mutable std::string param_name;
 
     void Dump() const override {
         cerr << "Dump FuncFParamAST" << endl;
@@ -189,8 +189,12 @@ class FuncFParamAST : public BaseAST {
         Data type = btype->Traverse();
         if (paraments.valid == false)
             paraments.valid = true;
+        paraments.paraments2.push_back(param_name);
+        string p1 = genLabel(param_name);
+        maptable.insert(param_name, p1);
+        param_name = p1; 
         paraments.paraments.push_back(param_name);
-        if (hasDuplicateElements(paraments.paraments)) {
+        if (hasDuplicateElements(paraments.paraments2)) {
             throw runtime_error("Duplicate parameter name");
         }
         cout << "%" << param_name << ": i32";
@@ -500,9 +504,7 @@ class BlockAST : public BaseAST {
 
         if (paraments.valid) {
             maptable.valid = true;
-            for (auto &p : paraments.paraments) {
-                string p1 = genLabel(p);
-                maptable.insert(p, p1);
+            for (auto &p1 : paraments.paraments) {
                 if (blockSymbolTable->insertVirableSymbol(p1, "0")) {
                     // cerr << "Insert" << p1 << " as variale" << endl;
                 } else {
@@ -512,10 +514,14 @@ class BlockAST : public BaseAST {
                 cout << "   store %" << p1 << ", @" << p1 << endl;
             }
             paraments.paraments.clear();
+            paraments.paraments2.clear();
             paraments.valid = false;
         }
 
         if (block_items == nullptr) {
+            maptable.valid = false;
+            paraments.paraments.clear();
+            paraments.paraments2.clear();
             return Data(0, 0, "", "");
         }
         symbolTableStack.push(blockSymbolTable);
@@ -525,6 +531,8 @@ class BlockAST : public BaseAST {
         symbolTableStack.pop();
         delete blockSymbolTable;
         maptable.valid = false;
+        paraments.paraments.clear();
+        paraments.paraments2.clear();
         // if(t != "") cout << "---------end " << t << "----------" << endl;
         // else cout << "---------end entry------------" << endl;
         return Data(0, 0, "", "");
@@ -768,7 +776,9 @@ class LValAST : public BaseAST {
     Data Traverse() const override {
         cerr << "Traverse Lval" << endl;
         int y = gen();
-        if(maptable.valid) name = maptable.get(name);
+        if(maptable.valid) {
+            name = maptable.get(name);
+        }
         cout << "   %" << y << " = load @" << name << endl;
         BlockSymbolTable *blockSymbolTable = symbolTableStack.top();
         if (blockSymbolTable->isConst(name)) {

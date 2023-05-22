@@ -25,7 +25,7 @@ extern void ParseAST(unique_ptr<BaseAST> &ast);
 stack<BlockSymbolTable *> symbolTableStack;
 stack<string> whileLevelsStack;
 vector<string> s1 = {};
-paramentsTable paraments = paramentsTable(false, s1);
+paramentsTable paraments = paramentsTable(false, s1, s1);
 unordered_map<string, string> m1 = {};
 unordered_map<string, string> m2 = {};
 mapTable maptable = mapTable(false, m1, m2);
