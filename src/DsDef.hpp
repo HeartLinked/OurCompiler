@@ -193,3 +193,32 @@ struct paramentsTable{
     std::vector<std::string> paraments;
     paramentsTable(bool valid, std::vector<std::string> paraments):valid(valid), paraments(paraments){}
 };
+
+struct mapTable{
+    bool valid;
+    std::unordered_map<std::string, std::string> from;
+    std::unordered_map<std::string, std::string> to;
+    mapTable(bool valid, std::unordered_map<std::string, std::string> from, std::unordered_map<std::string, std::string> to):valid(valid), from(from), to(to){}
+
+    void clear(){
+        from.clear();
+        to.clear();
+    }
+
+    void insert(std::string from, std::string to){
+        this->from[from] = to;
+        this->to[to] = from;
+    }
+
+    string get(std::string from){
+        return this->from[from];
+    }
+
+};
+
+struct functionTable{
+    bool valid;
+    std::vector<std::string> paraments;
+    functionTable(bool valid, std::vector<std::string> paraments):valid(valid), paraments(paraments){}
+};
+    

@@ -41,7 +41,7 @@ using namespace std;
 
 // 非终结符的类型定义
 %type <ast_val> VarDecl VarDef InitVal LVal ConstDef FuncDef FuncType Block BlockItem Stmt PrimaryExp UnaryExp Exp MulExp AddExp LOrExp RelExp EqExp LAndExp Decl ConstDecl ConstInitVal BType ConstExp
-%type <ast_val> open_statement closed_statement CompUnit2 FuncFParam
+%type <ast_val> open_statement closed_statement CompUnit2 FuncFParam FuncRParams
 %type <ast_list_val> ConstDefList BlockItemList VarDefList 
 %type <func_fparams_val> FuncFParams
 %type <str_val> UnaryOp
@@ -106,7 +106,6 @@ ConstDecl
   }
   ;
 
-// ----------------WARNING----------------------
 ConstDefList
   : ConstDef {
     auto const_def_list = new std::vector<std::unique_ptr<BaseAST>>();
@@ -211,7 +210,6 @@ FuncDef
     $$ = func_def;
   }
   | FuncType IDENT '(' FuncFParams ')' Block {
-    cerr << "FuncDef" << endl;
     auto func_def = new FuncDefAST();
     func_def->func_type = unique_ptr<BaseAST>($1);
     func_def->func_name = *unique_ptr<string>($2);
@@ -224,13 +222,9 @@ FuncDef
 
 FuncFParams
   : FuncFParam {
-    cerr << "FuncFParams" << endl;
     auto func_fparams = new FuncFParamsAST();
-    cerr << "FuncFParams2" << endl;
     func_fparams -> func_fparams.push_back(move(unique_ptr<BaseAST>($1)));
-    cerr << "FuncFParams3" << endl;
     $$ = func_fparams;
-    cerr << "FuncFParams4" << endl;
   }
   | FuncFParam ',' FuncFParams {
     auto func_fparams = new FuncFParamsAST();
@@ -452,7 +446,35 @@ UnaryExp
     unary_exp -> mode = 2;
     $$ = unary_exp;
   }
+  | IDENT '(' FuncRParams ')' {
+    auto unary_exp = new UnaryExpAST();
+    unary_exp -> func_name = *unique_ptr<string>($1);
+    unary_exp -> func_rparams = unique_ptr<BaseAST>($3);
+    unary_exp -> mode = 3;
+    $$ = unary_exp;
+  }
+  | IDENT '(' ')' {
+    auto unary_exp = new UnaryExpAST();
+    unary_exp -> func_name = *unique_ptr<string>($1);
+    unary_exp -> mode = 4;
+    $$ = unary_exp;
+  }
   ;
+
+FuncRParams
+  : Exp {
+    auto func_rparams = new FuncRParamsAST();
+    func_rparams -> exp = unique_ptr<BaseAST>($1);
+    func_rparams -> mode = 1;
+    $$ = func_rparams;
+  }
+  | Exp ',' FuncRParams {
+    auto func_rparams = new FuncRParamsAST();
+    func_rparams -> exp = unique_ptr<BaseAST>($1);
+    func_rparams -> func_rparams = unique_ptr<BaseAST>($3);
+    func_rparams -> mode = 2;
+    $$ = func_rparams;
+  }
 
 UnaryOp
   : '+' {

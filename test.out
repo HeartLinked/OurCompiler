@@ -1,30 +1,30 @@
 Start parsing...
 Parse success!
-CompUnitAST { CompUnitAST { CompUnitAST { FuncDefAST { FuncTypeAST { int }, half, (FuncFParamsAST { FuncFParamAST { BTypeAST { int }, x },  }) BlockAST { BlockItemAST { StmtAST { Lval { x }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } } + MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } / UnaryExp { PrimaryExp {  2  } } } } } } } } } } } } }FuncDefAST { FuncTypeAST { void }, f, (), BlockAST {  } } }FuncDefAST { FuncTypeAST { int }, main, (), BlockAST {  } } } }
+CompUnitAST { CompUnitAST { CompUnitAST { FuncDefAST { FuncTypeAST { int }, half, (FuncFParamsAST { FuncFParamAST { BTypeAST { int }, x },  }) BlockAST { BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { MulExp { UnaryExp { PrimaryExp { Lval { x } } } } / UnaryExp { PrimaryExp {  2  } } } } } } } } } } } } }FuncDefAST { FuncTypeAST { void }, f, (), BlockAST {  } } }FuncDefAST { FuncTypeAST { int }, main, (), BlockAST { BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { f  } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { half FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  10  } } } } } } } } },  } } } } } } } } } } } } } } }
 
 fun @half(%x: i32): i32 {
-%entry:
-   @x = alloc i32
-   store %x, @x
+%entry_0:
+   @x_0_XAu = alloc i32
+   store %x_0_XAu, @x_0_XAu
 
-   %0 = load @x
-   %1 = load @x
-   %2 = add %1, 2
-   store %2, @x
-
-   %3 = load @x
-   %4 = div %3, 2
-   ret %4
+   %0 = load @x_0_XAu
+   %1 = div %0, 2
+   ret %1
 }
 
 fun @f(): {
-%entry:
+%entry_1:
    ret
 }
 
 fun @main(): i32 {
-%entry:
+%entry_2:
+
+   %2 = call @f()
+
+   %3 = call @half(10)
+   ret %3
 }
 
 
-当前时间：2023-05-21 22:53:29
+当前时间：2023-05-22 14:13:56

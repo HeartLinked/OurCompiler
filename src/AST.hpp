@@ -13,24 +13,24 @@ using namespace std;
 extern int cnt;
 
 int gen();
-
 char gen2();
-
 char ifGen3();
-
 char whileGen4();
-
 char breakGen5();
+char entrygen();
+string genLabel(string s);
+bool hasDuplicateElements(const std::vector<string> &vec);
 
 extern stack<BlockSymbolTable *> symbolTableStack;
 extern stack<string> whileLevelsStack;
 extern paramentsTable paraments;
+extern mapTable maptable;
+extern functionTable functiontable;
 
 // CompUnit := FuncDef
 // CompUnit := CompUnit2
 class CompUnitAST : public BaseAST {
   public:
-
     // 函数定义
     int mode;
     std::unique_ptr<BaseAST> func_def;
@@ -39,15 +39,19 @@ class CompUnitAST : public BaseAST {
     void Dump() const override {
         cerr << "Dump CompUnitAST" << endl;
         std::cout << "CompUnitAST { ";
-        if(mode == 1)  func_def->Dump();
-        else comp_unit2->Dump();
+        if (mode == 1)
+            func_def->Dump();
+        else
+            comp_unit2->Dump();
         std::cout << " }";
     }
 
     Data Traverse() const override {
         cerr << "Traverse CompUnitAST" << endl;
-        if(mode == 1)  func_def->Traverse();
-        else comp_unit2->Traverse();
+        if (mode == 1)
+            func_def->Traverse();
+        else
+            comp_unit2->Traverse();
         return Data(0, 0, "", "");
     }
 };
@@ -56,7 +60,6 @@ class CompUnitAST : public BaseAST {
 // CompUnit2 := CompUnit2 FuncDef
 class CompUnit2AST : public BaseAST {
   public:
-
     // 函数定义
     int mode;
     std::unique_ptr<BaseAST> comp_unit2;
@@ -66,10 +69,10 @@ class CompUnit2AST : public BaseAST {
     void Dump() const override {
         cerr << "Dump CompUnitAST" << endl;
         std::cout << "CompUnitAST { ";
-        if(mode == 1) {
+        if (mode == 1) {
             func_def1->Dump();
             func_def2->Dump();
-        } else  {
+        } else {
             comp_unit2->Dump();
             func_def1->Dump();
         }
@@ -78,10 +81,10 @@ class CompUnit2AST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse CompUnitAST" << endl;
-        if(mode == 1) {
+        if (mode == 1) {
             func_def1->Traverse();
             func_def2->Traverse();
-        } else  {
+        } else {
             comp_unit2->Traverse();
             func_def1->Traverse();
         }
@@ -108,9 +111,9 @@ class FuncDefAST : public BaseAST {
         std::cout << "FuncDefAST { ";
         func_type->Dump();
         std::cout << ", " << func_name << ", ";
-        if(mode == 1) {
+        if (mode == 1) {
             std::cout << "(), ";
-        } else if(mode == 2){
+        } else if (mode == 2) {
             std::cout << "(";
             func_fparams->Dump();
             std::cout << ") ";
@@ -121,9 +124,9 @@ class FuncDefAST : public BaseAST {
 
     Data Traverse() const override {
         cerr << "Traverse FuncDefAST" << endl;
-        if(mode == 1) {
+        if (mode == 1) {
             cout << "fun @" << func_name << "(): ";
-        } else if(mode == 2){
+        } else if (mode == 2) {
             cout << "fun @" << func_name << "(";
             func_fparams->Traverse();
             cout << "): ";
@@ -131,7 +134,8 @@ class FuncDefAST : public BaseAST {
         Data type = func_type->Traverse();
         cout << "{" << endl;
         func_block->Traverse();
-        if(type.mode == -1) cout << "   ret" << endl;
+        if (type.mode == -1)
+            cout << "   ret" << endl;
         cout << "}" << endl << endl;
         return Data(0, 0, "", "");
     }
@@ -183,8 +187,12 @@ class FuncFParamAST : public BaseAST {
     Data Traverse() const override {
         cerr << "Traverse FuncFParamAST" << endl;
         Data type = btype->Traverse();
-        if(paraments.valid == false) paraments.valid = true;
+        if (paraments.valid == false)
+            paraments.valid = true;
         paraments.paraments.push_back(param_name);
+        if (hasDuplicateElements(paraments.paraments)) {
+            throw runtime_error("Duplicate parameter name");
+        }
         cout << "%" << param_name << ": i32";
         return Data(0, 0, "", "");
     }
@@ -286,6 +294,7 @@ class ConstDefAST : public BaseAST {
     void Dump() const override {
         cerr << "Dump ConstDef" << endl;
         std::cout << "ConstDef { ";
+        // const_name = genLabel(const_name);
         std::cout << const_name << ", ";
         const_init_val->Dump();
         std::cout << " }";
@@ -294,7 +303,6 @@ class ConstDefAST : public BaseAST {
     Data Traverse() const override {
         cerr << "Traverse ConstDef" << endl;
         Data x = const_init_val->Traverse();
-        // Insert const paramter const_name with symbol '%x'
         BlockSymbolTable *t = symbolTableStack.top();
         if (t->insertConstSymbol(const_name, to_string(x.value))) {
             //  cerr << "Insert const " << const_name << " as const number " <<
@@ -383,7 +391,6 @@ class VarDefAST : public BaseAST {
         if (mode == 1) { // int a;
             BlockSymbolTable *t = symbolTableStack.top();
             if (t->insertVirableSymbol(var_name, "0")) {
-                cerr << "Insert" << var_name << " as var: 0" << endl;
             } else {
                 throw runtime_error("Error: redefined variable " + var_name);
             }
@@ -394,7 +401,7 @@ class VarDefAST : public BaseAST {
             Data d = init_val->Traverse();
             BlockSymbolTable *t = symbolTableStack.top();
             if (t->insertVirableSymbol(var_name, to_string(d.value))) {
-                cerr << "Insert" << var_name << " as variale" << endl;
+                // cerr << "Insert" << var_name << " as variale" << endl;
             } else {
                 throw runtime_error("Error: redefined variable " + var_name);
             }
@@ -465,7 +472,7 @@ class BlockAST : public BaseAST {
     void Dump() const override {
         cerr << "Dump BlockAST" << endl;
         std::cout << "BlockAST { ";
-        if(block_items == nullptr) {
+        if (block_items == nullptr) {
             std::cout << " }";
             return;
         }
@@ -484,28 +491,31 @@ class BlockAST : public BaseAST {
         BlockSymbolTable *blockSymbolTable = new BlockSymbolTable();
         if (!symbolTableStack.empty()) {
             blockSymbolTable->father = symbolTableStack.top();
-            t = string("block") + gen2();
+            //  t = string("block") + gen2();
             // cout << "---------enter " << t << "----------" << endl;
         } else {
-            cout << "%entry:" << endl;
+            cout << "%entry_" << entrygen() << ":" << endl;
             // cout << "---------enter entry----------" << endl;
         }
 
-        if(paraments.valid) {
-            for(auto &p : paraments.paraments) {
-                if(blockSymbolTable->insertVirableSymbol(p, "0")) {
-                    cerr << "Insert" << p << " as variale" << endl;
+        if (paraments.valid) {
+            maptable.valid = true;
+            for (auto &p : paraments.paraments) {
+                string p1 = genLabel(p);
+                maptable.insert(p, p1);
+                if (blockSymbolTable->insertVirableSymbol(p1, "0")) {
+                    // cerr << "Insert" << p1 << " as variale" << endl;
                 } else {
-                    throw runtime_error("Error: redefined variable " + p);
+                    throw runtime_error("Error: redefined variable " + p1);
                 }
-                cout << "   @" << p << " = alloc i32" << endl;
-                cout << "   store %" << p << ", @" << p << endl;
+                cout << "   @" << p1 << " = alloc i32" << endl;
+                cout << "   store %" << p1 << ", @" << p1 << endl;
             }
             paraments.paraments.clear();
             paraments.valid = false;
         }
 
-        if(block_items == nullptr) {
+        if (block_items == nullptr) {
             return Data(0, 0, "", "");
         }
         symbolTableStack.push(blockSymbolTable);
@@ -514,6 +524,7 @@ class BlockAST : public BaseAST {
         }
         symbolTableStack.pop();
         delete blockSymbolTable;
+        maptable.valid = false;
         // if(t != "") cout << "---------end " << t << "----------" << endl;
         // else cout << "---------end entry------------" << endl;
         return Data(0, 0, "", "");
@@ -745,7 +756,7 @@ class ExpAST : public BaseAST {
 class LValAST : public BaseAST {
   public:
     // 变量名
-    std::string name;
+    mutable std::string name;
 
     void Dump() const override {
         cerr << "Dump Lval" << endl;
@@ -757,6 +768,7 @@ class LValAST : public BaseAST {
     Data Traverse() const override {
         cerr << "Traverse Lval" << endl;
         int y = gen();
+        if(maptable.valid) name = maptable.get(name);
         cout << "   %" << y << " = load @" << name << endl;
         BlockSymbolTable *blockSymbolTable = symbolTableStack.top();
         if (blockSymbolTable->isConst(name)) {
@@ -812,25 +824,33 @@ class PrimaryExpAST : public BaseAST {
 
 // UnaryExp := PrimaryExp
 // UnaryExp := UnaryOp UnaryExp
+// UnaryExp := IDENT '(' FuncRParams ')' 
+// UnaryExp := IDENT '(' ')'
 class UnaryExpAST : public BaseAST {
   public:
-    // 目前只支持一元表达式
-    int mode; // 1为primary_exp，2为unary_op & unary_exp
+    int mode; // 1为primary_exp, 2为unary_op & unary_exp, 3为函数调用, 4为函数调用无参数
 
     std::unique_ptr<BaseAST> primary_exp;
 
-    std::string unary_op;
+    std::string unary_op, func_name;
 
     std::unique_ptr<BaseAST> unary_exp;
+
+    std::unique_ptr<BaseAST> func_rparams;
 
     void Dump() const override {
         cerr << "Dump UnaryExpAST" << endl;
         std::cout << "UnaryExp { ";
         if (mode == 1) {
             primary_exp->Dump();
-        } else {
+        } else if(mode == 2){
             std::cout << unary_op << " ";
             unary_exp->Dump();
+        } else if(mode == 3){
+            std::cout << func_name << " ";
+            func_rparams->Dump();
+        } else {
+            std::cout << func_name << " ";
         }
         std::cout << " }";
     }
@@ -840,7 +860,7 @@ class UnaryExpAST : public BaseAST {
         if (mode == 1) {
             Data x = primary_exp->Traverse();
             return x;
-        } else {
+        } else if(mode == 2){
             Data x = unary_exp->Traverse();
             if (x.mode == 1) {
                 if (unary_op == "!") {
@@ -856,28 +876,90 @@ class UnaryExpAST : public BaseAST {
                     cout << "   %" << y << " = eq 0, %" << x.symbol << endl;
                     x.value = (x.value == 0);
                 } else if (unary_op == "-") {
+                    y = gen();
                     cout << "   %" << y << " = sub 0, %" << x.symbol << endl;
                     x.value = -x.value;
-                } else {
+                } else {                                                                         
                     return x;
                 }
-                return Data(3, x.value, "", to_string(y));
-            } else if (x.mode == 3) {
-                int y = -1;
+                return Data(2, x.value, "", to_string(y));
+            } else if(x.mode == 3) {
+                int y = gen();
                 if (unary_op == "!") {
-                    y = gen();
                     cout << "   %" << y << " = eq 0, %" << x.symbol << endl;
                     x.value = (x.value == 0);
                 } else if (unary_op == "-") {
                     cout << "   %" << y << " = sub 0, %" << x.symbol << endl;
                     x.value = -x.value;
-                } else {
+                } else {                                                                         
                     return x;
                 }
-                return Data(3, x.value, "", to_string(y));
+                return Data(2, x.value, "", to_string(y));
+            } else {
+                return x;
             }
+        } else if (mode == 3) {
+                int y = gen();
+                functiontable.valid = true;
+                func_rparams->Traverse();
+                cout << "   %" << y << " = call @" << func_name << "(" ;
+                for(int i = 0; i < functiontable.paraments.size(); i++){
+                    if(i != 0) cout << ", ";
+                    cout << functiontable.paraments[i];
+                }
+                cout << ")" << endl;
+                functiontable.paraments.clear();
+                functiontable.valid = false;
+                return Data(3, y, "", to_string(y));   
+        } else if(mode == 4){
+                int y = gen();
+                cout << "   %" << y << " = call @" << func_name << "()" << endl;
+                return Data(3, y, "", to_string(y));   
         }
     }
+};
+
+// FuncRParams := Exp 
+// FuncRParams := Exp ',' FuncRParams
+class FuncRParamsAST : public BaseAST {
+  public:
+    int mode; // 1为exp, 2为exp, func_rparams
+    std::unique_ptr<BaseAST> exp;
+    std::unique_ptr<BaseAST> func_rparams;
+
+    void Dump() const override {
+        cerr << "Dump FuncRParams" << endl;
+        std::cout << "FuncRParams { ";
+        exp -> Dump();
+        cout << ", ";
+        if(mode == 2) func_rparams -> Dump();
+        std::cout << " }";
+    }
+
+    Data Traverse() const override {
+        cerr << "Traverse FuncRParams" << endl;
+        Data x = exp->Traverse();
+        if(mode == 1) {
+          if(x.mode == 1) {
+            functiontable.paraments.push_back(to_string(x.value));
+          } else if(x.mode == 2) {
+            functiontable.paraments.push_back("%" + x.symbol);
+          } else if(x.mode == 3) {
+            functiontable.paraments.push_back("%" + x.symbol);
+          }
+        } else if(mode == 2) {
+          if(x.mode == 1) {
+            functiontable.paraments.push_back(to_string(x.value));
+          } else if(x.mode == 2) {
+            functiontable.paraments.push_back("%" + x.symbol);
+          } else if(x.mode == 3) {
+            functiontable.paraments.push_back("%" + x.symbol);
+          }
+          func_rparams->Traverse();
+        }
+        return Data(0, 0, "", "");
+    }
+
 };
 
 // MulExp := UnaryExp
