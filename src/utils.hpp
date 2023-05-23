@@ -113,6 +113,18 @@ public:
         this->two("bnez", rs, target);
     }
 
+    void call(const std::string &func){
+        this->append("  call " + func + "\n");
+    }
+
+    void word(int i){
+        this->append("  .word " + std::to_string(i) + "\n");
+    }
+
+    void zeroInitInt(){
+        this->append("  .zero 4\n");
+    }
+    
     //output
     const char* c_str()
     {

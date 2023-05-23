@@ -215,7 +215,7 @@ void Visit(const koopa_raw_program_t &program)
 {
     //执行一些必要操作
     cerr << "Raw Program Visit" << endl;
-    rg.append("\t.text\n");
+
 
     //访问所有全局变量
     Visit(program.values);
@@ -264,6 +264,7 @@ void Visit(const koopa_raw_function_t &func)
     string::iterator p = func_name.begin();
     func_name.erase(p);
     //添加输出
+    rg.append("\t.text\n");
     rg.append("\t.globl " + func_name + "\n");
     rg.append(func_name + ":\n");
 
@@ -359,6 +360,10 @@ void Visit(const koopa_raw_value_t &value)
         case KOOPA_RVT_CALL:
           //函数调用指令
           cerr << "not define call now" << endl;
+          Visit(kind.data.call);
+          if(kind.data.call.callee->ty->data.function.ret->tag == KOOPA_RTT_INT32){
+              rg.store("a0", "sp", la.getOffset(value));
+          }
           break;
         case KOOPA_RVT_BRANCH:
           //分支指令
@@ -392,6 +397,7 @@ void Visit(const koopa_raw_value_t &value)
           break;
         case KOOPA_RVT_GLOBAL_ALLOC:
           //全局内存分配指令
+          VisitGlobalVar(value);
           cerr << "not define global alloc now" << endl;
           break;
         case KOOPA_RVT_ZERO_INIT:
@@ -584,4 +590,68 @@ void Visit(const koopa_raw_branch_t &branch){
     rg.label(tmp_label);
     rg.jump(string(true_bb->name + 1));
     return;
+}
+
+// 访问 call 指令
+void Visit(const koopa_raw_call_t &call){
+    for(int i = 0; i < call.args.len; ++i){
+        koopa_raw_value_t v = (koopa_raw_value_t)call.args.buffer[i];
+        if(v->kind.tag == KOOPA_RVT_INTEGER){
+            int j = Visit(v->kind.data.integer);
+            if(i < 8){
+                rg.li("a" + to_string(i), j);
+            } else {
+                rg.li("t0", j);
+                rg.store("t0", "sp", (i - 8) * 4);
+            }
+        } else{
+            int off = la.getOffset(v);
+            if(i < 8){
+                rg.load("a" + to_string(i), "sp", off);
+            } else {
+                rg.load("t0", "sp", off);
+                rg.store("t0", "sp", (i - 8) * 4);
+            }
+        }
+    }
+    rg.call(string(call.callee->name + 1));
+    // if(call.callee->ty->data.function.ret->tag ==KOOPA_RTT_INT32)
+    return;
+}
+
+
+// 访问全局变量
+void VisitGlobalVar(koopa_raw_value_t value){
+    rg.append("  .data\n");
+    rg.append("  .globl " + string(value->name + 1) + "\n");
+    rg.append(string(value->name + 1) + ":\n");
+    koopa_raw_value_t init = value->kind.data.global_alloc.init;
+    auto ty = value->ty->data.pointer.base;
+    if(ty->tag == KOOPA_RTT_INT32){
+        if(init->kind.tag == KOOPA_RVT_ZERO_INIT){
+            rg.zeroInitInt();
+        } else {
+            int i = Visit(init->kind.data.integer);
+            rg.word(i);
+        }
+    } else{
+        // see aggragate
+        assert (init->kind.tag == KOOPA_RVT_AGGREGATE) ;
+        initGlobalArray(init);
+    }
+    rg.append("\n");
+    return ;
+}
+
+void initGlobalArray(koopa_raw_value_t init){
+    if(init->kind.tag == KOOPA_RVT_INTEGER){
+        int v = Visit(init->kind.data.integer);
+        rg.word(v);
+    } else {
+        // KOOPA_RVT_AGGREGATE
+        auto elems = init->kind.data.aggregate.elems;
+        for(int i = 0; i < elems.len; ++i){
+            initGlobalArray(reinterpret_cast<koopa_raw_value_t>(elems.buffer[i]));
+        }
+    }
 }

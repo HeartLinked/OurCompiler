@@ -30,3 +30,6 @@ void Visit(const koopa_raw_load_t &load);
 void Visit(const koopa_raw_store_t &store);
 void Visit(const koopa_raw_jump_t &jump);
 void Visit(const koopa_raw_branch_t &branch);
+void Visit(const koopa_raw_call_t &call);
+void initGlobalArray(koopa_raw_value_t init);
+void VisitGlobalVar(koopa_raw_value_t value);

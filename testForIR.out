@@ -1,21 +1,8 @@
+global @var = alloc i32, zeroinit
+
 fun @main(): i32 {
 %entry:
-  @a = alloc i32
-  store 2, @a
-  %0 = load @a
-  br %0, %then, %else
-
-%then:
-  %1 = load @a
-  %2 = add %1, 1
-  store %2, @a
-  jump %end
-
-%else:
-  store 0, @a
-  jump %end
-
-%end:
-  %3 = load @a
-  ret %3
+  %0 = load @var
+  %1 = add %0, 1
+  ret %1
 }

@@ -187,3 +187,40 @@ struct BlockSymbolTable{
         return 0;
     }
 };
+
+struct paramentsTable{
+    bool valid;
+    std::vector<std::string> paraments;
+    std::vector<std::string> paraments2;
+    paramentsTable(bool valid, std::vector<std::string> paraments, std::vector<std::string> p):valid(valid), paraments(paraments), paraments2(p){}
+};
+
+struct mapTable{
+    bool valid;
+    std::unordered_map<std::string, std::string> from;
+    std::unordered_map<std::string, std::string> to;
+    mapTable(bool valid, std::unordered_map<std::string, std::string> from, std::unordered_map<std::string, std::string> to):valid(valid), from(from), to(to){}
+
+    void clear(){
+        from.clear();
+        to.clear();
+    }
+
+    void insert(std::string from, std::string to){
+        this->from[from] = to;
+        this->to[to] = from;
+    }
+
+    string get(std::string from){
+        if(this->from.find(from) == this->from.end()) return from;
+        return this->from[from];
+    }
+
+};
+
+struct functionTable{
+    bool valid;
+    std::vector<std::string> paraments;
+    functionTable(bool valid, std::vector<std::string> paraments):valid(valid), paraments(paraments){}
+};
+    

@@ -6,6 +6,7 @@
 #include <ctime>
 #include <iostream>
 #include <memory>
+#include <stack>
 #include <string>
 #include "AST.hpp"
 #include "koopa.h"
@@ -16,7 +17,6 @@
 #include "utils.hpp"
 #include <unordered_map>
 #include <vector>
-#include <stack>
 
 using namespace std;
 
@@ -29,8 +29,14 @@ extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 extern void ParseAST(unique_ptr<BaseAST> &ast);
 SymbolTable symbolTable;
-stack<BlockSymbolTable*> symbolTableStack;
-
+stack<BlockSymbolTable *> symbolTableStack;
+stack<string> whileLevelsStack;
+vector<string> s1 = {};
+paramentsTable paraments = paramentsTable(false, s1, s1);
+unordered_map<string, string> m1 = {};
+unordered_map<string, string> m2 = {};
+mapTable maptable = mapTable(false, m1, m2);
+functionTable functiontable = functionTable(false, s1);
 
 int main(int argc, const char *argv[]) {
     // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
@@ -45,23 +51,23 @@ int main(int argc, const char *argv[]) {
      assert(yyin); */
 
     std::cout.setf(std::ios::unitbuf);
+    std::cerr.setf(std::ios::unitbuf);
 
     freopen("test.out", "w", stdout);
     yyin = fopen("hello.c", "r");
 
-
+    cout << "Start parsing..." << endl;
     unique_ptr<BaseAST> ast;
     auto ret = yyparse(ast);
     assert(!ret);
-
+    cout << "Parse success!" << endl;
     ast->Dump();
     cout << endl << endl;
 
     ParseAST(ast);
     cout << endl;
 
-   // symbolTable.output();
-
+    // symbolTable.output();
 
     std::time_t currentTime = std::time(nullptr);
     // 将时间格式化为字符串
