@@ -1,13 +1,10 @@
-int half(int b, int x, int y) {
-  return x + 1;
+int half(int x) {
+  return x / 2;
 }
 
-void half1(int c, int x, int y) {
-}
+void f() {}
 
-
-int main(int b) {
-  int a = 10;
-  return half(1, 2, a);
-
+int main() {
+  f();
+  return half(10);
 }

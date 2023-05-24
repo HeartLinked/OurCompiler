@@ -1,8 +1,23 @@
-global @var = alloc i32, zeroinit
+fun @half(%x_0_1N2: i32): i32 {
+%entry_0:
+   @x_0_1N2 = alloc i32
+   store %x_0_1N2, @x_0_1N2
+
+   %0 = load @x_0_1N2
+   %1 = div %0, 2
+   ret %1
+}
+
+fun @f(): {
+%entry_1:
+   ret
+}
 
 fun @main(): i32 {
-%entry:
-  %0 = load @var
-  %1 = add %0, 1
-  ret %1
+%entry_2:
+
+   %2 = call @f()
+
+   %3 = call @half(10)
+   ret %3
 }
