@@ -41,20 +41,20 @@ functionTable functiontable = functionTable(false, s1);
 int main(int argc, const char *argv[]) {
     // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
     // compiler 模式 输入文件 -o 输出文件
-    /* assert(argc == 5);
-     auto mode = argv[1];
-     auto input = argv[2];
-     auto output = argv[4];
+    assert(argc == 5);
+    auto mode = argv[1];//mode=-ir -riscv
+    auto input = argv[2];//.c
+    auto output = argv[4];//out file
 
      // 打开输入文件, 并且指定 lexer 在解析的时候读取这个文件
-     yyin = fopen(input, "r");
-     assert(yyin); */
+    yyin = fopen(input, "r");
+    assert(yyin);
 
     std::cout.setf(std::ios::unitbuf);
     std::cerr.setf(std::ios::unitbuf);
 
-    freopen("test.out", "w", stdout);
-    yyin = fopen("hello.c", "r");
+    freopen(output, "w", stdout);
+    // yyin = fopen("hello.c", "r");
 
     cout << "Start parsing..." << endl;
     unique_ptr<BaseAST> ast;
@@ -63,23 +63,38 @@ int main(int argc, const char *argv[]) {
     cout << "Parse success!" << endl;
     ast->Dump();
     cout << endl << endl;
+    
+    cout<<"decl @getint(): i32"<<endl
+        <<"decl @getch(): i32"<<endl
+        <<"decl @getarray(*i32): i32"<<endl
+        <<"decl @putint(i32)"<<endl
+        <<"decl @putch(i32)"<<endl
+        <<"decl @putarray(i32, *i32)"<<endl
+        <<"decl @starttime()"<<endl
+        <<"decl @stoptime()"<<endl;
 
     ParseAST(ast);
     cout << endl;
 
     // symbolTable.output();
 
-    std::time_t currentTime = std::time(nullptr);
-    // 将时间格式化为字符串
-    char buffer[80];
-    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S",
-                  std::localtime(&currentTime));
-    // 输出格式化后的时间字符串
-    std::cout << "当前时间：" << buffer << std::endl;
+    if(strcmp(mode,"-ir")==0){
+        std::time_t currentTime = std::time(nullptr);
+        // 将时间格式化为字符串
+        char buffer[80];
+        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S",
+                    std::localtime(&currentTime));
+        // 输出格式化后的时间字符串
+        std::cout << "当前时间：" << buffer << std::endl;
+        fclose(stdout);
+        return 0;
+    }
     fclose(stdout);
     char buf[1024] = {0};
-    TransferIR(buf, "testForIR.out");
-    freopen("IRtest.out", "w", stdout);
+    // TransferIR(buf, "testForIR.out");
+    // freopen("IRtest.out", "w", stdout);
+    TransferIR(buf, output);
+    freopen(output, "w", stdout);
     IRGenerate(buf);
     return 0;
 }

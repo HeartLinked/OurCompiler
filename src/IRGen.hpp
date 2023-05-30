@@ -33,3 +33,4 @@ void Visit(const koopa_raw_branch_t &branch);
 void Visit(const koopa_raw_call_t &call);
 void initGlobalArray(koopa_raw_value_t init);
 void VisitGlobalVar(koopa_raw_value_t value);
+void DeclImport();

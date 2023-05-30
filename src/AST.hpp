@@ -498,7 +498,8 @@ class BlockAST : public BaseAST {
             //  t = string("block") + gen2();
             // cout << "---------enter " << t << "----------" << endl;
         } else {
-            cout << "%entry_" << entrygen() << ":" << endl;
+            cout << "%entry" << ":" << endl;
+            // cout << "%entry_" << entrygen() << ":" << endl;
             // cout << "---------enter entry----------" << endl;
         }
 
