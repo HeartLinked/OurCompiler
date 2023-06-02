@@ -37,6 +37,8 @@ unordered_map<string, string> m1 = {};
 unordered_map<string, string> m2 = {};
 mapTable maptable = mapTable(false, m1, m2);
 functionTable functiontable = functionTable(false, s1);
+unordered_map<string, bool> is_func_void = {};
+string func_now = "";
 
 int main(int argc, const char *argv[]) {
     // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:

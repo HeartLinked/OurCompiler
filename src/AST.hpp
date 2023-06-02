@@ -26,6 +26,8 @@ extern stack<string> whileLevelsStack;
 extern paramentsTable paraments;
 extern mapTable maptable;
 extern functionTable functiontable;
+extern unordered_map<string, bool> is_func_void;
+extern string func_now;
 
 // CompUnit := FuncDef
 // CompUnit := CompUnit2
@@ -109,6 +111,7 @@ class FuncDefAST : public BaseAST {
     void Dump() const override {
         cerr << "Dump FuncDefAST" << endl;
         std::cout << "FuncDefAST { ";
+        func_now = func_name;
         func_type->Dump();
         std::cout << ", " << func_name << ", ";
         if (mode == 1) {
@@ -119,6 +122,7 @@ class FuncDefAST : public BaseAST {
             std::cout << ") ";
         }
         func_block->Dump();
+
         std::cout << " }";
     }
 
@@ -192,7 +196,7 @@ class FuncFParamAST : public BaseAST {
         paraments.paraments2.push_back(param_name);
         string p1 = genLabel(param_name);
         maptable.insert(param_name, p1);
-        param_name = p1; 
+        param_name = p1;
         paraments.paraments.push_back(param_name);
         if (hasDuplicateElements(paraments.paraments2)) {
             throw runtime_error("Duplicate parameter name");
@@ -454,6 +458,10 @@ class FuncTypeAST : public BaseAST {
         cerr << "Dump FuncTypeAST" << endl;
         std::cout << "FuncTypeAST { ";
         std::cout << type;
+        if (type == "void")
+            is_func_void[func_name] = true;
+        else
+            is_func_void[func_name] = false;
         std::cout << " }";
     }
 
@@ -498,7 +506,8 @@ class BlockAST : public BaseAST {
             //  t = string("block") + gen2();
             // cout << "---------enter " << t << "----------" << endl;
         } else {
-            cout << "%entry" << ":" << endl;
+            cout << "%entry"
+                 << ":" << endl;
             // cout << "%entry_" << entrygen() << ":" << endl;
             // cout << "---------enter entry----------" << endl;
         }
@@ -777,7 +786,7 @@ class LValAST : public BaseAST {
     Data Traverse() const override {
         cerr << "Traverse Lval" << endl;
         int y = gen();
-        if(maptable.valid) {
+        if (maptable.valid) {
             name = maptable.get(name);
         }
         cout << "   %" << y << " = load @" << name << endl;
@@ -835,11 +844,12 @@ class PrimaryExpAST : public BaseAST {
 
 // UnaryExp := PrimaryExp
 // UnaryExp := UnaryOp UnaryExp
-// UnaryExp := IDENT '(' FuncRParams ')' 
+// UnaryExp := IDENT '(' FuncRParams ')'
 // UnaryExp := IDENT '(' ')'
 class UnaryExpAST : public BaseAST {
   public:
-    int mode; // 1为primary_exp, 2为unary_op & unary_exp, 3为函数调用, 4为函数调用无参数
+    int mode; // 1为primary_exp, 2为unary_op & unary_exp, 3为函数调用,
+              // 4为函数调用无参数
 
     std::unique_ptr<BaseAST> primary_exp;
 
@@ -854,10 +864,10 @@ class UnaryExpAST : public BaseAST {
         std::cout << "UnaryExp { ";
         if (mode == 1) {
             primary_exp->Dump();
-        } else if(mode == 2){
+        } else if (mode == 2) {
             std::cout << unary_op << " ";
             unary_exp->Dump();
-        } else if(mode == 3){
+        } else if (mode == 3) {
             std::cout << func_name << " ";
             func_rparams->Dump();
         } else {
@@ -871,7 +881,7 @@ class UnaryExpAST : public BaseAST {
         if (mode == 1) {
             Data x = primary_exp->Traverse();
             return x;
-        } else if(mode == 2){
+        } else if (mode == 2) {
             Data x = unary_exp->Traverse();
             if (x.mode == 1) {
                 if (unary_op == "!") {
@@ -890,11 +900,11 @@ class UnaryExpAST : public BaseAST {
                     y = gen();
                     cout << "   %" << y << " = sub 0, %" << x.symbol << endl;
                     x.value = -x.value;
-                } else {                                                                         
+                } else {
                     return x;
                 }
                 return Data(2, x.value, "", to_string(y));
-            } else if(x.mode == 3) {
+            } else if (x.mode == 3) {
                 int y = gen();
                 if (unary_op == "!") {
                     cout << "   %" << y << " = eq 0, %" << x.symbol << endl;
@@ -902,7 +912,7 @@ class UnaryExpAST : public BaseAST {
                 } else if (unary_op == "-") {
                     cout << "   %" << y << " = sub 0, %" << x.symbol << endl;
                     x.value = -x.value;
-                } else {                                                                         
+                } else {
                     return x;
                 }
                 return Data(2, x.value, "", to_string(y));
@@ -910,27 +920,34 @@ class UnaryExpAST : public BaseAST {
                 return x;
             }
         } else if (mode == 3) {
-                int y = gen();
-                functiontable.valid = true;
-                func_rparams->Traverse();
-                cout << "   %" << y << " = call @" << func_name << "(" ;
-                for(int i = 0; i < functiontable.paraments.size(); i++){
-                    if(i != 0) cout << ", ";
-                    cout << functiontable.paraments[i];
-                }
-                cout << ")" << endl;
-                functiontable.paraments.clear();
-                functiontable.valid = false;
-                return Data(3, y, "", to_string(y));   
-        } else if(mode == 4){
-                int y = gen();
-                cout << "   %" << y << " = call @" << func_name << "()" << endl;
-                return Data(3, y, "", to_string(y));   
+            int y = gen();
+            functiontable.valid = true;
+            func_rparams->Traverse();
+
+            if (is_func_void[func_name] == true) {
+                cout << " = call @" << func_name << "(";
+            } else {
+                cout << "   %" << y << " = call @" << func_name << "(";
+            }
+
+            for (int i = 0; i < functiontable.paraments.size(); i++) {
+                if (i != 0)
+                    cout << ", ";
+                cout << functiontable.paraments[i];
+            }
+            cout << ")" << endl;
+            functiontable.paraments.clear();
+            functiontable.valid = false;
+            return Data(3, y, "", to_string(y));
+        } else if (mode == 4) {
+            int y = gen();
+            cout << "   %" << y << " = call @" << func_name << "()" << endl;
+            return Data(3, y, "", to_string(y));
         }
     }
 };
 
-// FuncRParams := Exp 
+// FuncRParams := Exp
 // FuncRParams := Exp ',' FuncRParams
 class FuncRParamsAST : public BaseAST {
   public:
@@ -941,36 +958,36 @@ class FuncRParamsAST : public BaseAST {
     void Dump() const override {
         cerr << "Dump FuncRParams" << endl;
         std::cout << "FuncRParams { ";
-        exp -> Dump();
+        exp->Dump();
         cout << ", ";
-        if(mode == 2) func_rparams -> Dump();
+        if (mode == 2)
+            func_rparams->Dump();
         std::cout << " }";
     }
 
     Data Traverse() const override {
         cerr << "Traverse FuncRParams" << endl;
         Data x = exp->Traverse();
-        if(mode == 1) {
-          if(x.mode == 1) {
-            functiontable.paraments.push_back(to_string(x.value));
-          } else if(x.mode == 2) {
-            functiontable.paraments.push_back("%" + x.symbol);
-          } else if(x.mode == 3) {
-            functiontable.paraments.push_back("%" + x.symbol);
-          }
-        } else if(mode == 2) {
-          if(x.mode == 1) {
-            functiontable.paraments.push_back(to_string(x.value));
-          } else if(x.mode == 2) {
-            functiontable.paraments.push_back("%" + x.symbol);
-          } else if(x.mode == 3) {
-            functiontable.paraments.push_back("%" + x.symbol);
-          }
-          func_rparams->Traverse();
+        if (mode == 1) {
+            if (x.mode == 1) {
+                functiontable.paraments.push_back(to_string(x.value));
+            } else if (x.mode == 2) {
+                functiontable.paraments.push_back("%" + x.symbol);
+            } else if (x.mode == 3) {
+                functiontable.paraments.push_back("%" + x.symbol);
+            }
+        } else if (mode == 2) {
+            if (x.mode == 1) {
+                functiontable.paraments.push_back(to_string(x.value));
+            } else if (x.mode == 2) {
+                functiontable.paraments.push_back("%" + x.symbol);
+            } else if (x.mode == 3) {
+                functiontable.paraments.push_back("%" + x.symbol);
+            }
+            func_rparams->Traverse();
         }
         return Data(0, 0, "", "");
     }
-
 };
 
 // MulExp := UnaryExp
