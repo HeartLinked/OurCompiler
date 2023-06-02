@@ -459,9 +459,9 @@ class FuncTypeAST : public BaseAST {
         std::cout << "FuncTypeAST { ";
         std::cout << type;
         if (type == "void")
-            is_func_void[func_name] = true;
+            is_func_void[func_now] = true;
         else
-            is_func_void[func_name] = false;
+            is_func_void[func_now] = false;
         std::cout << " }";
     }
 
@@ -925,7 +925,7 @@ class UnaryExpAST : public BaseAST {
             func_rparams->Traverse();
 
             if (is_func_void[func_name] == true) {
-                cout << " = call @" << func_name << "(";
+                cout << "  call @" << func_name << "(";
             } else {
                 cout << "   %" << y << " = call @" << func_name << "(";
             }
@@ -941,7 +941,12 @@ class UnaryExpAST : public BaseAST {
             return Data(3, y, "", to_string(y));
         } else if (mode == 4) {
             int y = gen();
-            cout << "   %" << y << " = call @" << func_name << "()" << endl;
+            if(is_func_void[func_name] == true){
+                cout<<"call @"<< func_name<<"()";
+            }else{
+                cout<<"%"<<y<<"= call @"<<func_name<<"()"<<endl;
+            }
+            // cout << "   %" << y << " = call @" << func_name << "()" << endl;
             return Data(3, y, "", to_string(y));
         }
     }
