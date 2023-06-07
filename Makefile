@@ -87,7 +87,7 @@ $(BUILD_DIR)/%.lex$(FB_EXT): $(SRC_DIR)/%.l
 # Bison
 $(BUILD_DIR)/%.tab$(FB_EXT): $(SRC_DIR)/%.y
 	mkdir -p $(dir $@)
-	$(BISON) $(BFLAGS) -o $@ $<
+	$(BISON) $(BFLAGS) -v -o $@ $<
 
 
 .PHONY: clean

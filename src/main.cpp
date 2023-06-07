@@ -78,23 +78,16 @@ int main(int argc, const char *argv[]) {
     ParseAST(ast);
     cout << endl;
 
-    // symbolTable.output();
-
     if(strcmp(mode,"-ir")==0){
-        std::time_t currentTime = std::time(nullptr);
-        // 将时间格式化为字符串
-        char buffer[80];
-        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S",
-                    std::localtime(&currentTime));
-        // 输出格式化后的时间字符串
-        std::cout << "当前时间：" << buffer << std::endl;
         fclose(stdout);
+        replaceInFile(output);
         return 0;
     }
+
     fclose(stdout);
+    replaceInFile(output);
     char buf[1024] = {0};
-    // TransferIR(buf, "testForIR.out");
-    // freopen("IRtest.out", "w", stdout);
+
     TransferIR(buf, output);
     freopen(output, "w", stdout);
     IRGenerate(buf);

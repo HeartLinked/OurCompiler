@@ -28,6 +28,7 @@ using namespace std;
 %union {
   std::string *str_val;
   int int_val;
+  char char_val;
   BaseAST *ast_val;   // AST
   FuncFParamsAST *func_fparams_val; // FuncFParams
   vector<std::unique_ptr<BaseAST>> *ast_list_val; // AST list
