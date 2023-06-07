@@ -85,7 +85,8 @@ int main(int argc, const char *argv[]) {
     }
 
     fclose(stdout);
-    replaceInFile(output);
+    output="out.txt";
+    // replaceInFile(output);
     char buf[1024] = {0};
 
     TransferIR(buf, output);

@@ -178,11 +178,7 @@ void TransferIR(char * buf , const char* file_name)
         getline(in,line);
         getline(in,line);
         getline(in,line);
-        // while(getline(in,line)){
-        //     if(strcmp(line.substr(0,6).c_str(),flag.substr(0,6).c_str())==0){
-        //         flag=line;
-        //     }
-        // }
+        
         while (getline (in, line)) // line中不包括每行的换行符
         {
             strcpy(buf+strlen(buf),line.c_str());

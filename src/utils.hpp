@@ -124,6 +124,10 @@ public:
     void zeroInitInt(){
         this->append("  .zero 4\n");
     }
+
+    void br(const std::string &v, const std::string &then_s, const std::string &else_s){
+        this->append("  br " + v + ", " + then_s + ", " + else_s + '\n');
+    }
     
     //output
     const char* c_str()
