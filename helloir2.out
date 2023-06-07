@@ -1,0 +1,160 @@
+Start parsing...
+Parse success!
+CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, (), BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a1, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  5  } } } } } } } } } } } } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a2, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  3  } } } } } } } } } } } } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { a3, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  8  } } } } } } } } } } } } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { n, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  3  } } } } } } } } } } } } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { swapped, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } }, BlockItemAST { StmtAST { while (Exp { LOrExp { LAndExp { EqExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { swapped } } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { Lval { swapped }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  0  } } } } } } } } } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { i, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } }, BlockItemAST { StmtAST { while (Exp { LOrExp { LAndExp { EqExp { RelExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { i } } } } } } < AddExp { MulExp { UnaryExp { PrimaryExp { Lval { n } } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { if (Exp { LOrExp { LAndExp { EqExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { i } } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { if (Exp { LOrExp { LAndExp { EqExp { RelExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a1 } } } } } } > AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a2 } } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { temp1, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a1 } } } } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a1 }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a2 } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a2 }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { temp1 } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { swapped }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } } } } } else StmtAST { if (Exp { LOrExp { LAndExp { EqExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { i } } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { if (Exp { LOrExp { LAndExp { EqExp { RelExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a2 } } } } } } > AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a3 } } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { temp2, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a2 } } } } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a2 }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a3 } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { a3 }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { temp2 } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { swapped }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { i }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { i } } } } } + MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } } }, BlockItemAST { StmtAST { Lval { n }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { n } } } } } - MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putint FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a1 } } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putch FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  32  } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putint FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a2 } } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putch FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  32  } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putint FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { a3 } } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putch FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  32  } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  0  } } } } } } } } } } } } } }
+
+decl @getint(): i32
+decl @getch(): i32
+decl @getarray(*i32): i32
+decl @putint(i32)
+decl @putch(i32)
+decl @putarray(i32, *i32)
+decl @starttime()
+decl @stoptime()
+fun @main(): i32 {
+%entry11:
+
+   @a1 = alloc i32
+   store 5, @a1
+
+   @a2 = alloc i32
+   store 3, @a2
+
+   @a3 = alloc i32
+   store 8, @a3
+
+   @n = alloc i32
+   store 3, @n
+
+   @swapped = alloc i32
+   store 1, @swapped
+
+   jump %while_entry_A
+
+%while_entry_A:
+   %0 = load @swapped
+   %1 = eq %0, 1
+   br %1, %while_body_A, %end_while_A
+
+%while_body_A:
+
+   %2 = load @swapped
+   store 0, @swapped
+
+   @i = alloc i32
+   store 1, @i
+
+   jump %while_entry_B
+
+%while_entry_B:
+   %3 = load @i
+   %4 = load @n
+   %5 = lt %3, %4
+   br %5, %while_body_B, %end_while_B
+
+%while_body_B:
+
+   %6 = load @i
+   %7 = eq %6, 1
+   br %7, %if_B, %else_B
+
+%if_B:
+
+   %8 = load @a1
+   %9 = load @a2
+   %10 = gt %8, %9
+   br %10, %if_A, %end_if_else_A
+
+%if_A:
+
+   %11 = load @a1
+   @temp1 = alloc i32
+   store %11, @temp1
+
+   %12 = load @a1
+   %13 = load @a2
+   store %13, @a1
+
+   %14 = load @a2
+   %15 = load @temp1
+   store %15, @a2
+
+   %16 = load @swapped
+   store 1, @swapped
+   jump %end_if_else_A
+
+%end_if_else_A:
+   jump %end_if_else_B
+
+%else_B:
+   %17 = load @i
+   %18 = eq %17, 2
+   br %18, %if_D, %end_if_else_D
+
+%if_D:
+
+   %19 = load @a2
+   %20 = load @a3
+   %21 = gt %19, %20
+   br %21, %if_C, %end_if_else_C
+
+%if_C:
+
+   %22 = load @a2
+   @temp2 = alloc i32
+   store %22, @temp2
+
+   %23 = load @a2
+   %24 = load @a3
+   store %24, @a2
+
+   %25 = load @a3
+   %26 = load @temp2
+   store %26, @a3
+
+   %27 = load @swapped
+   store 1, @swapped
+   jump %end_if_else_C
+
+%end_if_else_C:
+   jump %end_if_else_D
+
+%end_if_else_D:
+   jump %end_if_else_B
+
+%end_if_else_B:
+
+   %28 = load @i
+   %29 = load @i
+   %30 = add %29, 1
+   store %30, @i
+   jump %while_entry_B
+
+%end_while_B:
+
+   %31 = load @n
+   %32 = load @n
+   %33 = sub %32, 1
+   store %33, @n
+   jump %while_entry_A
+
+%end_while_A:
+
+   %35 = load @a1
+   call @putint(%35)
+
+   call @putch(32)
+
+   %38 = load @a2
+   call @putint(%38)
+
+   call @putch(32)
+
+   %41 = load @a3
+   call @putint(%41)
+
+   call @putch(32)
+
+   ret 0
+}
+
+
