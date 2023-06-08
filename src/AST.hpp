@@ -416,9 +416,7 @@ class VarDefAST : public BaseAST {
             cout << "   @" << var_name << " = alloc i32" << endl;
             if (d.mode == 1) {
                 cout << "   store " << d.value << ", @" << var_name << endl;
-            } else if (d.mode == 2) {
-                cout << "   store @" << d.name << ", @" << var_name << endl;
-            } else if (d.mode == 3) {
+            } else if (d.mode == 2 || d.mode == 3) {
                 cout << "   store %" << d.symbol << ", @" << var_name << endl;
             } else {
                 throw runtime_error("Error: Init variable error");
@@ -668,11 +666,10 @@ class StmtAST : public BaseAST {
             Data y = exp->Traverse();
             BlockSymbolTable *blockSymbolTable = symbolTableStack.top();
             blockSymbolTable->changeValue(x.name, to_string(y.value));
+            // cout << endl << "DDD" << y.mode << endl;
             if (y.mode == 1) {
                 cout << "   store " << y.value << ", @" << x.name << endl;
-            } else if (y.mode == 2) {
-                cout << "   store @" << y.name << ", @" << x.name << endl;
-            } else if (y.mode == 3) {
+            } else if (y.mode == 2 || y.mode == 3){
                 cout << "   store %" << y.symbol << ", @" << x.name << endl;
             } else {
                 throw runtime_error("Error: Set vriable to a illegal variable");
@@ -736,7 +733,6 @@ class StmtAST : public BaseAST {
             }
             cout << "   jump %end_while_" << whileLevelsStack.top() << endl;
             cout << endl << "%Unreachable_" << breakGen5() << ":" << endl;
-             
         } else if (mode == 10) {
             if (whileLevelsStack.empty()) {
                 throw runtime_error(
@@ -744,7 +740,6 @@ class StmtAST : public BaseAST {
             }
             cout << "   jump %while_entry_" << whileLevelsStack.top() << endl;
             cout << endl << "%Unreachable_" << breakGen5() << ":" << endl;
-             
         }
         return Data(0, 0, "", "");
     }

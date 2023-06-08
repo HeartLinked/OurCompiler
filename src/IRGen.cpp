@@ -176,8 +176,6 @@ void TransferIR(char * buf , const char* file_name)
     if(in) // 有该文件
     {
         getline(in,line);
-        getline(in,line);
-        getline(in,line);
         
         while (getline (in, line)) // line中不包括每行的换行符
         {
@@ -344,7 +342,7 @@ void Visit(const koopa_raw_value_t &value)
             break;
         case KOOPA_RVT_ALLOC:
             //本地内存分配指令，什么也不用做
-            cerr << "not define alloc now" << endl;
+            // cerr << "not define alloc now" << endl;
             break;
         case KOOPA_RVT_LOAD:
             //加载指令
@@ -354,7 +352,6 @@ void Visit(const koopa_raw_value_t &value)
             break;
         case KOOPA_RVT_STORE:
             //存储指令
-            cerr << "not define store now" << endl;
             Visit(kind.data.store);
             break;
         case KOOPA_RVT_GET_ELEM_PTR:
@@ -363,7 +360,6 @@ void Visit(const koopa_raw_value_t &value)
             break;
         case KOOPA_RVT_CALL:
           //函数调用指令
-          cerr << "not define call now" << endl;
           Visit(kind.data.call);
           if(kind.data.call.callee->ty->data.function.ret->tag == KOOPA_RTT_INT32){
               rg.store("a0", "sp", la.getOffset(value));
@@ -371,7 +367,6 @@ void Visit(const koopa_raw_value_t &value)
           break;
         case KOOPA_RVT_BRANCH:
           //分支指令
-          cerr << "not define branch now" << endl;
           Visit(kind.data.branch);
           break;
         case KOOPA_RVT_JUMP:

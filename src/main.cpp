@@ -58,11 +58,11 @@ int main(int argc, const char *argv[]) {
     freopen(output, "w", stdout);
     // yyin = fopen("hello.c", "r");
 
-    cout << "Start parsing..." << endl;
+    // cout << "Start parsing..." << endl;
     unique_ptr<BaseAST> ast;
     auto ret = yyparse(ast);
     assert(!ret);
-    cout << "Parse success!" << endl;
+    // cout << "Parse success!" << endl;
     ast->Dump();
     cout << endl << endl;
     
@@ -85,11 +85,11 @@ int main(int argc, const char *argv[]) {
     }
 
     fclose(stdout);
-    output="out.txt";
-    // replaceInFile(output);
-    char buf[1024] = {0};
+    replaceInFile(output);
+    char buf[10000] = {0};
 
     TransferIR(buf, output);
+    // cerr <<buf<<endl;
     freopen(output, "w", stdout);
     IRGenerate(buf);
     return 0;
