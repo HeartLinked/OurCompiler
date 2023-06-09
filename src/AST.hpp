@@ -11,6 +11,7 @@
 using namespace std;
 
 extern int cnt;
+extern bool flag;
 
 int gen();
 char gen2();
@@ -140,6 +141,8 @@ class FuncDefAST : public BaseAST {
         func_block->Traverse();
         if (type.mode == -1)
             cout << "   ret" << endl;
+
+        if(flag == true) cout << endl << "ret 0 " << endl;
         cout << "}" << endl << endl;
         return Data(0, 0, "", "");
     }
@@ -654,8 +657,10 @@ class StmtAST : public BaseAST {
         if (mode == 1) { // return
             Data x = exp->Traverse();
             if (x.mode == 1) {
+                flag = false;
                 cout << "   ret " << x.value << endl;
             } else if (x.mode == 2 || x.mode == 3) {
+                flag = false;
                 cout << "   ret %" << x.symbol << endl;
             }
         } else if (mode == 2) { // LVal "=" Exp
@@ -683,46 +688,59 @@ class StmtAST : public BaseAST {
         } else if (mode == 6) {
             Data x = exp->Traverse();
             if (x.mode == 1) {
+                flag = false;
                 cout << "   br " << x.value << ", %if_" << if_label
                      << ", %end_if_else_" << if_label << endl;
             } else if (x.mode == 2 || x.mode == 3) {
+                flag = false;
                 cout << "   br %" << x.symbol << ", %if_" << if_label
                      << ", %end_if_else_" << if_label << endl;
             }
             cout << endl << "%if_" << if_label << ":" << endl;
             if_stmt->Traverse();
+            flag = false;
             cout << "   jump %end_if_else_" << if_label << endl;
             cout << endl << "%end_if_else_" << if_label << ":" << endl;
+            flag = true;
         } else if (mode == 7) {
             Data x = exp->Traverse();
             if (x.mode == 1) {
+                flag = false;
                 cout << "   br " << x.value << ", %if_" << if_label
                      << ", %else_" << if_label << endl;
             } else if (x.mode == 2 || x.mode == 3) {
+                flag = false;
                 cout << "   br %" << x.symbol << ", %if_" << if_label
                      << ", %else_" << if_label << endl;
             }
             cout << endl << "%if_" << if_label << ":" << endl;
             if_stmt->Traverse();
+            flag = false;
             cout << "   jump %end_if_else_" << if_label << endl;
             cout << endl << "%else_" << if_label << ":" << endl;
             else_stmt->Traverse();
+            flag = false;
             cout << "   jump %end_if_else_" << if_label << endl;
             cout << endl << "%end_if_else_" << if_label << ":" << endl;
+            flag = true;
         } else if (mode == 8) {
             whileLevelsStack.push(while_label);
+            flag = false;
             cout << "   jump %while_entry_" << while_label << endl;
             cout << endl << "%while_entry_" << while_label << ":" << endl;
             Data x = exp->Traverse();
             if (x.mode == 1) {
+                flag = false;
                 cout << "   br " << x.value << ", %while_body_" << while_label
                      << ", %end_while_" << while_label << endl;
             } else if (x.mode == 2 || x.mode == 3) {
+                flag = false;
                 cout << "   br %" << x.symbol << ", %while_body_" << while_label
                      << ", %end_while_" << while_label << endl;
             }
             cout << endl << "%while_body_" << while_label << ":" << endl;
             while_stmt->Traverse();
+            flag = false;
             cout << "   jump %while_entry_" << while_label << endl;
             cout << endl << "%end_while_" << while_label << ":" << endl;
             whileLevelsStack.pop();
@@ -731,6 +749,7 @@ class StmtAST : public BaseAST {
                 throw runtime_error(
                     "Error: break statement is not in a while loop");
             }
+            flag = false;
             cout << "   jump %end_while_" << whileLevelsStack.top() << endl;
             cout << endl << "%Unreachable_" << breakGen5() << ":" << endl;
         } else if (mode == 10) {
@@ -738,6 +757,7 @@ class StmtAST : public BaseAST {
                 throw runtime_error(
                     "Error: continue statement is not in a while loop");
             }
+            flag = false;
             cout << "   jump %while_entry_" << whileLevelsStack.top() << endl;
             cout << endl << "%Unreachable_" << breakGen5() << ":" << endl;
         }

@@ -1,0 +1,66 @@
+
+decl @getint(): i32
+decl @getch(): i32
+decl @getarray(*i32): i32
+decl @putint(i32)
+decl @putch(i32)
+decl @putarray(i32, *i32)
+decl @starttime()
+decl @stoptime()
+
+fun @fib(@m_0: i32): i32 {
+%entry:
+  @m_1 = alloc i32
+  store @m_0, @m_1
+  @SCRES_0 = alloc i32
+  store 1, @SCRES_0
+  %0 = load @m_1
+  %1 = eq %0, 1
+  br %1, %end_sc_0, %then_sc_0
+%then_sc_0:
+  %2 = load @m_1
+  %3 = eq %2, 2
+  %4 = ne %3, 0
+  store %4, @SCRES_0
+  jump %end_sc_0
+%end_sc_0:
+  %5 = load @SCRES_0
+  br %5, %then_0, %else_0
+%then_0:
+  ret 1
+%else_0:
+  %6 = load @m_1
+  %7 = eq %6, 0
+  br %7, %then_1, %else_1
+%then_1:
+  ret 0
+%else_1:
+  %9 = load @m_1
+  %10 = sub %9, 1
+  %8 = call @fib(%10)
+  %12 = load @m_1
+  %13 = sub %12, 2
+  %11 = call @fib(%13)
+  %14 = add %8, %11
+  ret %14
+%end_1:
+  jump %end_0
+%end_0:
+  ret 0
+}
+
+fun @main(): i32 {
+%entry:
+  @n_0 = alloc i32
+  %0 = call @getint()
+  store %0, @n_0
+  @res_0 = alloc i32
+  %2 = load @n_0
+  %1 = call @fib(%2)
+  store %1, @res_0
+  %3 = load @res_0
+  call @putint(%3)
+  call @putch(10)
+  ret 0
+}
+

@@ -1,0 +1,83 @@
+CompUnitAST { CompUnitAST { FuncDefAST { FuncTypeAST { int }, fib, (FuncFParamsAST { FuncFParamAST { BTypeAST { int }, m },  }) BlockAST { BlockItemAST { StmtAST { if (Exp { LOrExp { LOrExp { LAndExp { EqExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { m } } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } || LAndExp { EqExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { m } } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } } } } } } else StmtAST { if (Exp { LOrExp { LAndExp { EqExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { m } } } } } } } == RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  0  } } } } } } } } }) StmtAST { BlockAST { BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  0  } } } } } } } } } } } } } else StmtAST { BlockAST { BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { fib FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { m } } } } } - MulExp { UnaryExp { PrimaryExp {  1  } } } } } } } } },  } } } } + MulExp { UnaryExp { fib FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { m } } } } } - MulExp { UnaryExp { PrimaryExp {  2  } } } } } } } } },  } } } } } } } } } } } } } } } } } }FuncDefAST { FuncTypeAST { int }, main, (), BlockAST { BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { n,  } } } }, BlockItemAST { StmtAST { Lval { n }Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { getint  } } } } } } } } } }, BlockItemAST { DeclAST { VarDeclAST { BTypeAST { int }, VarDefAST { res, InitValAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { fib FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { n } } } } } } } } } },  } } } } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putint FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp { Lval { res } } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { putch FuncRParams { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  10  } } } } } } } } },  } } } } } } } } } } }, BlockItemAST { StmtAST { Exp { LOrExp { LAndExp { EqExp { RelExp { AddExp { MulExp { UnaryExp { PrimaryExp {  0  } } } } } } } } } } } } } } }
+
+decl @getint(): i32
+decl @getch(): i32
+decl @getarray(*i32): i32
+decl @putint(i32)
+decl @putch(i32)
+decl @putarray(i32, *i32)
+decl @starttime()
+decl @stoptime()
+fun @fib(%m_0_Rjt: i32): i32 {
+%entry:
+   @m_0_Rjt = alloc i32
+   store %m_0_Rjt, @m_0_Rjt
+
+   %0 = load @m_0_Rjt
+   %1 = eq %0, 1
+   %2 = load @m_0_Rjt
+   %3 = eq %2, 2
+   %4 = ne %1, 0
+   %5 = ne %3, 0
+   %6 = or %4, %5
+   br %6, %if_A, %else_A
+
+%if_A:
+
+   ret 1
+   jump %end_if_else_A
+
+%else_A:
+   %7 = load @m
+   %8 = eq %7, 0
+   br %8, %if_B, %else_B
+
+%if_B:
+
+   ret 0
+   jump %end_if_else_B
+
+%else_B:
+
+   %10 = load @m
+   %11 = sub %10, 1
+   %9 = call @fib(%11)
+   %13 = load @m
+   %14 = sub %13, 2
+   %12 = call @fib(%14)
+   %15 = add %9, %12
+   ret %15
+   jump %end_if_else_B
+
+%end_if_else_B:
+   jump %end_if_else_A
+
+%end_if_else_A:
+
+ret 0 
+}
+
+fun @main(): i32 {
+%entry:
+
+   @n = alloc i32
+   store 0, @n
+
+   %16 = load @n
+%17= call @getint()
+   store %17, @n
+
+   %19 = load @n
+   %18 = call @fib(%19)
+   @res = alloc i32
+   store %18, @res
+
+   %21 = load @res
+   call @putint(%21)
+
+   call @putch(10)
+
+   ret 0
+}
+
+

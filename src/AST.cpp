@@ -9,6 +9,8 @@
 
 int cnt = 0, cnt2 = 'A', cnt3 = 'A', cnt4 = 'A', cnt5 = 'a', cnt6 = '0', cnt7 = '0';
 
+bool flag = false;
+
 int gen() { return cnt++; }
 
 char gen2() {return cnt2++;}
