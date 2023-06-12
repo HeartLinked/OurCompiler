@@ -1,4 +1,5 @@
-# 编译原理课程实践 of Zhejiang University
+# 编译原理课程实践 
+Course experiments in Compiler Principles of Zhejiang University
 
 ### 技术栈
 
